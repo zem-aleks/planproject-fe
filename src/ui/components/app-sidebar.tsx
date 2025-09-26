@@ -3,7 +3,6 @@ import { Link } from 'react-router';
 import { NavItem, NavMain } from '@/ui/components/nav-main';
 import { NavSecondary } from '@/ui/components/nav-secondary';
 import { NavUser } from '@/ui/components/nav-user';
-import { CircusLogo } from '@/ui/custom/CircusLogo.tsx';
 import {
   Sidebar,
   SidebarContent,
@@ -120,9 +119,10 @@ export function AppSidebar({ navMain }: Props) {
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <Link to={'/assistants'}>
-                <CircusLogo />
-                <span className="text-base font-semibold">CIRCUS GROUP</span>
+              <Link to={'/projects'}>
+                <span className="text-base font-semibold">
+                  Project Leverage
+                </span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

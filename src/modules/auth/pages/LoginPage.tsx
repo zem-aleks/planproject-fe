@@ -1,5 +1,4 @@
 import { LoginForm } from '@/modules/auth/components/LoginForm';
-import { CircusLogo } from '@/ui/custom/CircusLogo.tsx';
 
 export const LoginPage = () => {
   return (
@@ -12,8 +11,7 @@ export const LoginPage = () => {
               'flex flex-row items-center justify-start gap-2 text-lg font-semibold'
             }
           >
-            <CircusLogo className={'flex h-5 w-5 items-center'} />
-            <span className="text-base font-semibold">CIRCUS GROUP</span>
+            <span className="text-base font-semibold">Project Leverage</span>
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
@@ -24,7 +22,7 @@ export const LoginPage = () => {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <div className="absolute inset-20 flex items-center justify-center">
-          <CircusLogo />
+          Logo
         </div>
       </div>
     </div>
