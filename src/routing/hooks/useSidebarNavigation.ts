@@ -1,8 +1,7 @@
-import { useContext } from 'react';
 import { useLocation } from 'react-router';
 
-import { SelectedProjectContext } from '@/modules/projects/contexts/SelectedProjectContext.tsx';
-import { Icon, IconDashboard, IconUsers } from '@tabler/icons-react';
+import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
+import { Icon, IconHome, IconPackages } from '@tabler/icons-react';
 
 export type NavItem = {
   title: string;
@@ -13,14 +12,14 @@ export type NavItem = {
 
 export const useSidebarNavigation = (): NavItem[] => {
   const { pathname } = useLocation();
-  const { project } = useContext(SelectedProjectContext);
+  const project = useProjectByUrlParam();
 
   if (!project) {
     return [
       {
         title: 'Projects',
         url: '/projects',
-        icon: IconUsers,
+        icon: IconPackages,
         isActive: true,
       },
     ];
@@ -30,13 +29,13 @@ export const useSidebarNavigation = (): NavItem[] => {
     {
       title: 'Projects',
       url: '/projects',
-      icon: IconUsers,
+      icon: IconPackages,
       isActive: false,
     },
     {
-      title: 'Dashboard',
-      url: '/dashboard',
-      icon: IconDashboard,
+      title: 'Home',
+      url: `/project/${project.id}`,
+      icon: IconHome,
       isActive: false,
     },
   ].map((item) => ({ ...item, isActive: item.url.startsWith(pathname) }));

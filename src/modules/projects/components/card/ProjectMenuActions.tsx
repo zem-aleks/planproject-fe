@@ -1,4 +1,4 @@
-import { Pencil, ServerCog } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 
 import {
   ProjectMenuDeleteForm,
@@ -14,13 +14,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui/dropdown-menu.tsx';
-import { IconDotsVertical, IconUserCircle } from '@tabler/icons-react';
+import { IconCompass, IconDotsVertical } from '@tabler/icons-react';
 
 export type Msg =
   | { type: 'onProjectSelect'; project: ProjectEntity }
-  | { type: 'onProjectRobotConfigChange'; project: ProjectEntity }
   | { type: 'onProjectEdit'; project: ProjectEntity }
-  | { type: 'onProjectCloned'; project: ProjectEntity }
   | ProjectMenuDeleteFormMsg;
 
 type Props = {
@@ -49,17 +47,8 @@ export const ProjectMenuActions = ({ project, onMsg }: Props) => {
               onMsg({ type: 'onProjectSelect', project });
             }}
           >
-            <IconUserCircle />
-            Select
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              onMsg({ type: 'onProjectRobotConfigChange', project });
-            }}
-          >
-            <ServerCog />
-            Configure CA-1
+            <IconCompass />
+            Open
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={(e) => {

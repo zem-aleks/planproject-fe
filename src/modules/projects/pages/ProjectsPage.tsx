@@ -35,18 +35,13 @@ export const ProjectsPage = () => {
           switch (msg.type) {
             case 'onProjectSelect':
               select(msg.project);
-              navigate(`/dashboard`);
+              navigate(`/project/${msg.project.id}`);
               break;
 
             case 'onProjectEdit':
               navigate(`/projects/edit/${msg.project.id}`);
               break;
 
-            case 'onProjectRobotConfigChange':
-              // setState({ type: 'configureCa1', project: msg.project });
-              break;
-
-            case 'onProjectCloned':
             case 'onProjectDeleted':
               reload();
               break;
