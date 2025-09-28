@@ -4,13 +4,17 @@ import { useParams } from 'react-router';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 
-export const useProjectByUrlParam = (): ProjectEntity | null => {
+export const useProjectByUrlParam = (): {
+  project: ProjectEntity | null;
+  reload: () => void;
+} => {
   const { projectId } = useParams<{ projectId: string }>();
-  const { projects } = useContext(ProjectsContext);
+  const { projects, reload } = useContext(ProjectsContext);
   if (!projectId) {
     console.error('Project ID is required');
-    return null;
+    return { project: null, reload };
   }
 
-  return projects.find((project) => project.id === projectId) || null;
+  const project = projects.find((project) => project.id === projectId) || null;
+  return { project, reload };
 };
