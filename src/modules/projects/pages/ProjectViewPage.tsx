@@ -1,3 +1,4 @@
+import { PhasesBlock } from '@/modules/phases/components/PhasesBlock';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { ShapingForm } from '@/modules/shaping/components/ShapingForm';
@@ -20,13 +21,13 @@ export const ProjectViewPage = () => {
     >
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className="flex flex-col gap-1">
-          <h1 className={'text-2xl'}>{project.title}</h1>
+          <h1 className={'text-2xl font-semibold'}>{project.title}</h1>
           <p className={'text-muted-foreground'}>
             {project.description || 'No description available'}
           </p>
         </div>
 
-        {project.status === 'analyzing' && <div>Shaping is completed</div>}
+        {project.status === 'analyzing' && <PhasesBlock project={project} />}
 
         {project.status === 'shaping' && (
           <ShapingLoader projectId={project.id}>
