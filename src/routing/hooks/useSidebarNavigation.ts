@@ -12,7 +12,7 @@ export type NavItem = {
 
 export const useSidebarNavigation = (): NavItem[] => {
   const { pathname } = useLocation();
-  const project = useProjectByUrlParam();
+  const { project } = useProjectByUrlParam();
 
   if (!project) {
     return [

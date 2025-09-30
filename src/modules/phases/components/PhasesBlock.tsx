@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router';
+
 import {
   Bar,
   BarChart,
@@ -7,6 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 
+import { PhaseCard } from '@/modules/phases/components/PhaseCard';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectEntity } from '@/modules/projects/types/entity';
@@ -18,40 +21,43 @@ import {
   CardTitle,
 } from '@/ui/card';
 import { ChartConfig, ChartContainer } from '@/ui/chart';
+import { notReachable } from '@/utils/notReachable';
 
 export const PhasesBlock = ({ project }: { project: ProjectEntity }) => {
+  const navigate = useNavigate();
   return (
     <div className={'flex flex-col gap-2'}>
       <div className={'text-xl font-semibold'}>Project Phases</div>
       <PhasesLoader projectId={project.id}>
-        {(phases) => (
+        {(phases, reload) => (
           <div className={'flex flex-col gap-4'}>
-            <PhasesList phases={phases} />
+            <div className={'flex flex-col gap-2'}>
+              {phases.map((phase, index) => (
+                <PhaseCard
+                  phase={phase}
+                  index={index + 1}
+                  key={phase.id}
+                  onMsg={(msg) => {
+                    switch (msg.type) {
+                      case 'onPhaseUpdated':
+                        reload();
+                        break;
+
+                      case 'onOpenClicked':
+                        navigate(`/project/${project.id}/phase/${phase.id}`);
+                        break;
+
+                      default:
+                        return notReachable(msg);
+                    }
+                  }}
+                />
+              ))}
+            </div>
             <ChartBarHorizontal phases={phases} />
           </div>
         )}
       </PhasesLoader>
-    </div>
-  );
-};
-
-const PhasesList = ({ phases }: { phases: PhaseEntity[] }) => {
-  return (
-    <div className={'flex flex-col gap-2'}>
-      {phases.map((phase, index) => (
-        <div key={phase.id} className={'rounded border p-2'}>
-          <div className={'text-lg font-semibold'}>
-            {index + 1}. {phase.title}
-          </div>
-          <div className={'text-muted-foreground'}>{phase.description}</div>
-          <div className={'text-sm'}>
-            Estimation: {phase.minDaysNeeded} - {phase.maxDaysNeeded} days
-          </div>
-          <div className={'text-sm'}>
-            Expertise needed: {phase.expertiseNeeded}
-          </div>
-        </div>
-      ))}
     </div>
   );
 };
@@ -67,8 +73,6 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function ChartBarHorizontal({ phases }: { phases: PhaseEntity[] }) {
-  const minDays = phases.reduce((sum, phase) => sum + phase.minDaysNeeded, 0);
-  const maxDays = phases.reduce((sum, phase) => sum + phase.maxDaysNeeded, 0);
   const chartData = phases.map((phase) => {
     return {
       title: phase.title,
@@ -85,17 +89,12 @@ export function ChartBarHorizontal({ phases }: { phases: PhaseEntity[] }) {
       <CardHeader>
         <CardTitle>Project Timeline (avg)</CardTitle>
         <CardDescription>
-          Total estimation {minDays} - {maxDays} days (without overlapping)
+          Estimation {endOfTimeline} working days
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            layout="vertical"
-            margin={{ left: 10, right: 10 }}
-          >
+          <BarChart accessibilityLayer data={chartData} layout="vertical">
             <CartesianGrid horizontal={false} />
 
             <XAxis
