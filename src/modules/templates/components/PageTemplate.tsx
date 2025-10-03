@@ -1,6 +1,5 @@
 import { ReactNode } from 'react';
 
-import { useSidebarNavigation } from '@/routing/hooks/useSidebarNavigation.ts';
 import { AppSidebar } from '@/ui/components/app-sidebar.tsx';
 import { SiteHeader } from '@/ui/components/site-header.tsx';
 import { SidebarInset, SidebarProvider } from '@/ui/sidebar.tsx';
@@ -15,7 +14,6 @@ type Props = {
 };
 
 export const PageTemplate = ({ children, header }: Props) => {
-  const navMain = useSidebarNavigation();
   return (
     <SidebarProvider
       style={
@@ -25,7 +23,7 @@ export const PageTemplate = ({ children, header }: Props) => {
         } as React.CSSProperties
       }
     >
-      <AppSidebar navMain={navMain} />
+      <AppSidebar />
       <SidebarInset>
         <SiteHeader
           breadcrumbs={header.breadcrumbs}

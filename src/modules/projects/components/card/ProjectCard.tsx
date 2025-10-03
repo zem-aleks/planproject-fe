@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-import { ProjectLogo } from '@/modules/projects/components/ProjectLogo.tsx';
+import { ProjectLogo } from '@/modules/projects/components/ProjectLogo';
 import {
   ProjectMenuActions,
   Msg as ProjectMenuActionsMsg,

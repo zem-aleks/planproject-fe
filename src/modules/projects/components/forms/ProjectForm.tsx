@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { ProjectLogo } from '@/modules/projects/components/ProjectLogo.tsx';
+import { ProjectLogo } from '@/modules/projects/components/ProjectLogo';
 import {
   CREATE_PROJECT_SCHEMA,
   ProjectCreateData,

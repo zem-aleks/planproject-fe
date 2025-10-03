@@ -12,7 +12,7 @@ export const ProjectLogo = ({
   };
   return (
     <div
-      className={`${sizeClasses[size]} overflow-hidden rounded-md border border-gray-200`}
+      className={`${sizeClasses[size]} shrink-0 overflow-hidden rounded-md border border-gray-200`}
       style={{
         backgroundColor: `rgba(255, 255, 255, 0)`,
       }}

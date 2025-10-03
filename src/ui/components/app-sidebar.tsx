@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 
-import { NavItem, NavMain } from '@/ui/components/nav-main';
+import { NavMain } from '@/ui/components/nav-main';
 import { NavSecondary } from '@/ui/components/nav-secondary';
 import { NavUser } from '@/ui/components/nav-user';
 import {
@@ -12,7 +12,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/ui/sidebar';
-import { IconHelp, IconSettings } from '@tabler/icons-react';
 
 const data = {
   user: {
@@ -70,16 +69,16 @@ const data = {
     // },
   ],
   navSecondary: [
-    {
-      title: 'Settings',
-      url: '#',
-      icon: IconSettings,
-    },
-    {
-      title: 'Get Help',
-      url: '#',
-      icon: IconHelp,
-    },
+    // {
+    //   title: 'Settings',
+    //   url: '#',
+    //   icon: IconSettings,
+    // },
+    // {
+    //   title: 'Get Help',
+    //   url: '#',
+    //   icon: IconHelp,
+    // },
     // {
     //   title: 'Search',
     //   url: '#',
@@ -105,11 +104,7 @@ const data = {
   ],
 };
 
-type Props = {
-  navMain: NavItem[];
-};
-
-export function AppSidebar({ navMain }: Props) {
+export function AppSidebar() {
   return (
     <Sidebar collapsible="offcanvas" variant={'inset'}>
       <SidebarHeader>
@@ -129,7 +124,7 @@ export function AppSidebar({ navMain }: Props) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={navMain} />
+        <NavMain />
         {/*<NavDocuments items={data.documents} />*/}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
