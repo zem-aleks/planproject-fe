@@ -7,7 +7,6 @@ import {
 } from 'react';
 
 import { setApiAuth } from '@/modules/api/api';
-import { LoginPage } from '@/modules/auth/pages/LoginPage';
 import { supabase } from '@/modules/supabase/client';
 import { Session } from '@supabase/auth-js';
 
@@ -37,10 +36,6 @@ export const AuthSessionContextProvider = ({
     });
     return () => subscription.unsubscribe();
   }, []);
-
-  if (!session) {
-    return <LoginPage />;
-  }
 
   return (
     <AuthSessionContext.Provider value={{ session }}>

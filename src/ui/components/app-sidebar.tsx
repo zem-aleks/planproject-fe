@@ -115,9 +115,7 @@ export function AppSidebar() {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link to={'/projects'}>
-                <span className="text-base font-semibold">
-                  Project Leverage
-                </span>
+                <span className="text-base font-semibold">Plan Project</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
