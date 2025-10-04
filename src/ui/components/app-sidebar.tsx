@@ -1,5 +1,6 @@
 import { Link } from 'react-router';
 
+import { LogoBlock } from '@/modules/home/components/LogoBlock';
 import { NavMain } from '@/ui/components/nav-main';
 import { NavSecondary } from '@/ui/components/nav-secondary';
 import { NavUser } from '@/ui/components/nav-user';
@@ -107,7 +108,7 @@ const data = {
 export function AppSidebar() {
   return (
     <Sidebar collapsible="offcanvas" variant={'inset'}>
-      <SidebarHeader>
+      <SidebarHeader className={'rounded-lg border bg-white'}>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -115,7 +116,7 @@ export function AppSidebar() {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <Link to={'/projects'}>
-                <span className="text-base font-semibold">Plan Project</span>
+                <LogoBlock />
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

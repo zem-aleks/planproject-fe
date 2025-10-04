@@ -1,6 +1,6 @@
 {
-  "name": "Voice Interface App",
-  "short_name": "CA-1 voice interface",
+  "name": "Plan Project",
+  "short_name": "Plan Project Platform",
   "start_url": "/",
   "display": "standalone",  // or "fullscreen"
   "background_color": "#ffffff",
