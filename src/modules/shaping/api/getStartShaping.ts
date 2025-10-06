@@ -3,14 +3,11 @@ import { AxiosRequestConfig } from 'axios';
 import { api } from '@/modules/api/api.ts';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 
-export const addShapingUserMessage = async (
-  {
-    shapingId,
-    ...data
-  }: { shapingId: string; clientId: string; message: string },
+export const getStartShaping = async (
+  clientId: string,
   config?: AxiosRequestConfig,
-): Promise<ShapingEntity> => {
-  return api.post(`/start/${shapingId}`, data, {
+): Promise<ShapingEntity | null> => {
+  return api.get(`/start/${clientId}`, {
     signal: config?.signal,
   });
 };

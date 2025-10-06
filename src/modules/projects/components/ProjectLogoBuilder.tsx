@@ -45,13 +45,36 @@ export const ProjectLogoBuilder = ({
     );
   }
 
-  return (
-    <div className={`size-[128px] shrink-0 rounded-md bg-blue-100`}>
-      <img
-        src={project.logoUrl}
-        alt="Project Logo"
-        className="h-full w-full rounded-md object-contain object-center"
-      />
-    </div>
-  );
+  switch (state.type) {
+    case 'loading':
+      return (
+        <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
+      );
+
+    case 'error':
+    case 'not_requested':
+      return (
+        <div className={`size-[128px] shrink-0 rounded-md bg-blue-100`}>
+          <img
+            src={project.logoUrl}
+            alt="Project Logo"
+            className="h-full w-full rounded-md object-contain object-center"
+          />
+        </div>
+      );
+
+    case 'loaded':
+      return (
+        <div className={`size-[128px] shrink-0 rounded-md bg-blue-100`}>
+          <img
+            src={state.data.logoUrl || ''}
+            alt="Project Logo"
+            className="h-full w-full rounded-md object-contain object-center"
+          />
+        </div>
+      );
+
+    default:
+      return notReachable(state);
+  }
 };

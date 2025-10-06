@@ -1,14 +1,32 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { LogoBlock } from '@/modules/home/components/LogoBlock';
+import { ShapingModal } from '@/modules/shaping/components/ShapingModal';
 import { Button } from '@/ui/button';
+import { notReachable } from '@/utils/notReachable';
 
 export const HomePage = () => {
-  const session = useAuthSession();
+  const { session } = useAuthSession();
+  const [open, setOpen] = useState<boolean>(false);
 
   return (
     <div className={'bg-background min-h-screen'}>
+      <ShapingModal
+        open={open}
+        onMsg={(msg) => {
+          switch (msg.type) {
+            case 'onClose':
+              setOpen(false);
+              break;
+
+            default:
+              return notReachable(msg.type);
+          }
+        }}
+      />
+
       <header className={'bg-background absolute top-0 z-50 w-full border-b'}>
         <div className="container mx-auto px-4">
           <div className={'flex h-16 items-center justify-between'}>
@@ -23,12 +41,13 @@ export const HomePage = () => {
                 <Button asChild variant={'outline'}>
                   <Link to={'/login'}>Log In</Link>
                 </Button>
-                <Button>Try for Free</Button>
+                <Button onClick={() => setOpen(true)}>Try for Free</Button>
               </div>
             )}
           </div>
         </div>
       </header>
+
       <section className="flex items-center justify-center pt-56 pb-40">
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-8 lg:grid-cols-2">
@@ -43,7 +62,11 @@ export const HomePage = () => {
                 AI help you shape them into clear, actionable plans.
               </p>
               <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
-                <Button className="px-24" size={'lg'}>
+                <Button
+                  className="px-24"
+                  size={'lg'}
+                  onClick={() => setOpen(true)}
+                >
                   Try for Free
                 </Button>
               </div>
@@ -65,7 +88,7 @@ export const HomePage = () => {
             <h2 className="my-6 text-3xl font-bold text-pretty lg:text-6xl">
               How It Works
             </h2>
-            <div className="grid gap-6 md:grid-cols-2 lg:gap-8">
+            <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
               <HomeCard
                 image={
                   'https://akmoolaxrpskmtqdymjo.supabase.co/storage/v1/object/public/assets/logo/how_it_works_11.png'
@@ -100,7 +123,11 @@ export const HomePage = () => {
                 description={`Do daily tasks, track progress, provide feedback and your project will be done step by step.`}
               />
             </div>
-            <Button className="mt-10 px-24" size={'lg'}>
+            <Button
+              className="mt-10 px-24"
+              size={'lg'}
+              onClick={() => setOpen(true)}
+            >
               Try for Free
             </Button>
           </div>

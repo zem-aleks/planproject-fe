@@ -5,7 +5,7 @@ import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { LogoBlock } from '@/modules/home/components/LogoBlock';
 
 export const LoginPage = () => {
-  const session = useAuthSession();
+  const { session } = useAuthSession();
   if (session) {
     return <Navigate to="/projects" replace />;
   }

@@ -3,16 +3,19 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
+
+import { v4 as uuidv4 } from 'uuid';
 
 import { setApiAuth } from '@/modules/api/api';
 import { supabase } from '@/modules/supabase/client';
 import { Session } from '@supabase/auth-js';
 
-type AuthContextData = { session: Session | null };
+type AuthContextData = { session: Session | null; clientId: string };
 
-const emptyContextValue: AuthContextData = { session: null };
+const emptyContextValue: AuthContextData = { session: null, clientId: '' };
 
 export const AuthSessionContext =
   createContext<AuthContextData>(emptyContextValue);
@@ -22,6 +25,11 @@ export const AuthSessionContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
+  const clientId = useMemo(
+    () => localStorage.getItem('clientId') || uuidv4(),
+    [],
+  );
+  localStorage.setItem('clientId', clientId);
   const [session, setSession] = useState<Session | null>(null);
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -38,13 +46,12 @@ export const AuthSessionContextProvider = ({
   }, []);
 
   return (
-    <AuthSessionContext.Provider value={{ session }}>
+    <AuthSessionContext.Provider value={{ session, clientId }}>
       {children}
     </AuthSessionContext.Provider>
   );
 };
 
 export const useAuthSession = () => {
-  const { session } = useContext(AuthSessionContext);
-  return session;
+  return useContext(AuthSessionContext);
 };
