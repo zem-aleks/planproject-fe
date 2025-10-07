@@ -36,6 +36,9 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
             <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
               {project.title}
             </CardTitle>
+            <div className={'text-muted-foreground'}>
+              {(project.description || '').slice(0, 140)}...
+            </div>
           </div>
         </div>
         <CardAction>
