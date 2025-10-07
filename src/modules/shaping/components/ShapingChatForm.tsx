@@ -61,6 +61,66 @@ export const ShapingChatForm = ({
     }
   }, [state]);
 
+  if (shaping.status === 'finished') {
+    return (
+      <>
+        <FinishShapingForm
+          shaping={shaping}
+          onMsg={(msg) => {
+            switch (msg.type) {
+              case 'onFinish':
+                break;
+
+              default:
+                return notReachable(msg.type);
+            }
+          }}
+        />
+
+        <div className="container mx-auto mt-4 flex flex-col items-center justify-center gap-2 px-4">
+          <DialogHeader className={'flex flex-col items-center gap-2'}>
+            <DialogTitle className={'text-center text-2xl'}>
+              Please sign in to continue
+            </DialogTitle>
+          </DialogHeader>
+        </div>
+
+        <div className={'flex w-[300px] justify-center'}>
+          {session ? (
+            <IconCheck className={'size-20 text-green-600'} />
+          ) : (
+            <div className={'w-full'}>
+              <Auth
+                view="sign_in"
+                supabaseClient={supabase}
+                appearance={{
+                  theme: ThemeSupa,
+
+                  style: {
+                    button: {
+                      borderRadius: '5px',
+                      borderColor: 'rgba(0,0,0,0.2)',
+                    },
+                  },
+                  variables: {
+                    default: {
+                      colors: {
+                        brand: '#000',
+                        brandAccent: '#cfd1ff',
+                      },
+                    },
+                  },
+                }}
+                providers={[]}
+                showLinks={true}
+              />
+            </div>
+          )}
+        </div>
+      </>
+    );
+  }
+
   if (shaping.score >= 100) {
     return (
       <>
@@ -186,7 +246,15 @@ export const ShapingChatForm = ({
                 'shrink px-4 py-2 text-sm whitespace-normal sm:text-lg'
               }
             >
-              {state.type === 'loading' ? '...' : lastAssistantMessage.comment}
+              {state.type === 'loading' ? (
+                <>
+                  <b className={'animate-bounce'}>.</b>
+                  <b className={'animate-bounce delay-100'}>.</b>
+                  <b className={'animate-bounce delay-300'}>.</b>
+                </>
+              ) : (
+                lastAssistantMessage.comment
+              )}
             </Badge>
           </div>
         </div>

@@ -7,6 +7,7 @@ import { ProjectEntity } from '@/modules/projects/types/entity';
 import { finishStartShaping } from '@/modules/shaping/api/finishStartShaping';
 import { ConnectProjectForm } from '@/modules/shaping/components/ConnectProjectForm';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
+import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -72,6 +73,9 @@ export const FinishShapingForm = ({
               <div className={'text-muted-foreground'}>
                 {state.data.description}
               </div>
+              {state.data.daysNeeded && (
+                <Badge>±{state.data.daysNeeded} days</Badge>
+              )}
             </div>
           </Card>
         </div>

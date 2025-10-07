@@ -70,6 +70,7 @@ const ShapingContent = () => {
           />
         );
       }
+
       return (
         <ShapingChatForm
           shaping={state.data}

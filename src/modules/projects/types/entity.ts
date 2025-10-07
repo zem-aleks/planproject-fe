@@ -6,6 +6,7 @@ export type ProjectEntity = {
   title: string;
   description: string | null;
   logoUrl: string | null;
+  daysNeeded: number | null;
   createdAt: Date;
   updatedAt: Date;
   startedAt: Date;
