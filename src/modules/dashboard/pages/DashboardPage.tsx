@@ -1,7 +1,10 @@
+import dayjs from 'dayjs';
+
 import { PhaseItemBuilder } from '@/modules/phases/components/PhaseItemBuilder';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
 import { PhasesTimeline } from '@/modules/phases/components/PhasesTimeline';
 import { ProjectLogoBuilder } from '@/modules/projects/components/ProjectLogoBuilder';
+import { StartProjectForm } from '@/modules/projects/components/StartProjectForm';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { FinishShapingFormInternal } from '@/modules/shaping/components/FinishShapingFormInternal';
@@ -31,6 +34,7 @@ export const DashboardPage = () => {
             {/*  <span className={'text-2xl'}>Day 1</span>*/}
             {/*  <Separator className={'my-2'} />*/}
             {/*</div>*/}
+
             <h1
               className={
                 'flex items-center justify-between gap-2 text-2xl font-semibold'
@@ -43,9 +47,9 @@ export const DashboardPage = () => {
               {project.description || 'No description available'}
             </p>
 
-            {project.status === 'analyzing' && (
-              <Button className={'mt-2 w-full'}>Start Project</Button>
-            )}
+            <StartProjectForm project={project} onStarted={reload} />
+
+            <Button className={'mt-2'}>Show tasks</Button>
           </div>
           <div className={'flex flex-col gap-2'}>
             <ProjectLogoBuilder
@@ -61,6 +65,13 @@ export const DashboardPage = () => {
                 }
               }}
             />
+            <div className={'mb-2 self-start rounded-lg border p-2 shadow'}>
+              <div className={'text-2xl'}>
+                Day {dayjs(project.startedAt).diff(dayjs(), 'days') + 1}
+              </div>
+              <Separator className={'my-2'} />
+              Out of {project.daysNeeded || 'N/A'} days
+            </div>
           </div>
         </div>
 
@@ -85,13 +96,15 @@ export const DashboardPage = () => {
                 <div className={'mb-4 flex flex-col gap-2'}>
                   <div className={'flex items-center justify-between gap-2'}>
                     <h2 className={'text-lg font-semibold'}>Main phases</h2>
-                    <Button
-                      variant={'outline'}
-                      size={'sm'}
-                      onClick={() => alert('Coming soon!')}
-                    >
-                      Modify Phases
-                    </Button>
+                    {project.status === 'analyzing' && (
+                      <Button
+                        variant={'outline'}
+                        size={'sm'}
+                        onClick={() => alert('Coming soon!')}
+                      >
+                        Modify Phases
+                      </Button>
+                    )}
                   </div>
                   <ol className={'flex flex-col gap-2'}>
                     {/* TODO: build separated components for loading and built states */}

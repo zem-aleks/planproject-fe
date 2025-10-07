@@ -35,6 +35,18 @@ export const PhaseItemBuilder = ({
       );
 
     case 'inProgress':
+      return (
+        <div className={'flex items-center justify-between'}>
+          <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
+            <Button variant={'link'} className={'px-0'}>
+              {index + 1}. {currentPhase.title}
+            </Button>
+          </Link>
+
+          <Badge className={'bg-green-600 text-white'}>In progress</Badge>
+        </div>
+      );
+
     case 'completed':
     case 'notStarted':
       return (
