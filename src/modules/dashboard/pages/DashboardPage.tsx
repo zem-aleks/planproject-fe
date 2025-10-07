@@ -1,10 +1,10 @@
-import { Link } from 'react-router';
-
+import { PhaseItemBuilder } from '@/modules/phases/components/PhaseItemBuilder';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
 import { PhasesTimeline } from '@/modules/phases/components/PhasesTimeline';
 import { ProjectLogoBuilder } from '@/modules/projects/components/ProjectLogoBuilder';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
+import { FinishShapingFormInternal } from '@/modules/shaping/components/FinishShapingFormInternal';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -58,41 +58,55 @@ export const DashboardPage = () => {
           </div>
         </div>
 
-        <PhasesLoader projectId={project.id}>
-          {(phases) => (
-            <div className={'flex flex-col gap-4'}>
-              <div className={'mb-4 flex flex-col gap-2'}>
-                <h2 className={'text-lg font-semibold'}>Main phases</h2>
-                <ol className={'flex flex-col gap-2'}>
-                  {phases.map((phase, index) => (
-                    <li key={phase.id} className={''}>
-                      <div className={'flex items-center justify-between'}>
-                        <Link to={`/project/${project.id}/phase/${phase.id}`}>
-                          <Button variant={'link'} className={'px-0'}>
-                            {index + 1}. {phase.title}
-                          </Button>
-                        </Link>
-                        <div className={'text-sm'}>{phase.status}</div>
-                      </div>
-                      <Separator />
-                      {/*<div className={'text-muted-foreground'}>*/}
-                      {/*  {phase.description}*/}
-                      {/*</div>*/}
-                      {/*<div className={'text-sm'}>*/}
-                      {/*  Estimation: {phase.minDaysNeeded} -{' '}*/}
-                      {/*  {phase.maxDaysNeeded} days*/}
-                      {/*</div>*/}
-                      {/*<div className={'text-sm'}>*/}
-                      {/*  Expertise needed: {phase.expertiseNeeded}*/}
-                      {/*</div>*/}
-                    </li>
-                  ))}
-                </ol>
+        {project.status === 'shaping' ? (
+          <FinishShapingFormInternal
+            shapingId={project.shapingId}
+            onMsg={(msg) => {
+              switch (msg.type) {
+                case 'onFinish':
+                  reload();
+                  break;
+
+                default:
+                  return notReachable(msg.type);
+              }
+            }}
+          />
+        ) : (
+          <PhasesLoader projectId={project.id}>
+            {(phases) => (
+              <div className={'flex flex-col gap-4'}>
+                <div className={'mb-4 flex flex-col gap-2'}>
+                  <h2 className={'text-lg font-semibold'}>Main phases</h2>
+                  <ol className={'flex flex-col gap-2'}>
+                    {/* TODO: build separated components for loading and built states */}
+                    {phases.map((phase, index) => (
+                      <li key={phase.id} className={''}>
+                        <PhaseItemBuilder
+                          phase={phase}
+                          project={project}
+                          index={index}
+                        />
+                        <Separator />
+                        {/*<div className={'text-muted-foreground'}>*/}
+                        {/*  {phase.description}*/}
+                        {/*</div>*/}
+                        {/*<div className={'text-sm'}>*/}
+                        {/*  Estimation: {phase.minDaysNeeded} -{' '}*/}
+                        {/*  {phase.maxDaysNeeded} days*/}
+                        {/*</div>*/}
+                        {/*<div className={'text-sm'}>*/}
+                        {/*  Expertise needed: {phase.expertiseNeeded}*/}
+                        {/*</div>*/}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                <PhasesTimeline phases={phases} />
               </div>
-              <PhasesTimeline phases={phases} />
-            </div>
-          )}
-        </PhasesLoader>
+            )}
+          </PhasesLoader>
+        )}
 
         {/*<ChartAreaInteractive />*/}
 

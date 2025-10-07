@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 import { getPhases } from '@/modules/phases/api/getPhases';
-import { PhaseEntity } from '@/modules/phases/types/entity';
+import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
@@ -9,7 +9,10 @@ import { useReloadableData } from '@/utils/useReloadableData.ts';
 
 type Props = {
   projectId: string;
-  children: (chat: PhaseEntity[], reload: () => void) => ReactNode;
+  children: (
+    chat: PhaseEntityWithMilestones[],
+    reload: () => void,
+  ) => ReactNode;
 };
 
 export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {

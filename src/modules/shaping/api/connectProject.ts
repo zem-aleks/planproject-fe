@@ -7,7 +7,7 @@ export const connectProject = async (
   { projectId, ...data }: { projectId: string; clientId: string },
   config?: AxiosRequestConfig,
 ): Promise<ProjectEntity> => {
-  return api.put(`/projects/${projectId}`, data, {
+  return api.put(`/shaping/${projectId}/connect`, data, {
     signal: config?.signal,
   });
 };

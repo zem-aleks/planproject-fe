@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
-import { connectProject } from '@/modules/projects/api/connectProject';
 import { ProjectEntity } from '@/modules/projects/types/entity';
+import { connectProject } from '@/modules/shaping/api/connectProject';
 import { Button } from '@/ui/button';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';

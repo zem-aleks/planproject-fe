@@ -16,7 +16,7 @@ import {
 
 const data = {
   user: {
-    name: 'Oleksii Zemliakov',
+    name: '',
     email: 'nlight115@gmail.com',
     avatar: '/avatars/shadcn.jpg',
   },

@@ -3,7 +3,10 @@ import { useEffect } from 'react';
 import { Loader2Icon } from 'lucide-react';
 
 import { createMilestones } from '@/modules/milestones/api/createMilestones';
-import { PhaseEntity } from '@/modules/phases/types/entity';
+import {
+  PhaseEntity,
+  PhaseEntityWithMilestones,
+} from '@/modules/phases/types/entity';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
@@ -14,7 +17,7 @@ export const MilestonesBuilder = ({
   onDone,
 }: {
   phase: PhaseEntity;
-  onDone: (phase: PhaseEntity) => void;
+  onDone: (phase: PhaseEntityWithMilestones) => void;
 }) => {
   const { state, reload } = useLoadableData(createMilestones, phase.id);
 

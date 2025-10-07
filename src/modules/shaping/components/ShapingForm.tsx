@@ -22,7 +22,7 @@ export const ShapingForm = ({
   shaping: ShapingEntity;
   onMsg: (msg: Msg) => void;
 }) => {
-  const { state, load } = useLazyLoadableData(addShapingUserMessage);
+  const { state } = useLazyLoadableData(addShapingUserMessage);
   const { state: finishState, load: finishLoad } =
     useLazyLoadableData(finishShaping);
   const [message, setMessage] = useState<string>('');
@@ -106,7 +106,7 @@ export const ShapingForm = ({
 
       <Button
         loading={state.type === 'loading'}
-        onClick={() => load({ shapingId: shaping.id, message })}
+        // onClick={() => load({ shapingId: shaping.id, message })}
       >
         Submit
       </Button>

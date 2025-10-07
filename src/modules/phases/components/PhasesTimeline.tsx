@@ -28,6 +28,10 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function PhasesTimeline({ phases }: { phases: PhaseEntity[] }) {
+  if (phases.length === 0) {
+    return null;
+  }
+
   const chartData = phases.map((phase) => {
     return {
       title: phase.title,
