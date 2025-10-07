@@ -15,7 +15,6 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarSeparator,
 } from '@/ui/sidebar';
 import {
   type Icon,
@@ -69,24 +68,24 @@ export function NavMain() {
 
   return (
     <>
-      <SidebarGroup>
-        <SidebarGroupContent className="flex flex-col gap-2">
-          <SidebarMenu>
-            <SidebarMenuItem key={'projects'}>
-              <Link to={'/projects'}>
-                <SidebarMenuButton>
-                  <IconPackages />
-                  <span>Projects</span>
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-          </SidebarMenu>
-          <SidebarSeparator />
-        </SidebarGroupContent>
-      </SidebarGroup>
+      {/*<SidebarGroup>*/}
+      {/*  <SidebarGroupContent className="flex flex-col gap-2">*/}
+      {/*    <SidebarMenu>*/}
+      {/*      <SidebarMenuItem key={'projects'}>*/}
+      {/*        <Link to={'/projects'}>*/}
+      {/*          <SidebarMenuButton>*/}
+      {/*            <IconPackages />*/}
+      {/*            <span>Projects</span>*/}
+      {/*          </SidebarMenuButton>*/}
+      {/*        </Link>*/}
+      {/*      </SidebarMenuItem>*/}
+      {/*    </SidebarMenu>*/}
+      {/*    <SidebarSeparator />*/}
+      {/*  </SidebarGroupContent>*/}
+      {/*</SidebarGroup>*/}
 
       <SidebarGroup>
-        <SidebarGroupLabel className={'mb-2 text-lg font-semibold'}>
+        <SidebarGroupLabel className={'mb-2 h-auto text-lg font-semibold'}>
           {project.title}
         </SidebarGroupLabel>
         <SidebarGroupContent className="flex flex-col gap-2">
