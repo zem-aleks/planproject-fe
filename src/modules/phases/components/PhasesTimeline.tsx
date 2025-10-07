@@ -48,7 +48,7 @@ export function PhasesTimeline({ phases }: { phases: PhaseEntity[] }) {
       <CardHeader>
         <CardTitle>Project Timeline (avg)</CardTitle>
         <CardDescription>
-          Estimation {endOfTimeline} working days
+          Estimation {endOfTimeline} calendar days
         </CardDescription>
       </CardHeader>
       <CardContent>

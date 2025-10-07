@@ -1,5 +1,7 @@
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { PhaseEntity } from '@/modules/phases/types/entity';
+import { Badge } from '@/ui/badge';
+import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 
 // export type Msg = { type: 'onPhaseUpdated' } | { type: 'onOpenClicked' };
@@ -14,14 +16,14 @@ export const MilestoneCard = ({
   // onMsg: (msg: Msg) => void;
 }) => {
   return (
-    <div key={milestone.id} className={'rounded border p-2'}>
+    <Card key={milestone.id} className={'gap-0 p-4'}>
       <div className={'text-lg font-semibold'}>{milestone.title}</div>
       <div className={'text-muted-foreground mb-2'}>
         {milestone.description}
       </div>
-      <div className={'text-sm'}>
-        <b>Estimation:</b> {milestone.daysNeeded}
-        days
+      <div className={'flex items-center gap-1'}>
+        <b className={'text-sm'}>Estimation:</b>
+        <Badge>{milestone.daysNeeded} days</Badge>
       </div>
 
       <Separator className={'my-2'} />
@@ -31,6 +33,6 @@ export const MilestoneCard = ({
       </div>
 
       {/*<TasksBlock milestone={milestone} />*/}
-    </div>
+    </Card>
   );
 };

@@ -34,6 +34,8 @@ export const PhaseItemBuilder = ({
         </div>
       );
 
+    case 'inProgress':
+    case 'completed':
     case 'notStarted':
       return (
         <div className={'flex items-center justify-between'}>
@@ -46,12 +48,6 @@ export const PhaseItemBuilder = ({
           <Badge>{currentPhase.milestones.length} milestones</Badge>
         </div>
       );
-
-    case 'inProgress':
-      break;
-
-    case 'completed':
-      break;
 
     default:
       return notReachable(currentPhase.status);

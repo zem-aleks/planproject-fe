@@ -81,9 +81,18 @@ export const DashboardPage = () => {
         ) : (
           <PhasesLoader projectId={project.id}>
             {(phases) => (
-              <div className={'flex flex-col gap-4'}>
+              <div className={'mt-4 flex flex-col gap-4'}>
                 <div className={'mb-4 flex flex-col gap-2'}>
-                  <h2 className={'text-lg font-semibold'}>Main phases</h2>
+                  <div className={'flex items-center justify-between gap-2'}>
+                    <h2 className={'text-lg font-semibold'}>Main phases</h2>
+                    <Button
+                      variant={'outline'}
+                      size={'sm'}
+                      onClick={() => alert('Coming soon!')}
+                    >
+                      Modify Phases
+                    </Button>
+                  </div>
                   <ol className={'flex flex-col gap-2'}>
                     {/* TODO: build separated components for loading and built states */}
                     {phases.map((phase, index) => (
@@ -94,16 +103,6 @@ export const DashboardPage = () => {
                           index={index}
                         />
                         <Separator />
-                        {/*<div className={'text-muted-foreground'}>*/}
-                        {/*  {phase.description}*/}
-                        {/*</div>*/}
-                        {/*<div className={'text-sm'}>*/}
-                        {/*  Estimation: {phase.minDaysNeeded} -{' '}*/}
-                        {/*  {phase.maxDaysNeeded} days*/}
-                        {/*</div>*/}
-                        {/*<div className={'text-sm'}>*/}
-                        {/*  Expertise needed: {phase.expertiseNeeded}*/}
-                        {/*</div>*/}
                       </li>
                     ))}
                   </ol>
