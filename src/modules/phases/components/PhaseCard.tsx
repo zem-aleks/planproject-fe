@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { MilestonesBuilder } from '@/modules/milestones/components/MilestonesBuilder';
 import { PhaseEntity } from '@/modules/phases/types/entity';
@@ -16,6 +16,11 @@ export const PhaseCard = ({
   onMsg: (msg: Msg) => void;
 }) => {
   const [currentPhase, setCurrentPhase] = useState<PhaseEntity>(phase);
+
+  useEffect(() => {
+    setCurrentPhase(phase);
+  }, [phase]);
+
   return (
     <div key={currentPhase.id} className={'rounded border p-2'}>
       <div className={'text-lg font-semibold'}>

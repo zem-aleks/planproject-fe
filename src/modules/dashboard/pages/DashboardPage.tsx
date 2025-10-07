@@ -65,13 +65,15 @@ export const DashboardPage = () => {
                 }
               }}
             />
-            <div className={'mb-2 self-start rounded-lg border p-2 shadow'}>
-              <div className={'text-2xl'}>
-                Day {dayjs(project.startedAt).diff(dayjs(), 'days') + 1}
+            {project.status === 'active' && (
+              <div className={'mb-2 self-start rounded-lg border p-2 shadow'}>
+                <div className={'text-2xl'}>
+                  Day {dayjs().diff(project.startedAt, 'days') + 1}
+                </div>
+                <Separator className={'my-2'} />
+                Out of {project.daysNeeded || 'N/A'} days
               </div>
-              <Separator className={'my-2'} />
-              Out of {project.daysNeeded || 'N/A'} days
-            </div>
+            )}
           </div>
         </div>
 
