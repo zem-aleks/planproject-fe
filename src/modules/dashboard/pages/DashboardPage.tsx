@@ -27,21 +27,27 @@ export const DashboardPage = () => {
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className={'flex flex-row gap-8'}>
           <div className="flex flex-col gap-1">
-            <div>
-              <span className={'text-2xl'}>Day 1</span>
-              <Separator className={'my-2'} />
-            </div>
-            <h1 className={'flex items-center gap-2 text-2xl font-semibold'}>
+            {/*<div>*/}
+            {/*  <span className={'text-2xl'}>Day 1</span>*/}
+            {/*  <Separator className={'my-2'} />*/}
+            {/*</div>*/}
+            <h1
+              className={
+                'flex items-center justify-between gap-2 text-2xl font-semibold'
+              }
+            >
               {project.title}
               <Badge>Status: {project.status}</Badge>
             </h1>
             <p className={'text-muted-foreground'}>
               {project.description || 'No description available'}
             </p>
+
+            {project.status === 'analyzing' && (
+              <Button className={'mt-2 w-full'}>Start Project</Button>
+            )}
           </div>
           <div className={'flex flex-col gap-2'}>
-            {project.status === 'analyzing' && <Button>Start Project</Button>}
-
             <ProjectLogoBuilder
               project={project}
               onMsg={(msg) => {

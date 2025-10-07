@@ -16,15 +16,13 @@ export const MilestonesBlock = ({
       <MilestonesLoader phaseId={phase.id}>
         {(milestones) => (
           <div className={'flex flex-col gap-4'}>
-            <div className={'flex flex-col gap-2'}>
-              {milestones.map((milestone) => (
-                <MilestoneCard
-                  phase={phase}
-                  milestone={milestone}
-                  key={phase.id}
-                />
-              ))}
-            </div>
+            {milestones.map((milestone) => (
+              <MilestoneCard
+                phase={phase}
+                milestone={milestone}
+                key={phase.id}
+              />
+            ))}
           </div>
         )}
       </MilestonesLoader>
