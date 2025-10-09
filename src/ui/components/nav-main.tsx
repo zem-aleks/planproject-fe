@@ -100,14 +100,18 @@ export function NavMain() {
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <Link to={`/project/${project.id}/workspace`}>
-                <SidebarMenuButton>
-                  <Zap />
-                  <span>Workspace</span>
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
+            {project.status === 'active' && (
+              <SidebarMenuItem>
+                <Link to={`/project/${project.id}/workspace`}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/project/${project.id}/workspace`}
+                  >
+                    <Zap />
+                    <span>Workspace</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>

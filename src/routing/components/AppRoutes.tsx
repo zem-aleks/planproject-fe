@@ -7,6 +7,7 @@ import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
 import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.tsx';
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
+import { WorkspacePage } from '@/modules/workspace/pages/WorkspacePage';
 import { InternalElement } from '@/routing/components/InternalElement';
 
 export const AppRoutes = () => {
@@ -53,6 +54,14 @@ export const AppRoutes = () => {
           element={
             <InternalElement>
               <PhaseViewPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/workspace"
+          element={
+            <InternalElement>
+              <WorkspacePage />
             </InternalElement>
           }
         />

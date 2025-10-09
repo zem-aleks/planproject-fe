@@ -23,7 +23,7 @@ export const MilestonesBlock = ({
       </div>
       <MilestonesLoader phaseId={phase.id}>
         {(milestones) => (
-          <div className={'flex flex-col gap-4'}>
+          <div className={'grid gap-4 lg:grid-cols-2'}>
             {milestones.map((milestone) => (
               <MilestoneCard
                 phase={phase}

@@ -1,4 +1,4 @@
-import dayjs from 'dayjs';
+import { Link } from 'react-router';
 
 import { PhaseItemBuilder } from '@/modules/phases/components/PhaseItemBuilder';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
@@ -11,6 +11,7 @@ import { FinishShapingFormInternal } from '@/modules/shaping/components/FinishSh
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
+import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { Separator } from '@/ui/separator';
 import { notReachable } from '@/utils/notReachable';
 
@@ -30,11 +31,6 @@ export const DashboardPage = () => {
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className={'flex flex-row gap-8'}>
           <div className="flex flex-col gap-1">
-            {/*<div>*/}
-            {/*  <span className={'text-2xl'}>Day 1</span>*/}
-            {/*  <Separator className={'my-2'} />*/}
-            {/*</div>*/}
-
             <h1
               className={
                 'flex items-center justify-between gap-2 text-2xl font-semibold'
@@ -49,7 +45,11 @@ export const DashboardPage = () => {
 
             <StartProjectForm project={project} onStarted={reload} />
 
-            <Button className={'mt-2'}>Show tasks</Button>
+            <Button className={'mt-2'} asChild>
+              <Link to={`/project/${project.id}/workspace`}>
+                Open workspace
+              </Link>
+            </Button>
           </div>
           <div className={'flex flex-col gap-2'}>
             <ProjectLogoBuilder
@@ -66,13 +66,10 @@ export const DashboardPage = () => {
               }}
             />
             {project.status === 'active' && (
-              <div className={'mb-2 self-start rounded-lg border p-2 shadow'}>
-                <div className={'text-2xl'}>
-                  Day {dayjs().diff(project.startedAt, 'days') + 1}
-                </div>
-                <Separator className={'my-2'} />
-                Out of {project.daysNeeded || 'N/A'} days
-              </div>
+              <DaysCounter
+                startedAt={project.startedAt}
+                daysCount={project.daysNeeded}
+              />
             )}
           </div>
         </div>
@@ -109,7 +106,6 @@ export const DashboardPage = () => {
                     )}
                   </div>
                   <ol className={'flex flex-col gap-2'}>
-                    {/* TODO: build separated components for loading and built states */}
                     {phases.map((phase, index) => (
                       <li key={phase.id} className={''}>
                         <PhaseItemBuilder
@@ -127,35 +123,6 @@ export const DashboardPage = () => {
             )}
           </PhasesLoader>
         )}
-
-        {/*<ChartAreaInteractive />*/}
-
-        {/*{project.status === 'analyzing' && <PhasesBlock project={project} />}*/}
-
-        {/*{project.status === 'shaping' && (*/}
-        {/*  <ShapingLoader projectId={project.id}>*/}
-        {/*    {(shaping, setData) => (*/}
-        {/*      <ShapingForm*/}
-        {/*        project={project}*/}
-        {/*        shaping={shaping}*/}
-        {/*        onMsg={(msg) => {*/}
-        {/*          switch (msg.type) {*/}
-        {/*            case 'onUpdate':*/}
-        {/*              setData(msg.shaping);*/}
-        {/*              break;*/}
-
-        {/*            case 'onFinish':*/}
-        {/*              reload();*/}
-        {/*              break;*/}
-
-        {/*            default:*/}
-        {/*              return notReachable(msg);*/}
-        {/*          }*/}
-        {/*        }}*/}
-        {/*      />*/}
-        {/*    )}*/}
-        {/*  </ShapingLoader>*/}
-        {/*)}*/}
       </div>
     </PageTemplate>
   );
