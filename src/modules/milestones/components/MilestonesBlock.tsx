@@ -3,6 +3,7 @@ import { MilestonesLoader } from '@/modules/milestones/components/MilestonesLoad
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button';
+import { noOperation } from '@/utils/notReachable';
 
 export const MilestonesBlock = ({
   project,
@@ -29,6 +30,7 @@ export const MilestonesBlock = ({
                 phase={phase}
                 milestone={milestone}
                 key={phase.id}
+                onUpdated={noOperation}
               />
             ))}
           </div>

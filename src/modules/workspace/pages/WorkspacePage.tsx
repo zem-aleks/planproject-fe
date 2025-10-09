@@ -23,7 +23,7 @@ export const WorkspacePage = () => {
       <PhasesLoader projectId={project.id}>
         {(phases) => (
           <div className="flex flex-col gap-4 px-4 py-0">
-            <ActivePhases phases={phases} />
+            <ActivePhases phases={phases} project={project} />
           </div>
         )}
       </PhasesLoader>

@@ -12,6 +12,10 @@ const badgeVariants = cva(
       variant: {
         default:
           'border-transparent bg-neutral-900 text-neutral-50 [a&]:hover:bg-neutral-900/90 dark:bg-neutral-50 dark:text-neutral-900 dark:[a&]:hover:bg-neutral-50/90',
+        warning:
+          'border-transparent bg-yellow-500 text-white [a&]:hover:bg-yellow-500/90 focus-visible:ring-yellow-500/20 dark:focus-visible:ring-yellow-500/40 dark:bg-yellow-500/60 dark:bg-yellow-900 dark:[a&]:hover:bg-yellow-900/90 dark:focus-visible:ring-yellow-900/20 dark:dark:focus-visible:ring-yellow-900/40 dark:dark:bg-yellow-900/60',
+        success:
+          'border-transparent bg-green-500 text-white [a&]:hover:bg-green-500/90 focus-visible:ring-green-500/20 dark:focus-visible:ring-green-500/40 dark:bg-green-500/60 dark:bg-green-900 dark:[a&]:hover:bg-green-900/90 dark:focus-visible:ring-green-900/20 dark:dark:focus-visible:ring-green-900/40 dark:dark:bg-green-900/60',
         secondary:
           'border-transparent bg-neutral-100 text-neutral-900 [a&]:hover:bg-neutral-100/90 dark:bg-neutral-800 dark:text-neutral-50 dark:[a&]:hover:bg-neutral-800/90',
         destructive:

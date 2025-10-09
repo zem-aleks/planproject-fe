@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
+import { toast } from 'sonner';
+
 import { MilestonesBuilder } from '@/modules/milestones/components/MilestonesBuilder';
-import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
+import { startPhase } from '@/modules/phases/api/startPhase';
+import {
+  PhaseEntity,
+  PhaseEntityWithMilestones,
+} from '@/modules/phases/types/entity';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -13,7 +19,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui/dropdown-menu';
+import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { IconDotsVertical } from '@tabler/icons-react';
 
 export const PhaseItemBuilder = ({
@@ -110,7 +118,16 @@ export const PhaseItemBuilder = ({
                     Open
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>Start</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <StartPhaseForm
+                  phase={phase}
+                  onStarted={(newPhase) => {
+                    setCurrentPhase({
+                      ...newPhase,
+                      milestones: currentPhase.milestones,
+                    });
+                  }}
+                />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -120,4 +137,48 @@ export const PhaseItemBuilder = ({
     default:
       return notReachable(currentPhase.status);
   }
+};
+
+const StartPhaseForm = ({
+  phase,
+  onStarted,
+}: {
+  phase: PhaseEntity;
+  onStarted: (phase: PhaseEntity) => void;
+}) => {
+  const { state, load } = useLazyLoadableData(startPhase);
+
+  useEffect(() => {
+    switch (state.type) {
+      case 'loaded':
+        onStarted(state.data);
+        toast.success(`Phase ${phase.title} started successfully!`);
+        break;
+
+      case 'error':
+        toast.error(`Failed to start the phase: ${state.error.message}`);
+        break;
+
+      case 'not_requested':
+      case 'loading':
+        break;
+
+      default:
+        notReachable(state);
+    }
+  }, [state]);
+
+  return (
+    <DropdownMenuItem
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        load(phase.id);
+      }}
+      disabled={state.type === 'loading'}
+    >
+      {state.type === 'loading' && <Spinner />}
+      Start
+    </DropdownMenuItem>
+  );
 };
