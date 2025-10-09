@@ -1,25 +1,23 @@
-import { ReactNode, useContext, useEffect } from 'react';
+import { ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
-import { createProject } from '@/modules/projects/api/createProject.ts';
-import { ProjectForm } from '@/modules/projects/components/forms/ProjectForm.tsx';
-import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext.tsx';
-import { ProjectCreateData } from '@/modules/projects/types/entity';
-import { notReachable } from '@/utils/notReachable.ts';
+import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
+import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
+import { createShaping } from '@/modules/shaping/api/createShaping';
+import { Button } from '@/ui/button';
+import { Textarea } from '@/ui/textarea';
+import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
-
-const DEFAULT_VALUES: ProjectCreateData = {
-  title: '',
-  description: null,
-  logoUrl: null,
-};
 
 export const ProjectCreateForm = (): ReactNode => {
   const { reload } = useContext(ProjectsContext);
   const navigate = useNavigate();
-  const { state, load, reset } = useLazyLoadableData(createProject);
+  const { clientId } = useAuthSession();
+  const { state, load } = useLazyLoadableData(createShaping);
+  const [message, setMessage] = useState<string>('');
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     switch (state.type) {
@@ -28,10 +26,9 @@ export const ProjectCreateForm = (): ReactNode => {
         break;
 
       case 'loaded':
-        reset();
         reload();
-        toast.success(`Project "${state.data.title}" created successfully!`);
-        navigate('/projects');
+        toast.success(`Project draft created successfully!`);
+        navigate(`/projects/edit/${state.data.projectId}`);
         break;
 
       case 'error':
@@ -41,7 +38,40 @@ export const ProjectCreateForm = (): ReactNode => {
       default:
         return notReachable(state);
     }
-  }, [state, reset, navigate, reload]);
+  }, [state, navigate]);
 
-  return <ProjectForm defaultValues={DEFAULT_VALUES} onSubmit={load} />;
+  return (
+    <div
+      className={
+        'flex w-full flex-col items-center justify-center gap-2 p-4 py-0'
+      }
+    >
+      <h1 className={'w-full text-2xl font-semibold'}>New Project</h1>
+      <div className={'w-full'}>
+        <div className={'text-lg'}>Describe Your Idea</div>
+        <div className={'text-muted-foreground'}>
+          Provide all possible details about your project idea to help us create
+          a comprehensive plan.
+        </div>
+      </div>
+      <Textarea
+        id="description"
+        placeholder="Enter your answer"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        rows={3}
+        required={true}
+        disabled={state.type === 'loading'}
+        ref={textAreaRef}
+        className={'w-full'}
+      />
+      <Button
+        className={'w-full'}
+        onClick={() => load({ clientId, message })}
+        loading={state.type === 'loading'}
+      >
+        Submit
+      </Button>
+    </div>
+  );
 };

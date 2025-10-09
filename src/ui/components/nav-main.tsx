@@ -34,8 +34,9 @@ export function NavMain() {
   const { pathname } = useLocation();
   const { projects } = useContext(ProjectsContext);
   const { project } = useProjectByUrlParam();
+  const isProjectEditPage = pathname.startsWith('/projects/edit/');
 
-  if (!project) {
+  if (!project || isProjectEditPage) {
     return (
       <SidebarGroup>
         <SidebarGroupContent className="flex flex-col gap-2">

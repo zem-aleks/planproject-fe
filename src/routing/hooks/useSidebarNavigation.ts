@@ -24,7 +24,9 @@ export const useSidebarNavigation = (): NavItem[] => {
   const { projects } = useContext(ProjectsContext);
   const { project } = useProjectByUrlParam();
 
-  if (!project) {
+  const isProjectEditPage = pathname.startsWith('/projects/edit/');
+
+  if (!project || isProjectEditPage) {
     return [
       {
         title: 'Projects',

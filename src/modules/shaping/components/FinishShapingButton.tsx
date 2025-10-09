@@ -2,20 +2,21 @@ import { useEffect } from 'react';
 
 import { toast } from 'sonner';
 
-import { startProject } from '@/modules/projects/api/startProject';
 import { ProjectEntity } from '@/modules/projects/types/entity';
+import { finishShaping } from '@/modules/shaping/api/finishShaping';
+import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
-export const StartProjectForm = ({
-  project,
-  onStarted,
+export const FinishShapingButton = ({
+  shaping,
+  onFinish,
 }: {
-  project: ProjectEntity;
-  onStarted: () => void;
+  shaping: ShapingEntity;
+  onFinish: (project: ProjectEntity) => void;
 }) => {
-  const { state, load } = useLazyLoadableData(startProject);
+  const { state, load } = useLazyLoadableData(finishShaping);
 
   useEffect(() => {
     switch (state.type) {
@@ -24,14 +25,11 @@ export const StartProjectForm = ({
         break;
 
       case 'error':
-        toast.error(
-          `Failed to start the project: ${state.error.response?.data.message || state.error.message}`,
-        );
+        toast.error(`Failed the shaping processing. Please try again.`);
         break;
 
       case 'loaded':
-        onStarted();
-        toast.success(`Project started successfully!`);
+        onFinish(state.data);
         break;
 
       default:
@@ -39,17 +37,17 @@ export const StartProjectForm = ({
     }
   }, [state]);
 
-  if (project.status !== 'analyzing') {
+  if (shaping.score < 90 || state.type === 'loaded') {
     return null;
   }
 
   return (
     <Button
-      className={'mt-2 w-full'}
+      className={'bg-green-600 text-white hover:bg-green-800'}
       loading={state.type === 'loading'}
-      onClick={() => load(project.id)}
+      onClick={() => load(shaping.id)}
     >
-      Start Project
+      Finish
     </Button>
   );
 };

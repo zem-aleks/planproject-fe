@@ -6,6 +6,7 @@ import {
   Msg as ProjectMenuActionsMsg,
 } from '@/modules/projects/components/card/ProjectMenuActions.tsx';
 import { ProjectEntity } from '@/modules/projects/types/entity';
+import { Badge } from '@/ui/badge';
 import {
   Card,
   CardAction,
@@ -13,6 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/ui/card.tsx';
+import { notReachable } from '@/utils/notReachable';
 
 export type Msg = ProjectMenuActionsMsg;
 
@@ -22,30 +24,69 @@ type Props = {
 };
 
 export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
-  return (
-    <Card
-      className="@container/card cursor-pointer gap-4 bg-gradient-to-b py-6 transition-shadow hover:shadow-lg"
-      tabIndex={0}
-      aria-role="button"
-      onClick={() => onMsg({ type: 'onProjectSelect', project })}
-    >
-      <CardHeader>
-        <div className={'flex gap-4 pr-2'}>
-          <ProjectLogo url={project.logoUrl} size={'medium'} />
-          <div>
-            <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-              {project.title}
-            </CardTitle>
-            <div className={'text-muted-foreground'}>
-              {(project.description || '').slice(0, 140)}...
+  switch (project.status) {
+    case 'draft':
+      return (
+        <Card
+          className="@container/card cursor-pointer gap-4 bg-gradient-to-b py-6 transition-shadow hover:shadow-lg"
+          tabIndex={0}
+          aria-role="button"
+          onClick={() => onMsg({ type: 'onProjectSelect', project })}
+        >
+          <CardHeader>
+            <div className={'flex gap-4 pr-2'}>
+              <div>
+                <ProjectLogo url={project.logoUrl} size={'medium'} />
+                <Badge className={'mt-2'}>{project.status}</Badge>
+              </div>
+              <div>
+                <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                  {project.title}
+                </CardTitle>
+              </div>
             </div>
-          </div>
-        </div>
-        <CardAction>
-          <ProjectMenuActions project={project} onMsg={onMsg} />
-        </CardAction>
-      </CardHeader>
-      <CardFooter className="w-full flex-row items-start justify-between"></CardFooter>
-    </Card>
-  );
+            <CardAction>
+              <ProjectMenuActions project={project} onMsg={onMsg} />
+            </CardAction>
+          </CardHeader>
+          <CardFooter className="w-full flex-row items-start justify-between"></CardFooter>
+        </Card>
+      );
+
+    case 'shaping':
+    case 'analyzing':
+    case 'active':
+    case 'completed':
+    case 'onHold':
+    case 'cancelled':
+      return (
+        <Card
+          className="@container/card cursor-pointer gap-4 bg-gradient-to-b py-6 transition-shadow hover:shadow-lg"
+          tabIndex={0}
+          aria-role="button"
+          onClick={() => onMsg({ type: 'onProjectSelect', project })}
+        >
+          <CardHeader>
+            <div className={'flex gap-4 pr-2'}>
+              <div>
+                <ProjectLogo url={project.logoUrl} size={'medium'} />
+                <Badge className={'mt-2'}>{project.status}</Badge>
+              </div>
+              <div>
+                <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                  {project.title}
+                </CardTitle>
+              </div>
+            </div>
+            <CardAction>
+              <ProjectMenuActions project={project} onMsg={onMsg} />
+            </CardAction>
+          </CardHeader>
+          <CardFooter className="w-full flex-row items-start justify-between"></CardFooter>
+        </Card>
+      );
+
+    default:
+      return notReachable(project.status);
+  }
 };

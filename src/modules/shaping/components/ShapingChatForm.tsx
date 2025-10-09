@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
-import { addShapingUserMessage } from '@/modules/shaping/api/addShapingUserMessage';
+import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
 import { FinishShapingForm } from '@/modules/shaping/components/FinishShapingForm';
+import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
+import { ShapingScore } from '@/modules/shaping/components/ShapingScore';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { supabase } from '@/modules/supabase/client';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { DialogHeader, DialogTitle } from '@/ui/dialog';
 import { Textarea } from '@/ui/textarea';
@@ -27,7 +28,7 @@ export const ShapingChatForm = ({
   onMsg: (msg: Msg) => void;
 }) => {
   const { session, clientId } = useAuthSession();
-  const { state, load } = useLazyLoadableData(addShapingUserMessage);
+  const { state, load } = useLazyLoadableData(addStartShapingUserMessage);
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const assistantMessages = shaping.messages.filter(
@@ -124,14 +125,7 @@ export const ShapingChatForm = ({
   if (shaping.score >= 100) {
     return (
       <>
-        <div
-          className={
-            'flex size-48 flex-col items-center justify-center rounded-full border-3 border-green-700 bg-green-100 text-center text-2xl'
-          }
-        >
-          <p>{shaping.score} / 100</p>
-          <p>points</p>
-        </div>
+        <ShapingScore score={shaping.score} />
 
         <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4">
           <DialogHeader className={'mb-4 flex flex-col items-center gap-2'}>
@@ -192,14 +186,7 @@ export const ShapingChatForm = ({
 
   return (
     <>
-      <div
-        className={
-          'flex size-48 flex-col items-center justify-center rounded-full border-3 border-green-700 bg-green-100 text-center text-2xl'
-        }
-      >
-        <p>{shaping.score} / 100</p>
-        <p>points</p>
-      </div>
+      <ShapingScore score={shaping.score} />
 
       <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4 pb-20">
         <DialogHeader className={'mb-4 flex flex-col items-center gap-2'}>
@@ -232,31 +219,10 @@ export const ShapingChatForm = ({
             Submit
           </Button>
 
-          <div className={'flex w-full items-start gap-2 text-xl'}>
-            <img
-              src={
-                'https://akmoolaxrpskmtqdymjo.supabase.co/storage/v1/object/public/assets/fox.png'
-              }
-              alt={'Funny fox'}
-              className={'animate-in fade-in-0 h-24'}
-            />
-            <Badge
-              variant={'outline'}
-              className={
-                'shrink px-4 py-2 text-sm whitespace-normal sm:text-lg'
-              }
-            >
-              {state.type === 'loading' ? (
-                <>
-                  <b className={'animate-bounce'}>.</b>
-                  <b className={'animate-bounce delay-100'}>.</b>
-                  <b className={'animate-bounce delay-300'}>.</b>
-                </>
-              ) : (
-                lastAssistantMessage.comment
-              )}
-            </Badge>
-          </div>
+          <ShapingComment
+            comment={lastAssistantMessage.comment}
+            loading={state.type === 'loading'}
+          />
         </div>
       </div>
     </>

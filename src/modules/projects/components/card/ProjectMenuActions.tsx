@@ -41,15 +41,17 @@ export const ProjectMenuActions = ({ project, onMsg }: Props) => {
         sideOffset={4}
       >
         <DropdownMenuGroup>
-          <DropdownMenuItem
-            onClick={(e) => {
-              e.stopPropagation();
-              onMsg({ type: 'onProjectSelect', project });
-            }}
-          >
-            <IconCompass />
-            Open
-          </DropdownMenuItem>
+          {project.status !== 'draft' && (
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onMsg({ type: 'onProjectSelect', project });
+              }}
+            >
+              <IconCompass />
+              Open
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             onClick={(e) => {
               e.stopPropagation();

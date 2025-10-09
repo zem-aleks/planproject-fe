@@ -4,8 +4,8 @@ import { PhaseItemBuilder } from '@/modules/phases/components/PhaseItemBuilder';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
 import { PhasesTimeline } from '@/modules/phases/components/PhasesTimeline';
 import { ProjectLogoBuilder } from '@/modules/projects/components/ProjectLogoBuilder';
-import { StartProjectForm } from '@/modules/projects/components/StartProjectForm';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
+import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { FinishShapingFormInternal } from '@/modules/shaping/components/FinishShapingFormInternal';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
@@ -17,7 +17,7 @@ import { notReachable } from '@/utils/notReachable';
 
 export const DashboardPage = () => {
   const { project, reload } = useProjectByUrlParam();
-  if (!project) {
+  if (!project || project.status === 'draft') {
     return <ProjectNotFound />;
   }
 
@@ -30,7 +30,7 @@ export const DashboardPage = () => {
     >
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
         <div className={'flex flex-row gap-8'}>
-          <div className="flex flex-col gap-1">
+          <div className="flex grow flex-col gap-1">
             <h1
               className={
                 'flex items-center justify-between gap-2 text-2xl font-semibold'
@@ -45,11 +45,13 @@ export const DashboardPage = () => {
 
             <StartProjectForm project={project} onStarted={reload} />
 
-            <Button className={'mt-2'} asChild>
-              <Link to={`/project/${project.id}/workspace`}>
-                Open workspace
-              </Link>
-            </Button>
+            {project.status === 'active' && (
+              <Button className={'mt-2'} asChild>
+                <Link to={`/project/${project.id}/workspace`}>
+                  Open workspace
+                </Link>
+              </Button>
+            )}
           </div>
           <div className={'flex flex-col gap-2'}>
             <ProjectLogoBuilder

@@ -33,10 +33,14 @@ export const ProjectsPage = () => {
         projects={projects}
         onMsg={(msg) => {
           switch (msg.type) {
-            case 'onProjectSelect':
+            case 'onProjectSelect': {
+              if (msg.project.status === 'draft') {
+                return navigate(`/projects/edit/${msg.project.id}`);
+              }
               select(msg.project);
               navigate(`/project/${msg.project.id}`);
               break;
+            }
 
             case 'onProjectEdit':
               navigate(`/projects/edit/${msg.project.id}`);

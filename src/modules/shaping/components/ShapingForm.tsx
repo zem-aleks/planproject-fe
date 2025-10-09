@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { ProjectEntity } from '@/modules/projects/types/entity';
-import { addShapingUserMessage } from '@/modules/shaping/api/addShapingUserMessage';
+import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
 import { finishShaping } from '@/modules/shaping/api/finishShaping';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
@@ -22,7 +22,7 @@ export const ShapingForm = ({
   shaping: ShapingEntity;
   onMsg: (msg: Msg) => void;
 }) => {
-  const { state } = useLazyLoadableData(addShapingUserMessage);
+  const { state } = useLazyLoadableData(addStartShapingUserMessage);
   const { state: finishState, load: finishLoad } =
     useLazyLoadableData(finishShaping);
   const [message, setMessage] = useState<string>('');
