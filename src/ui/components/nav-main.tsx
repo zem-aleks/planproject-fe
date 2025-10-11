@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { Link, useLocation } from 'react-router';
 
-import { Zap } from 'lucide-react';
+import { Map, Zap } from 'lucide-react';
 
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
@@ -98,6 +98,16 @@ export function NavMain() {
                 >
                   <IconAdjustmentsStar />
                   <span>Dashboard</span>
+                </SidebarMenuButton>
+              </Link>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <Link to={`/project/${project.id}/roadmap`}>
+                <SidebarMenuButton
+                  isActive={pathname === `/project/${project.id}/roadmap`}
+                >
+                  <Map />
+                  <span>Roadmap</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>

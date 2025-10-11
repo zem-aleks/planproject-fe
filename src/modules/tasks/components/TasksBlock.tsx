@@ -16,11 +16,9 @@ export const TasksBlock = ({ milestone }: { milestone: MilestoneEntity }) => {
             <div className={'text-xl font-semibold'}>Tasks</div>
 
             <div className={'flex flex-col gap-4'}>
-              <div className={'flex flex-wrap gap-2'}>
-                {tasks.map((task) => (
-                  <TaskCard task={task} key={task.id} />
-                ))}
-              </div>
+              {tasks.map((task) => (
+                <TaskCard task={task} key={task.id} />
+              ))}
             </div>
           </div>
         );

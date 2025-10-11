@@ -33,7 +33,7 @@ export const StartProjectForm = ({
 
       case 'loaded':
         onStarted();
-        navigate(`/project/${project.id}/dashboard`);
+        navigate(`/project/${project.id}/workspace`);
         toast.success(`Project started successfully!`);
         break;
 

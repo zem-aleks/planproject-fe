@@ -17,11 +17,7 @@ export const MilestonesLoader = ({ phaseId, children }: Props): ReactNode => {
 
   switch (state.type) {
     case 'loading':
-      return (
-        <div className="flex flex-1 flex-col gap-4">
-          <Skeleton className="aspect-video rounded-xl" />
-        </div>
-      );
+      return <Skeleton className="h-[500px] w-full rounded-xl" />;
 
     case 'error':
       return (

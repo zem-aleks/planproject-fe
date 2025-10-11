@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { MilestonesBuilder } from '@/modules/milestones/components/MilestonesBuilder';
 import { startPhase } from '@/modules/phases/api/startPhase';
+import { PhaseStatusBadge } from '@/modules/phases/components/PhaseStatus';
 import {
   PhaseEntity,
   PhaseEntityWithMilestones,
@@ -60,7 +61,7 @@ export const PhaseItemBuilder = ({
           </Link>
 
           <div className="flex flex-row items-center gap-2">
-            <Badge className={'bg-orange-400 text-white'}>In progress</Badge>
+            <Badge variant={'warning'}>In progress</Badge>
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -70,7 +71,7 @@ export const PhaseItemBuilder = ({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
-                    Open
+                    Preview
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>Pause</DropdownMenuItem>
@@ -91,7 +92,7 @@ export const PhaseItemBuilder = ({
             </Button>
           </Link>
 
-          <Badge className={'bg-green-600 text-white'}>Completed</Badge>
+          <PhaseStatusBadge status={phase.status} />
         </div>
       );
 
@@ -105,7 +106,7 @@ export const PhaseItemBuilder = ({
           </Link>
 
           <div className="flex flex-row items-center gap-2">
-            <Badge className={''}>Not started</Badge>
+            <PhaseStatusBadge status={phase.status} />
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -115,19 +116,24 @@ export const PhaseItemBuilder = ({
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
                   <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
-                    Open
+                    Preview
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <StartPhaseForm
-                  phase={phase}
-                  onStarted={(newPhase) => {
-                    setCurrentPhase({
-                      ...newPhase,
-                      milestones: currentPhase.milestones,
-                    });
-                  }}
-                />
+
+                {project.status === 'active' && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <StartPhaseForm
+                      phase={phase}
+                      onStarted={(newPhase) => {
+                        setCurrentPhase({
+                          ...newPhase,
+                          milestones: currentPhase.milestones,
+                        });
+                      }}
+                    />
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

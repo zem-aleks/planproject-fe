@@ -29,6 +29,12 @@ export const DashboardPage = () => {
       }}
     >
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        {project.status === 'active' && (
+          <DaysCounter
+            startedAt={project.startedAt}
+            daysCount={project.daysNeeded}
+          />
+        )}
         <div className={'flex flex-row gap-8'}>
           <div className="flex grow flex-col gap-1">
             <h1
@@ -47,9 +53,7 @@ export const DashboardPage = () => {
 
             {project.status === 'active' && (
               <Button className={'mt-2'} asChild>
-                <Link to={`/project/${project.id}/workspace`}>
-                  Open workspace
-                </Link>
+                <Link to={`/project/${project.id}/roadmap`}>Open Roadmap</Link>
               </Button>
             )}
           </div>
@@ -67,12 +71,6 @@ export const DashboardPage = () => {
                 }
               }}
             />
-            {project.status === 'active' && (
-              <DaysCounter
-                startedAt={project.startedAt}
-                daysCount={project.daysNeeded}
-              />
-            )}
           </div>
         </div>
 

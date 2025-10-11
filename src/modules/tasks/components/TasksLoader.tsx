@@ -22,7 +22,7 @@ export const TasksLoader = ({ milestoneId, children }: Props): ReactNode => {
   switch (state.type) {
     case 'loading':
       return (
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="flex flex-1 flex-col gap-4">
           <Skeleton className="aspect-video rounded-xl" />
         </div>
       );

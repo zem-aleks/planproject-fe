@@ -1,12 +1,16 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router';
 
 import { toast } from 'sonner';
 
 import { startMilestone } from '@/modules/milestones/api/startMilestone';
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
+import { getTasks } from '@/modules/tasks/api/getTasks';
+import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useLoadableData } from '@/utils/useLoadableData';
 
 export const MilestoneActions = ({
   milestone,
@@ -48,10 +52,51 @@ export const MilestoneActions = ({
       );
 
     case 'completed':
+      return (
+        <Badge variant="success" className={'w-full py-2'}>
+          Milestone completed
+        </Badge>
+      );
+
     case 'inProgress':
-      return null;
+      return <ActionsInProgress milestone={milestone} />;
 
     default:
       return notReachable(milestone.status);
+  }
+};
+
+const ActionsInProgress = ({ milestone }: { milestone: MilestoneEntity }) => {
+  const { state } = useLoadableData(getTasks, milestone.id);
+
+  switch (state.type) {
+    case 'error':
+    case 'loading':
+      return (
+        <Button variant="warning" className={'w-full py-2'} asChild>
+          <Link
+            to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
+            className="w-full"
+          >
+            Tasks
+          </Link>
+        </Button>
+      );
+
+    case 'loaded':
+      return (
+        <Button variant="warning" className={'w-full py-2'} asChild>
+          <Link
+            to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
+            className="w-full"
+          >
+            Tasks: {state.data.filter((t) => t.status === 'completed').length} /{' '}
+            {state.data.length}
+          </Link>
+        </Button>
+      );
+
+    default:
+      return notReachable(state);
   }
 };

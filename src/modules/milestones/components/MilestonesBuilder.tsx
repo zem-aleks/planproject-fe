@@ -30,7 +30,7 @@ export const MilestonesBuilder = ({
   switch (state.type) {
     case 'loading':
       return (
-        <Badge className="mt-2 flex items-center gap-2 bg-yellow-100 text-yellow-800">
+        <Badge variant={'warning'} className="mt-2 flex items-center gap-2">
           <Loader2Icon className="animate-spin" />
           Milestones development in the progress...
         </Badge>
@@ -38,7 +38,7 @@ export const MilestonesBuilder = ({
 
     case 'loaded':
       return (
-        <Badge className="mt-2 flex items-center gap-2 bg-green-100 text-green-800">
+        <Badge variant={'success'} className="mt-2 flex items-center gap-2">
           Success
         </Badge>
       );

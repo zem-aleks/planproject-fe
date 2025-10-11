@@ -2,7 +2,9 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 
 import { LoginPage } from '@/modules/auth/pages/LoginPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
+import { RoadmapPage } from '@/modules/dashboard/pages/RoadmapPage';
 import { HomePage } from '@/modules/home/pages/HomePage';
+import { MilestonePage } from '@/modules/milestones/pages/MilestonePage';
 import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
 import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.tsx';
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
@@ -62,6 +64,24 @@ export const AppRoutes = () => {
           element={
             <InternalElement>
               <WorkspacePage />
+            </InternalElement>
+          }
+        />
+
+        <Route
+          path="/project/:projectId/roadmap"
+          element={
+            <InternalElement>
+              <RoadmapPage />
+            </InternalElement>
+          }
+        />
+
+        <Route
+          path="/project/:projectId/milestone/:milestoneId"
+          element={
+            <InternalElement>
+              <MilestonePage />
             </InternalElement>
           }
         />

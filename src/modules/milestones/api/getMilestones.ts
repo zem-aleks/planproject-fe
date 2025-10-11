@@ -7,7 +7,7 @@ export const getMilestones = async (
   phaseId: string,
   config?: AxiosRequestConfig,
 ): Promise<MilestoneEntity[]> => {
-  return api.get(`/milestones/${phaseId}`, {
+  return api.get(`/milestones/phase/${phaseId}`, {
     signal: config?.signal,
   });
 };
