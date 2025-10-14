@@ -6,6 +6,7 @@ import { PhaseLoader } from '@/modules/phases/components/PhaseLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
+import { DaysCounter } from '@/ui/custom/DaysCounter';
 
 export const PhaseViewPage = () => {
   const { project } = useProjectByUrlParam();
@@ -28,6 +29,12 @@ export const PhaseViewPage = () => {
         {(phase) => (
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
             <div className="flex flex-col gap-1">
+              {phase.status === 'inProgress' && (
+                <DaysCounter
+                  startedAt={phase.startedAt}
+                  daysCount={phase.maxDaysNeeded}
+                />
+              )}
               <h1 className={'text-2xl font-semibold'}>{phase.title}</h1>
               <PhaseDescription phase={phase} />
             </div>

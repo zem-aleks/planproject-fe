@@ -1,14 +1,15 @@
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
-import { TaskCard } from '@/modules/tasks/components/TaskCard';
+import { ActiveTaskCard } from '@/modules/tasks/components/ActiveTaskCard';
 import { TasksBuilder } from '@/modules/tasks/components/TasksBuilder';
 import { TasksLoader } from '@/modules/tasks/components/TasksLoader';
+import { notReachable } from '@/utils/notReachable';
 
 export const TasksBlock = ({ milestone }: { milestone: MilestoneEntity }) => {
   return (
     <TasksLoader milestoneId={milestone.id}>
-      {(tasks, setData) => {
+      {(tasks, reload) => {
         if (tasks.length === 0) {
-          return <TasksBuilder milestone={milestone} onDone={setData} />;
+          return <TasksBuilder milestone={milestone} onDone={reload} />;
         }
 
         return (
@@ -17,7 +18,20 @@ export const TasksBlock = ({ milestone }: { milestone: MilestoneEntity }) => {
 
             <div className={'flex flex-col gap-4'}>
               {tasks.map((task) => (
-                <TaskCard task={task} key={task.id} />
+                <ActiveTaskCard
+                  task={{ ...task, milestone: milestone }}
+                  key={task.id}
+                  onMsg={(msg) => {
+                    switch (msg.type) {
+                      case 'onTaskUpdated':
+                        reload();
+                        break;
+
+                      default:
+                        return notReachable(msg.type);
+                    }
+                  }}
+                />
               ))}
             </div>
           </div>

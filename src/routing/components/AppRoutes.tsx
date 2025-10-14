@@ -9,7 +9,7 @@ import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
 import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.tsx';
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
-import { WorkspacePage } from '@/modules/workspace/pages/WorkspacePage';
+import { TasksPage } from '@/modules/tasks/pages/TasksPage';
 import { InternalElement } from '@/routing/components/InternalElement';
 
 export const AppRoutes = () => {
@@ -60,10 +60,10 @@ export const AppRoutes = () => {
           }
         />
         <Route
-          path="/project/:projectId/workspace"
+          path="/project/:projectId/tasks"
           element={
             <InternalElement>
-              <WorkspacePage />
+              <TasksPage />
             </InternalElement>
           }
         />

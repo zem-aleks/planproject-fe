@@ -112,7 +112,7 @@ export const HomePage = () => {
                   'https://akmoolaxrpskmtqdymjo.supabase.co/storage/v1/object/public/assets/logo/how_it_works_3.png'
                 }
                 title={'3. Start the project'}
-                description={`After the review you can start your project immediately. It will activate your workspace with the detailed tasks.`}
+                description={`After the review you can start your project immediately. It will activate your roadmap and tasks.`}
               />
 
               <HomeCard

@@ -1,3 +1,5 @@
+import { Link } from 'react-router';
+
 import { MilestonesList } from '@/modules/milestones/components/MilestonesList';
 import { PhaseDescription } from '@/modules/phases/components/PhaseDescription';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
@@ -10,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/ui/accordion';
+import { Button } from '@/ui/button';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
 
 export const RoadmapPage = () => {
@@ -53,14 +56,22 @@ export const RoadmapPage = () => {
                       </div>
                     </AccordionTrigger>
                     <AccordionContent className={'flex flex-col gap-2'}>
-                      <div className={'flex gap-2'}>
-                        <PhaseDescription phase={phase} />
-                        {phase.status === 'inProgress' && (
-                          <DaysCounter
-                            startedAt={phase.startedAt}
-                            daysCount={phase.maxDaysNeeded}
-                          />
-                        )}
+                      <div className={'mb-6'}>
+                        <div className={'flex gap-4'}>
+                          <PhaseDescription phase={phase} />
+
+                          {phase.status === 'inProgress' && (
+                            <DaysCounter
+                              startedAt={phase.startedAt}
+                              daysCount={phase.maxDaysNeeded}
+                            />
+                          )}
+                        </div>
+                        <Button size={'sm'} asChild>
+                          <Link to={`/project/${project.id}/phase/${phase.id}`}>
+                            View Phase Details
+                          </Link>
+                        </Button>
                       </div>
                       <MilestonesList phase={phase} />
                     </AccordionContent>

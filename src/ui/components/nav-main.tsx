@@ -16,19 +16,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
 } from '@/ui/sidebar';
-import {
-  type Icon,
-  IconAdjustmentsStar,
-  IconPackages,
-} from '@tabler/icons-react';
-
-export type NavItem = {
-  title: string;
-  url: string;
-  icon?: Icon;
-  isActive?: boolean;
-  subItems?: NavItem[];
-};
+import { IconAdjustmentsStar, IconPackages } from '@tabler/icons-react';
 
 export function NavMain() {
   const { pathname } = useLocation();
@@ -111,14 +99,15 @@ export function NavMain() {
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
+
             {project.status === 'active' && (
               <SidebarMenuItem>
-                <Link to={`/project/${project.id}/workspace`}>
+                <Link to={`/project/${project.id}/tasks`}>
                   <SidebarMenuButton
-                    isActive={pathname === `/project/${project.id}/workspace`}
+                    isActive={pathname === `/project/${project.id}/tasks`}
                   >
                     <Zap />
-                    <span>Workspace</span>
+                    <span>Tasks</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
