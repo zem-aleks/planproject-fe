@@ -58,9 +58,7 @@ export const ActivePhases = ({
                         phase={phase}
                         milestone={milestone}
                         key={milestone.id}
-                        onUpdated={() => {
-                          reload();
-                        }}
+                        onUpdated={reload}
                       />
                     ))}
                   </div>

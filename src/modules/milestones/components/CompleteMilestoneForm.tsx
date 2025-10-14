@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import { completeTask } from '@/modules/tasks/api/completeTask';
-import { TaskDetailsEntity, TaskEntity } from '@/modules/tasks/types/entity';
+import { completeMilestone } from '@/modules/milestones/api/completeMilestone';
+import { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { Button } from '@/ui/button';
 import {
   Dialog,
@@ -16,42 +16,42 @@ import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
-export const CompleteTaskForm = ({
-  task,
+export const CompleteMilestoneForm = ({
+  milestone,
   onUpdate,
 }: {
-  task: TaskDetailsEntity;
-  onUpdate: (task: TaskDetailsEntity) => void;
+  milestone: MilestoneEntity;
+  onUpdate: (milestone: MilestoneEntity) => void;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
   return (
     <>
-      <CompleteTaskModal
+      <CompleteMilestoneModal
         open={open}
         onClose={() => setOpen(false)}
-        task={task}
-        onUpdate={(newTask) => {
-          onUpdate({ ...newTask, milestone: task.milestone });
+        milestone={milestone}
+        onUpdate={(newMilestone) => {
+          onUpdate(newMilestone);
           setOpen(false);
         }}
       />
-      <Button onClick={() => setOpen(true)}>Complete Task</Button>
+      <Button onClick={() => setOpen(true)}>Complete Milestone</Button>
     </>
   );
 };
 
-const CompleteTaskModal = ({
+const CompleteMilestoneModal = ({
   open,
-  task,
+  milestone,
   onClose,
   onUpdate,
 }: {
-  task: TaskDetailsEntity;
+  milestone: MilestoneEntity;
   open: boolean;
   onClose: () => void;
-  onUpdate: (task: TaskEntity) => void;
+  onUpdate: (milestone: MilestoneEntity) => void;
 }) => {
-  const { load, state } = useLazyLoadableData(completeTask);
+  const { load, state } = useLazyLoadableData(completeMilestone);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState<string>('');
 
@@ -89,10 +89,10 @@ const CompleteTaskModal = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className={'text-xl'}>Complete task</DialogTitle>
+          <DialogTitle className={'text-xl'}>Complete milestone</DialogTitle>
           <DialogDescription className={'text-muted-foreground w-full'}>
-            Describe the outcome of your task. Was it done or not? What key
-            learnings did you get? Did you achieve the definition of done?
+            Describe the outcome of your milestone. Was it done or not? What key
+            learnings did you get? Did you finish all tasks?
           </DialogDescription>
         </DialogHeader>
 
@@ -108,7 +108,7 @@ const CompleteTaskModal = ({
         />
         <Button
           className={'w-full'}
-          onClick={() => load({ taskId: task.id, message })}
+          onClick={() => load({ milestoneId: milestone.id, message })}
           loading={state.type === 'loading'}
         >
           Submit

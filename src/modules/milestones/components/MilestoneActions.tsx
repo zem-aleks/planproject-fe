@@ -53,9 +53,19 @@ export const MilestoneActions = ({
 
     case 'completed':
       return (
-        <Badge variant="success" className={'w-full py-2'}>
-          Milestone completed
-        </Badge>
+        <div className={'flex flex-col gap-2'}>
+          <Button variant="warning" className={'w-full py-2'} asChild>
+            <Link
+              to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
+              className="w-full"
+            >
+              Tasks
+            </Link>
+          </Button>
+          <Badge variant="success" className={'w-full py-2'}>
+            Milestone is completed
+          </Badge>
+        </div>
       );
 
     case 'inProgress':
@@ -85,15 +95,17 @@ const ActionsInProgress = ({ milestone }: { milestone: MilestoneEntity }) => {
 
     case 'loaded':
       return (
-        <Button variant="warning" className={'w-full py-2'} asChild>
-          <Link
-            to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
-            className="w-full"
-          >
-            Tasks: {state.data.filter((t) => t.status === 'completed').length} /{' '}
-            {state.data.length}
-          </Link>
-        </Button>
+        <>
+          <Button variant="warning" className={'w-full py-2'} asChild>
+            <Link
+              to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
+              className="w-full"
+            >
+              Tasks: {state.data.filter((t) => t.status === 'completed').length}{' '}
+              / {state.data.length}
+            </Link>
+          </Button>
+        </>
       );
 
     default:

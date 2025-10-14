@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneActions } from '@/modules/milestones/components/MilestoneActions';
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { PhaseEntity } from '@/modules/phases/types/entity';
@@ -17,6 +18,11 @@ export const MilestoneCard = ({
   onUpdated: (milestone: MilestoneEntity) => void;
 }) => {
   const [currentMilestone, setCurrentMilestone] = useState(milestone);
+
+  useEffect(() => {
+    setCurrentMilestone(milestone);
+  }, [milestone]);
+
   return (
     <Card key={currentMilestone.id} className={'gap-0 p-4'}>
       <div className={'flex items-start justify-between'}>
@@ -45,13 +51,19 @@ export const MilestoneCard = ({
       </div>
 
       {phase.status === 'inProgress' && (
-        <MilestoneActions
-          milestone={currentMilestone}
-          onUpdated={(milestone) => {
-            setCurrentMilestone(milestone);
-            onUpdated(milestone);
-          }}
-        />
+        <div className={'flex flex-col gap-2'}>
+          <MilestoneActions
+            milestone={currentMilestone}
+            onUpdated={(milestone) => {
+              setCurrentMilestone(milestone);
+              onUpdated(milestone);
+            }}
+          />
+
+          {milestone.status !== 'completed' && (
+            <CompleteMilestoneForm milestone={milestone} onUpdate={onUpdated} />
+          )}
+        </div>
       )}
 
       {/*<TasksBlock milestone={milestone} />*/}

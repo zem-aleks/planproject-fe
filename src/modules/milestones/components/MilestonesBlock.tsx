@@ -3,7 +3,6 @@ import { MilestonesLoader } from '@/modules/milestones/components/MilestonesLoad
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button';
-import { noOperation } from '@/utils/notReachable';
 
 export const MilestonesBlock = ({
   project,
@@ -23,14 +22,14 @@ export const MilestonesBlock = ({
         )}
       </div>
       <MilestonesLoader phaseId={phase.id}>
-        {(milestones) => (
+        {(milestones, reload) => (
           <div className={'grid gap-4 lg:grid-cols-2'}>
             {milestones.map((milestone) => (
               <MilestoneCard
                 phase={phase}
                 milestone={milestone}
                 key={phase.id}
-                onUpdated={noOperation}
+                onUpdated={reload}
               />
             ))}
           </div>
