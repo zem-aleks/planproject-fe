@@ -1,8 +1,10 @@
 import { Link } from 'react-router';
 
 import { MilestonesList } from '@/modules/milestones/components/MilestonesList';
+import { CompletePhaseForm } from '@/modules/phases/components/CompletePhaseForm';
 import { PhaseDescription } from '@/modules/phases/components/PhaseDescription';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
+import { StartPhaseForm } from '@/modules/phases/components/StartPhaseForm';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
@@ -45,7 +47,7 @@ export const RoadmapPage = () => {
         </div>
 
         <PhasesLoader projectId={project.id}>
-          {(phases) => (
+          {(phases, _, setPhases) => (
             <div className={'flex flex-col'}>
               <Accordion type="multiple">
                 {phases.map((phase, index) => (
@@ -67,11 +69,52 @@ export const RoadmapPage = () => {
                             />
                           )}
                         </div>
-                        <Button size={'sm'} asChild>
-                          <Link to={`/project/${project.id}/phase/${phase.id}`}>
-                            View Phase Details
-                          </Link>
-                        </Button>
+                        Actions
+                        <div className={'mt-2 flex items-center gap-2'}>
+                          <Button size={'sm'} asChild>
+                            <Link
+                              to={`/project/${project.id}/phase/${phase.id}`}
+                            >
+                              View Phase Details
+                            </Link>
+                          </Button>
+                          {phase.status === 'inProgress' && (
+                            <CompletePhaseForm
+                              variant={'button'}
+                              phase={phase}
+                              onCompleted={(newPhase) => {
+                                setPhases(
+                                  phases.map((p) =>
+                                    p.id === newPhase.id
+                                      ? {
+                                          ...newPhase,
+                                          milestones: phase.milestones,
+                                        }
+                                      : p,
+                                  ),
+                                );
+                              }}
+                            />
+                          )}
+                          {phase.status === 'notStarted' && (
+                            <StartPhaseForm
+                              variant={'button'}
+                              phase={phase}
+                              onStarted={(newPhase) => {
+                                setPhases(
+                                  phases.map((p) =>
+                                    p.id === newPhase.id
+                                      ? {
+                                          ...newPhase,
+                                          milestones: phase.milestones,
+                                        }
+                                      : p,
+                                  ),
+                                );
+                              }}
+                            />
+                          )}
+                        </div>
                       </div>
                       <MilestonesList phase={phase} />
                     </AccordionContent>

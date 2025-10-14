@@ -12,11 +12,12 @@ type Props = {
   children: (
     chat: PhaseEntityWithMilestones[],
     reload: () => void,
+    setData: (data: PhaseEntityWithMilestones[]) => void,
   ) => ReactNode;
 };
 
 export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
-  const { state, reload } = useReloadableData(getPhases, projectId);
+  const { state, reload, setData } = useReloadableData(getPhases, projectId);
 
   switch (state.type) {
     case 'loading':
@@ -37,7 +38,7 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
 
     case 'reloading':
     case 'loaded':
-      return <>{children(state.data, reload)}</>;
+      return <>{children(state.data, reload, setData)}</>;
 
     default:
       return notReachable(state);

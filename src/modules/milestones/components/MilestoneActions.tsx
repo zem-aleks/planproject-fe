@@ -63,8 +63,17 @@ export const MilestoneActions = ({
             </Link>
           </Button>
           <Badge variant="success" className={'w-full py-2'}>
-            Milestone is completed
+            Completed
           </Badge>
+          {milestone.completeMessage && (
+            <div
+              className={
+                'text-muted-foreground bg-secondary rounded-lg p-2 px-4'
+              }
+            >
+              <b>Comment:</b> {milestone.completeMessage}
+            </div>
+          )}
         </div>
       );
 

@@ -6,6 +6,7 @@ import { ActiveTasksLoader } from '@/modules/tasks/components/ActiveTasksLoader'
 import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
+import { notReachable } from '@/utils/notReachable';
 
 export const TasksPage = () => {
   const { project } = useProjectByUrlParam();
@@ -40,7 +41,13 @@ export const TasksPage = () => {
         </div>
 
         <ActiveTasksLoader projectId={project.id}>
-          {(tasks) => <ActiveTasksList tasks={tasks} project={project} />}
+          {(tasks, reload) => (
+            <ActiveTasksList
+              tasks={tasks}
+              project={project}
+              onChange={reload}
+            />
+          )}
         </ActiveTasksLoader>
       </div>
     </PageTemplate>
@@ -50,9 +57,11 @@ export const TasksPage = () => {
 export const ActiveTasksList = ({
   // project,
   tasks,
+  onChange,
 }: {
   project: ProjectEntity;
   tasks: TaskDetailsEntity[];
+  onChange: () => void;
 }) => {
   const tasksByDay = tasks.reduce(
     (acc, task) => {
@@ -90,7 +99,20 @@ export const ActiveTasksList = ({
         <TabsContent value={`day-${day}`} className={''}>
           {/*<div className={'grid grid-cols-1 gap-4 md:grid-cols-2'}>*/}
           {tasks.map((task) => (
-            <ActiveTaskCard task={task} key={task.id} />
+            <ActiveTaskCard
+              task={task}
+              key={task.id}
+              onMsg={(msg) => {
+                switch (msg.type) {
+                  case 'onTaskUpdated':
+                    onChange();
+                    break;
+
+                  default:
+                    return notReachable(msg.type);
+                }
+              }}
+            />
           ))}
           {/*</div>*/}
         </TabsContent>

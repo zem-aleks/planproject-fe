@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 
-import { toast } from 'sonner';
-
 import { MilestonesBuilder } from '@/modules/milestones/components/MilestonesBuilder';
-import { startPhase } from '@/modules/phases/api/startPhase';
+import { CompletePhaseForm } from '@/modules/phases/components/CompletePhaseForm';
 import { PhaseStatusBadge } from '@/modules/phases/components/PhaseStatus';
-import {
-  PhaseEntity,
-  PhaseEntityWithMilestones,
-} from '@/modules/phases/types/entity';
+import { StartPhaseForm } from '@/modules/phases/components/StartPhaseForm';
+import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -20,9 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui/dropdown-menu';
-import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { IconDotsVertical } from '@tabler/icons-react';
 
 export const PhaseItemBuilder = ({
@@ -36,6 +30,8 @@ export const PhaseItemBuilder = ({
 }) => {
   const [currentPhase, setCurrentPhase] =
     useState<PhaseEntityWithMilestones>(phase);
+
+  console.log(currentPhase);
 
   switch (currentPhase.status) {
     case 'building':
@@ -74,9 +70,17 @@ export const PhaseItemBuilder = ({
                     Preview
                   </Link>
                 </DropdownMenuItem>
-                <DropdownMenuItem>Pause</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Complete</DropdownMenuItem>
+                <CompletePhaseForm
+                  phase={currentPhase}
+                  onCompleted={(newPhase) =>
+                    setCurrentPhase({
+                      ...newPhase,
+                      milestones: currentPhase.milestones,
+                    })
+                  }
+                  variant={'menuItem'}
+                />
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -92,7 +96,7 @@ export const PhaseItemBuilder = ({
             </Button>
           </Link>
 
-          <PhaseStatusBadge status={phase.status} />
+          <PhaseStatusBadge status={currentPhase.status} />
         </div>
       );
 
@@ -106,7 +110,7 @@ export const PhaseItemBuilder = ({
           </Link>
 
           <div className="flex flex-row items-center gap-2">
-            <PhaseStatusBadge status={phase.status} />
+            <PhaseStatusBadge status={currentPhase.status} />
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant="ghost" className="h-8 w-8 p-0">
@@ -124,6 +128,7 @@ export const PhaseItemBuilder = ({
                   <>
                     <DropdownMenuSeparator />
                     <StartPhaseForm
+                      variant={'menuItem'}
                       phase={phase}
                       onStarted={(newPhase) => {
                         setCurrentPhase({
@@ -143,48 +148,4 @@ export const PhaseItemBuilder = ({
     default:
       return notReachable(currentPhase.status);
   }
-};
-
-const StartPhaseForm = ({
-  phase,
-  onStarted,
-}: {
-  phase: PhaseEntity;
-  onStarted: (phase: PhaseEntity) => void;
-}) => {
-  const { state, load } = useLazyLoadableData(startPhase);
-
-  useEffect(() => {
-    switch (state.type) {
-      case 'loaded':
-        onStarted(state.data);
-        toast.success(`Phase ${phase.title} started successfully!`);
-        break;
-
-      case 'error':
-        toast.error(`Failed to start the phase: ${state.error.message}`);
-        break;
-
-      case 'not_requested':
-      case 'loading':
-        break;
-
-      default:
-        notReachable(state);
-    }
-  }, [state]);
-
-  return (
-    <DropdownMenuItem
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        load(phase.id);
-      }}
-      disabled={state.type === 'loading'}
-    >
-      {state.type === 'loading' && <Spinner />}
-      Start
-    </DropdownMenuItem>
-  );
 };
