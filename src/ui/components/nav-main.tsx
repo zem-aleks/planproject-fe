@@ -40,7 +40,13 @@ export function NavMain() {
               <SidebarMenuSub>
                 {projects.map((project) => (
                   <SidebarMenuSubItem>
-                    <Link to={`/project/${project.id}`}>
+                    <Link
+                      to={
+                        project.status === 'draft'
+                          ? `/projects/edit/${project.id}`
+                          : `/project/${project.id}`
+                      }
+                    >
                       <SidebarMenuSubButton>
                         <span>{project.title}</span>
                       </SidebarMenuSubButton>
@@ -56,65 +62,47 @@ export function NavMain() {
   }
 
   return (
-    <>
-      {/*<SidebarGroup>*/}
-      {/*  <SidebarGroupContent className="flex flex-col gap-2">*/}
-      {/*    <SidebarMenu>*/}
-      {/*      <SidebarMenuItem key={'projects'}>*/}
-      {/*        <Link to={'/projects'}>*/}
-      {/*          <SidebarMenuButton>*/}
-      {/*            <IconPackages />*/}
-      {/*            <span>Projects</span>*/}
-      {/*          </SidebarMenuButton>*/}
-      {/*        </Link>*/}
-      {/*      </SidebarMenuItem>*/}
-      {/*    </SidebarMenu>*/}
-      {/*    <SidebarSeparator />*/}
-      {/*  </SidebarGroupContent>*/}
-      {/*</SidebarGroup>*/}
+    <SidebarGroup>
+      <SidebarGroupLabel className={'mb-2 h-auto text-lg font-semibold'}>
+        {project.title}
+      </SidebarGroupLabel>
+      <SidebarGroupContent className="flex flex-col gap-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}`}
+              >
+                <IconAdjustmentsStar />
+                <span>Dashboard</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}/roadmap`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/roadmap`}
+              >
+                <Map />
+                <span>Roadmap</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
 
-      <SidebarGroup>
-        <SidebarGroupLabel className={'mb-2 h-auto text-lg font-semibold'}>
-          {project.title}
-        </SidebarGroupLabel>
-        <SidebarGroupContent className="flex flex-col gap-2">
-          <SidebarMenu>
+          {project.status === 'active' && (
             <SidebarMenuItem>
-              <Link to={`/project/${project.id}`}>
+              <Link to={`/project/${project.id}/tasks`}>
                 <SidebarMenuButton
-                  isActive={pathname === `/project/${project.id}`}
+                  isActive={pathname === `/project/${project.id}/tasks`}
                 >
-                  <IconAdjustmentsStar />
-                  <span>Dashboard</span>
+                  <Zap />
+                  <span>Tasks</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
-            <SidebarMenuItem>
-              <Link to={`/project/${project.id}/roadmap`}>
-                <SidebarMenuButton
-                  isActive={pathname === `/project/${project.id}/roadmap`}
-                >
-                  <Map />
-                  <span>Roadmap</span>
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
-
-            {project.status === 'active' && (
-              <SidebarMenuItem>
-                <Link to={`/project/${project.id}/tasks`}>
-                  <SidebarMenuButton
-                    isActive={pathname === `/project/${project.id}/tasks`}
-                  >
-                    <Zap />
-                    <span>Tasks</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
-        </SidebarGroupContent>
-      </SidebarGroup>
-    </>
+          )}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
   );
 }
