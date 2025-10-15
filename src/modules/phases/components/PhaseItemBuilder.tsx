@@ -31,8 +31,6 @@ export const PhaseItemBuilder = ({
   const [currentPhase, setCurrentPhase] =
     useState<PhaseEntityWithMilestones>(phase);
 
-  console.log(currentPhase);
-
   switch (currentPhase.status) {
     case 'building':
       return (
@@ -111,36 +109,36 @@ export const PhaseItemBuilder = ({
 
           <div className="flex flex-row items-center gap-2">
             <PhaseStatusBadge status={currentPhase.status} />
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <IconDotsVertical className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
-                    Preview
-                  </Link>
-                </DropdownMenuItem>
+            {project.status === 'active' && (
+              <DropdownMenu>
+                <DropdownMenuTrigger>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <IconDotsVertical className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to={`/project/${project.id}/phase/${currentPhase.id}`}
+                    >
+                      Preview
+                    </Link>
+                  </DropdownMenuItem>
 
-                {project.status === 'active' && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <StartPhaseForm
-                      variant={'menuItem'}
-                      phase={phase}
-                      onStarted={(newPhase) => {
-                        setCurrentPhase({
-                          ...newPhase,
-                          milestones: currentPhase.milestones,
-                        });
-                      }}
-                    />
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuSeparator />
+                  <StartPhaseForm
+                    variant={'menuItem'}
+                    phase={phase}
+                    onStarted={(newPhase) => {
+                      setCurrentPhase({
+                        ...newPhase,
+                        milestones: currentPhase.milestones,
+                      });
+                    }}
+                  />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       );

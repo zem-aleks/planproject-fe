@@ -44,7 +44,7 @@ export function PhasesTimeline({ phases }: { phases: PhaseEntity[] }) {
   const endOfTimeline = Math.max(...phases.map((p) => p.timelineEndDay), 0);
 
   return (
-    <Card>
+    <Card className={'py-4'}>
       <CardHeader>
         <CardTitle>Project Timeline (avg)</CardTitle>
         <CardDescription>
@@ -52,7 +52,10 @@ export function PhasesTimeline({ phases }: { phases: PhaseEntity[] }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer
+          config={chartConfig}
+          className={'aspect-auto h-[520px] w-full'}
+        >
           <BarChart accessibilityLayer data={chartData} layout="vertical">
             <CartesianGrid horizontal={false} />
 
