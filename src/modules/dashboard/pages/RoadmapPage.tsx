@@ -1,4 +1,4 @@
-import { MilestonesList } from '@/modules/milestones/components/MilestonesList';
+import { MilestonesBlock } from '@/modules/milestones/components/MilestonesBlock';
 import { PhaseDescription } from '@/modules/phases/components/PhaseDescription';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
 import { ProjectActions } from '@/modules/projects/components/ProjectActions';
@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/ui/accordion';
+import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { notReachable } from '@/utils/notReachable';
 
@@ -65,7 +66,7 @@ export const RoadmapPage = () => {
 
         <PhasesLoader projectId={project.id}>
           {(phases) => (
-            <div className={'flex flex-col'}>
+            <Card className={'p-4 py-1'}>
               <Accordion type="multiple">
                 {phases.map((phase, index) => (
                   <AccordionItem value={phase.id}>
@@ -133,12 +134,12 @@ export const RoadmapPage = () => {
                         {/*  )}*/}
                         {/*</div>*/}
                       </div>
-                      <MilestonesList phase={phase} />
+                      <MilestonesBlock phase={phase} project={project} />
                     </AccordionContent>
                   </AccordionItem>
                 ))}
               </Accordion>
-            </div>
+            </Card>
           )}
         </PhasesLoader>
       </div>
