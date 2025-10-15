@@ -134,7 +134,11 @@ export const RoadmapPage = () => {
                         {/*  )}*/}
                         {/*</div>*/}
                       </div>
-                      <MilestonesBlock phase={phase} project={project} />
+                      <MilestonesBlock
+                        phase={phase}
+                        project={project}
+                        // onModified={reload}
+                      />
                     </AccordionContent>
                   </AccordionItem>
                 ))}
