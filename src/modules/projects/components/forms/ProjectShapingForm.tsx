@@ -98,7 +98,7 @@ export const ProjectShapingForm = ({
         shaping={shaping}
         onFinish={() => {
           reload();
-          navigate(`/project/${project.id}`);
+          navigate(`/project/${project.id}?new=true`);
         }}
       />
     </div>

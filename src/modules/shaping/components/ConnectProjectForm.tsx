@@ -27,7 +27,7 @@ export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
         break;
 
       case 'loaded':
-        navigate(`/project/${project.id}`);
+        navigate(`/project/${project.id}?new=true`);
         break;
 
       default:
