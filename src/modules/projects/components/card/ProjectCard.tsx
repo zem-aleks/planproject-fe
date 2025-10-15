@@ -1,12 +1,12 @@
 import { ReactNode } from 'react';
 
 import { ProjectLogo } from '@/modules/projects/components/ProjectLogo';
+import { ProjectStatusBadge } from '@/modules/projects/components/ProjectStatus';
 import {
   ProjectMenuActions,
   Msg as ProjectMenuActionsMsg,
 } from '@/modules/projects/components/card/ProjectMenuActions.tsx';
 import { ProjectEntity } from '@/modules/projects/types/entity';
-import { Badge } from '@/ui/badge';
 import {
   Card,
   CardAction,
@@ -35,10 +35,7 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
         >
           <CardHeader>
             <div className={'flex gap-4 pr-2'}>
-              <div>
-                <ProjectLogo url={project.logoUrl} size={'medium'} />
-                <Badge className={'mt-2'}>{project.status}</Badge>
-              </div>
+              <ProjectLogo url={project.logoUrl} size={'medium'} />
               <div>
                 <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
                   {project.title}
@@ -49,7 +46,9 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
               <ProjectMenuActions project={project} onMsg={onMsg} />
             </CardAction>
           </CardHeader>
-          <CardFooter className="w-full flex-row items-start justify-between"></CardFooter>
+          <CardFooter className="w-full flex-row items-start justify-between">
+            <ProjectStatusBadge status={project.status} />
+          </CardFooter>
         </Card>
       );
 
@@ -70,7 +69,6 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
             <div className={'flex gap-4 pr-2'}>
               <div>
                 <ProjectLogo url={project.logoUrl} size={'medium'} />
-                <Badge className={'mt-2'}>{project.status}</Badge>
               </div>
               <div>
                 <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -82,7 +80,9 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
               <ProjectMenuActions project={project} onMsg={onMsg} />
             </CardAction>
           </CardHeader>
-          <CardFooter className="w-full flex-row items-start justify-between"></CardFooter>
+          <CardFooter className="w-full flex-row items-start justify-between">
+            <ProjectStatusBadge status={project.status} />
+          </CardFooter>
         </Card>
       );
 

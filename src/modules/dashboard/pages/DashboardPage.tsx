@@ -7,11 +7,11 @@ import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
 import { PhasesTimeline } from '@/modules/phases/components/PhasesTimeline';
 import { ProjectActions } from '@/modules/projects/components/ProjectActions';
 import { ProjectLogoBuilder } from '@/modules/projects/components/ProjectLogoBuilder';
+import { ProjectStatusBadge } from '@/modules/projects/components/ProjectStatus';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { FinishShapingFormInternal } from '@/modules/shaping/components/FinishShapingFormInternal';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
-import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
@@ -46,7 +46,7 @@ export const DashboardPage = () => {
               }
             >
               {project.title}
-              <Badge>Status: {project.status}</Badge>
+              <ProjectStatusBadge status={project.status} />
             </h1>
             <p className={'text-muted-foreground'}>
               {project.description || 'No description available'}
