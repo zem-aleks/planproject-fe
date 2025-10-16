@@ -35,7 +35,7 @@ export const PhaseItemBuilder = ({
     case 'building':
       return (
         <div className={'flex items-center justify-between'}>
-          <div>
+          <div className={'text-sm font-medium'}>
             {index + 1}. {currentPhase.title}
           </div>
           <MilestonesBuilder

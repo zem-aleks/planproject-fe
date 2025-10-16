@@ -1,9 +1,12 @@
+import { PhaseEntity } from '@/modules/phases/types/entity';
+import { ModifyPhasesForm } from '@/modules/projects/components/forms/ModifyPhasesForm';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
 import { ProjectEntity } from '@/modules/projects/types/entity';
-import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
 
-export type Msg = { type: 'onProjectStarted' } | { type: 'onPhasesChanged' };
+export type Msg =
+  | { type: 'onProjectStarted' }
+  | { type: 'onPhasesChanged'; phases: PhaseEntity[] };
 
 export const ProjectActions = ({
   project,
@@ -38,13 +41,10 @@ export const ProjectActions = ({
             </div>
           </div>
 
-          <Button
-            variant={'outline'}
-            onClick={() => alert('Coming soon!')}
-            className={'w-full'}
-          >
-            Modify Phases
-          </Button>
+          <ModifyPhasesForm
+            project={project}
+            onModified={(phases) => onMsg({ type: 'onPhasesChanged', phases })}
+          />
         </div>
       );
 

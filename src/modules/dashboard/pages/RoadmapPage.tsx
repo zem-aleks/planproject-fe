@@ -44,7 +44,8 @@ export const RoadmapPage = () => {
               <ProjectStatusBadge status={project.status} />
             </h1>
             <p className={'text-muted-foreground'}>
-              Overview of all project phases and their milestones
+              Overview of all project phases and their milestones. You can start
+              the project immediately or modify the phases and milestones first.
             </p>
 
             <ProjectActions
@@ -71,7 +72,7 @@ export const RoadmapPage = () => {
                 {phases.map((phase, index) => (
                   <AccordionItem value={phase.id}>
                     <AccordionTrigger>
-                      <div className={'flex items-center gap-2 text-xl'}>
+                      <div className={'flex items-center gap-2 text-lg'}>
                         {index + 1}. {phase.title}
                       </div>
                     </AccordionTrigger>

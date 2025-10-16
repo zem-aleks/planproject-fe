@@ -5,14 +5,14 @@ import { ProjectEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData.ts';
+import { useLoadableData } from '@/utils/useLoadableData';
 
 type Props = {
   children: (chat: ProjectEntity[], reload: () => void) => ReactNode;
 };
 
 export const ProjectsLoader = ({ children }: Props): ReactNode => {
-  const { state, reload } = useReloadableData(getProjects, undefined);
+  const { state, reload } = useLoadableData(getProjects, undefined);
 
   switch (state.type) {
     case 'loading':
@@ -35,7 +35,7 @@ export const ProjectsLoader = ({ children }: Props): ReactNode => {
         </div>
       );
 
-    case 'reloading':
+    // case 'reloading':
     case 'loaded':
       return <>{children(state.data, reload)}</>;
 
