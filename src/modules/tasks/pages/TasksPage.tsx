@@ -1,10 +1,17 @@
+import { Link } from 'react-router';
+
+import { Map } from 'lucide-react';
+
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
 import { ActiveTaskCard } from '@/modules/tasks/components/ActiveTaskCard';
-import { ActiveTasksLoader } from '@/modules/tasks/components/ActiveTasksLoader';
 import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
+import { TodayTimelineLoader } from '@/modules/timeline/components/TodayTimelineLoader';
+import { Button } from '@/ui/button';
+import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 import { notReachable } from '@/utils/notReachable';
 
@@ -32,23 +39,63 @@ export const TasksPage = () => {
                 'flex items-center justify-between gap-2 text-2xl font-semibold'
               }
             >
-              Tasks
+              Today Tasks
             </h1>
             <div className={'text-muted-foreground'}>
-              List of all active tasks
+              List of tasks that're planned for today.
             </div>
           </div>
+          <DaysCounter
+            startedAt={project.startedAt}
+            daysCount={project.daysNeeded}
+          />
         </div>
 
-        <ActiveTasksLoader projectId={project.id}>
-          {(tasks, reload) => (
-            <ActiveTasksList
-              tasks={tasks}
-              project={project}
-              onChange={reload}
-            />
-          )}
-        </ActiveTasksLoader>
+        <TodayTimelineLoader projectId={project.id}>
+          {(timelinePoint) => {
+            if (!timelinePoint) {
+              return (
+                <div className={'flex flex-col gap-2'}>
+                  There no active tasks. Please review the phases and activate
+                  some of them to generate new tasks
+                  <Button asChild={true}>
+                    <Link to={`/project/${project.id}/roadmap`}>
+                      <Map />
+                      Roadmap
+                    </Link>
+                  </Button>
+                </div>
+              );
+            }
+
+            return (
+              <div className={'flex flex-col gap-2'}>
+                <ShapingComment comment={timelinePoint.comment} />
+                {timelinePoint.tasks.map((task) => (
+                  <ActiveTaskCard
+                    task={task}
+                    key={task.id}
+                    onMsg={(msg) => {
+                      switch (msg.type) {
+                        case 'onTaskUpdated':
+                          // onChange();
+                          break;
+
+                        default:
+                          return notReachable(msg.type);
+                      }
+                    }}
+                  />
+                ))}
+                {/*<ActiveTasksList*/}
+                {/*  tasks={timelinePoint.tasks}*/}
+                {/*  project={project}*/}
+                {/*  onChange={() => {}}*/}
+                {/*/>*/}
+              </div>
+            );
+          }}
+        </TodayTimelineLoader>
       </div>
     </PageTemplate>
   );
