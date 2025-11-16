@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
-import { LogoBlock } from '@/modules/home/components/LogoBlock';
+import { GradientBackground } from '@/modules/home/components/GradientBackground';
+import { LogoBlockWhite } from '@/modules/home/components/LogoBlockWhite';
 import { ShapingModal } from '@/modules/shaping/components/ShapingModal';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
@@ -12,7 +13,7 @@ export const HomePage = () => {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <div className={'bg-background min-h-screen'}>
+    <div className={'bg-background relative min-h-screen'}>
       <ShapingModal
         open={open}
         onMsg={(msg) => {
@@ -27,10 +28,14 @@ export const HomePage = () => {
         }}
       />
 
-      <header className={'bg-background absolute top-0 z-50 w-full border-b'}>
+      <div className={'absolute top-0 left-0 z-20 h-[700px] w-full'}>
+        <GradientBackground />
+      </div>
+
+      <header className={'absolute top-0 z-50 w-full border-b'}>
         <div className="container mx-auto px-4">
           <div className={'flex h-16 items-center justify-between'}>
-            <LogoBlock />
+            <LogoBlockWhite />
 
             {session ? (
               <Button asChild>
@@ -48,14 +53,14 @@ export const HomePage = () => {
         </div>
       </header>
 
-      <section className="flex items-center justify-center pt-56 pb-40">
+      <section className="relative z-40 flex items-center justify-center pt-56 pb-40">
         <div className="container mx-auto px-4">
           <div className="grid items-center gap-8 lg:grid-cols-2">
             <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-              <h1 className="my-6 text-4xl font-bold text-pretty lg:text-6xl">
+              <h1 className="my-6 text-4xl font-bold text-pretty text-gray-300 lg:text-6xl">
                 PLANPROJECT.AI
               </h1>
-              <p className="text-muted-foreground mb-8 max-w-xl lg:text-xl">
+              <p className="mb-8 max-w-xl text-gray-300 lg:text-xl">
                 Platform that transforms your ideas into structured project
                 plans in minutes. Empowering you to kickstart your projects with
                 clarity and confidence. Frustrated with vague project ideas? Let
@@ -72,11 +77,9 @@ export const HomePage = () => {
               </div>
             </div>
             <img
-              src={
-                'https://akmoolaxrpskmtqdymjo.supabase.co/storage/v1/object/public/assets/logo/heroimage.jpeg'
-              }
+              src={'/images/hero_img.png'}
               alt={'hero image'}
-              className="max-h-96 w-full rounded-md object-cover"
+              className="max-h-96 w-full rounded-md object-contain"
             />
           </div>
         </div>
