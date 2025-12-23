@@ -1,4 +1,5 @@
 import { AxiosError } from 'axios';
+import { Lightbulb } from 'lucide-react';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { getStartShaping } from '@/modules/shaping/api/getStartShaping';
@@ -34,7 +35,7 @@ export const ShapingModal = ({
       onOpenChange={(open) => !open && onMsg({ type: 'onClose' })}
       modal={true}
     >
-      <DialogContent className="flex h-full max-w-full flex-col items-center justify-center gap-4 rounded-none sm:h-full sm:max-w-full">
+      <DialogContent className="flex h-full w-full max-w-full flex-col items-center justify-center gap-4 rounded-none sm:max-w-full md:h-[90%] md:w-[94%] md:max-w-[94%] md:rounded-md">
         <ShapingContent />
       </DialogContent>
     </Dialog>
@@ -141,28 +142,34 @@ const ShapingContentInitialForm = ({
   onMsg: (msg: ShapingPublicFormFormMsg) => void;
 }) => {
   return (
-    <>
-      <div
+    <div
+      className={'relative flex min-h-full w-full flex-col gap-2 md:flex-row'}
+    >
+      <DialogHeader
         className={
-          'flex size-48 flex-col items-center justify-center rounded-full border-3 border-green-700 bg-green-100 text-center text-2xl'
+          'relative hidden flex-col items-center justify-center gap-3 overflow-hidden rounded-md bg-[#803698] p-4 md:flex md:h-full md:basis-1/2 md:items-start md:p-10 md:pr-4'
         }
       >
-        <p>0 / 100</p>
-        <p>points</p>
-      </div>
+        <DialogTitle
+          className={'flex gap-1 text-2xl text-gray-200 md:text-4xl'}
+        >
+          <span>Describe Your Idea</span>
+          <Lightbulb className={'size-10 text-gray-200'} />
+        </DialogTitle>
+        <DialogDescription
+          className={'w-full text-lg text-gray-200 md:text-2xl'}
+        >
+          Provide all possible details about your project idea to help us create
+          a comprehensive plan. Add all information that can be related to your
+          idea and it's development.
+        </DialogDescription>
+      </DialogHeader>
 
-      <div className="container mx-auto px-4 pb-20">
-        <DialogHeader className={'mb-4 flex flex-col items-center gap-2'}>
-          <DialogTitle className={'text-center text-2xl'}>
-            Describe Your Idea
-          </DialogTitle>
-          <DialogDescription className={'w-full text-center text-xl md:w-1/2'}>
-            Provide all possible details about your project idea to help us
-            create a comprehensive plan.
-          </DialogDescription>
-        </DialogHeader>
+      <div
+        className={'flex min-h-full flex-col items-center gap-2 md:basis-1/2'}
+      >
         <ShapingPublicFormForm onMsg={onMsg} />
       </div>
-    </>
+    </div>
   );
 };

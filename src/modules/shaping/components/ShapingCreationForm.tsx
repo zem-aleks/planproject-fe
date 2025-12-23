@@ -6,6 +6,7 @@ import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { createStartShaping } from '@/modules/shaping/api/createStartShaping';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
+import { Label } from '@/ui/label';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
@@ -68,25 +69,46 @@ export const ShapingPublicFormForm = ({
   // }, [finishState]);
 
   return (
-    <div className={'flex w-full flex-col items-center justify-center gap-2'}>
-      <Textarea
-        id="description"
-        placeholder="Enter your answer"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        rows={3}
-        required={true}
-        disabled={state.type === 'loading'}
-        ref={textAreaRef}
-        className={'w-full md:w-2/5'}
-      />
-      <Button
-        className={'w-full md:w-2/5'}
-        onClick={() => load({ clientId, message })}
-        loading={state.type === 'loading'}
+    <div
+      className={
+        'flex min-h-full w-full flex-col items-center justify-center gap-2'
+      }
+    >
+      {/*<div className={'w-full px-10'}>*/}
+      {/*  <img src={'/images/nightsky.jpeg'} className={'rounded-md'} />*/}
+      {/*</div>*/}
+      <div
+        className={'flex w-full flex-col items-center gap-2 md:gap-8 md:px-10'}
       >
-        Submit
-      </Button>
+        <div className="flex w-full flex-col gap-2">
+          <Label htmlFor="description" className={'text-2xl'}>
+            Your Idea Description
+          </Label>
+          <p className={'text-muted-foreground mb-2 text-lg'}>
+            For example, you can describe that you wanna build an app, some
+            game, platform or you have a complex task and don't know how to
+            solve it
+          </p>
+          <Textarea
+            id="description"
+            placeholder="Enter your answer"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={8}
+            required={true}
+            disabled={state.type === 'loading'}
+            ref={textAreaRef}
+            className={'w-full'}
+          />
+        </div>
+        <Button
+          className={'w-full'}
+          onClick={() => load({ clientId, message })}
+          loading={state.type === 'loading'}
+        >
+          Submit
+        </Button>
+      </div>
     </div>
   );
 };
