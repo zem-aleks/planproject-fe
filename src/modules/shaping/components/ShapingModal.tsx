@@ -35,7 +35,7 @@ export const ShapingModal = ({
       onOpenChange={(open) => !open && onMsg({ type: 'onClose' })}
       modal={true}
     >
-      <DialogContent className="flex h-full w-full max-w-full flex-col items-center justify-center gap-4 rounded-none sm:max-w-full md:h-[90%] md:w-[94%] md:max-w-[94%] md:rounded-md">
+      <DialogContent className="flex h-full max-h-full w-full max-w-full flex-col items-center justify-center gap-4 rounded-none p-0 sm:max-w-full md:h-[90%] md:w-[94%] md:max-w-[94%] md:rounded-md lg:h-[700px] lg:max-w-[1200px]">
         <ShapingContent />
       </DialogContent>
     </Dialog>
@@ -147,7 +147,7 @@ const ShapingContentInitialForm = ({
     >
       <DialogHeader
         className={
-          'relative hidden flex-col items-center justify-center gap-3 overflow-hidden rounded-md bg-[#803698] p-4 md:flex md:h-full md:basis-1/2 md:items-start md:p-10 md:pr-4'
+          'relative hidden flex-col items-center justify-center gap-3 overflow-hidden rounded-l-md bg-[#803698] p-4 md:flex md:h-full md:basis-5/12 md:items-start md:p-10 md:pr-4'
         }
       >
         <DialogTitle
@@ -166,7 +166,7 @@ const ShapingContentInitialForm = ({
       </DialogHeader>
 
       <div
-        className={'flex min-h-full flex-col items-center gap-2 md:basis-1/2'}
+        className={'flex min-h-full flex-col items-center gap-2 md:basis-7/12'}
       >
         <ShapingPublicFormForm onMsg={onMsg} />
       </div>

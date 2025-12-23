@@ -1,12 +1,19 @@
 export const ShapingScore = ({ score }: { score: number }) => {
   return (
     <div
-      className={
-        'flex size-48 shrink-0 flex-col items-center justify-center rounded-full border-3 border-green-700 bg-green-100 text-center text-2xl'
-      }
+      className={'flex flex-col text-center text-2xl text-white md:text-left'}
     >
-      <p>{score} / 100</p>
-      <p>points</p>
+      <div className={'text-4xl'}>Your score:</div>
+      <div className={'flex items-end gap-2'}>
+        <span
+          className={`text-2xl ${score < 50 ? 'text-orange-400' : 'text-green-600'}`}
+        >
+          {score}
+        </span>{' '}
+        of
+        <span className={'text-3xl text-green-600'}>100</span>
+        <p>points</p>
+      </div>
     </div>
   );
 };

@@ -5,12 +5,13 @@ import { toast } from 'sonner';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
 import { FinishShapingForm } from '@/modules/shaping/components/FinishShapingForm';
-import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
 import { ShapingScore } from '@/modules/shaping/components/ShapingScore';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { supabase } from '@/modules/supabase/client';
 import { Button } from '@/ui/button';
-import { DialogHeader, DialogTitle } from '@/ui/dialog';
+import { DialogDescription, DialogHeader, DialogTitle } from '@/ui/dialog';
+import { Label } from '@/ui/label';
+import { Separator } from '@/ui/separator';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
@@ -65,23 +66,12 @@ export const ShapingChatForm = ({
   if (shaping.status === 'finished') {
     return (
       <>
-        <FinishShapingForm
-          shaping={shaping}
-          onMsg={(msg) => {
-            switch (msg.type) {
-              case 'onFinish':
-                break;
-
-              default:
-                return notReachable(msg.type);
-            }
-          }}
-        />
-
-        <div className="container mx-auto mt-4 flex flex-col items-center justify-center gap-2 px-4">
-          <DialogHeader className={'flex flex-col items-center gap-2'}>
-            <DialogTitle className={'text-center text-2xl'}>
-              Please sign in to continue
+        <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4">
+          <DialogHeader className={'mb-4 flex flex-col items-center gap-2'}>
+            <DialogTitle
+              className={'text-center text-3xl md:mb-[-20px] md:py-4'}
+            >
+              All data is here! Please sign up to see your results.
             </DialogTitle>
           </DialogHeader>
         </div>
@@ -90,7 +80,7 @@ export const ShapingChatForm = ({
           {session ? (
             <IconCheck className={'size-20 text-green-600'} />
           ) : (
-            <div className={'w-full'}>
+            <div className={'w-120 max-w-full rounded-md border px-6 py-2'}>
               <Auth
                 view="sign_in"
                 supabaseClient={supabase}
@@ -118,6 +108,19 @@ export const ShapingChatForm = ({
             </div>
           )}
         </div>
+
+        <FinishShapingForm
+          shaping={shaping}
+          onMsg={(msg) => {
+            switch (msg.type) {
+              case 'onFinish':
+                break;
+
+              default:
+                return notReachable(msg.type);
+            }
+          }}
+        />
       </>
     );
   }
@@ -125,11 +128,11 @@ export const ShapingChatForm = ({
   if (shaping.score >= 100) {
     return (
       <>
-        <ShapingScore score={shaping.score} />
-
         <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4">
           <DialogHeader className={'mb-4 flex flex-col items-center gap-2'}>
-            <DialogTitle className={'text-center text-2xl'}>
+            <DialogTitle
+              className={'text-center text-3xl md:mb-[-20px] md:py-4'}
+            >
               All data is here! Please sign up to see your results.
             </DialogTitle>
           </DialogHeader>
@@ -139,7 +142,7 @@ export const ShapingChatForm = ({
           {session ? (
             <IconCheck className={'size-20 text-green-600'} />
           ) : (
-            <div className={'w-full'}>
+            <div className={'w-120 max-w-full rounded-md border px-6 py-2'}>
               <Auth
                 view="sign_up"
                 supabaseClient={supabase}
@@ -185,32 +188,46 @@ export const ShapingChatForm = ({
   }
 
   return (
-    <>
-      <ShapingScore score={shaping.score} />
-
-      <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4 pb-20">
-        <DialogHeader className={'mb-4 flex flex-col items-center gap-2'}>
-          <DialogTitle className={'text-center text-2xl'}>
-            {lastAssistantMessage.content}
-          </DialogTitle>
-        </DialogHeader>
-
-        <div
-          className={
-            'flex w-full flex-col items-center justify-center gap-2 md:w-3/5'
-          }
+    <div
+      className={
+        'relative flex min-h-full w-full flex-col gap-10 md:flex-row md:gap-2'
+      }
+    >
+      <DialogHeader
+        className={
+          'relative flex-col items-center justify-center gap-3 overflow-hidden bg-[#803698] p-4 md:flex md:h-full md:basis-5/12 md:items-start md:rounded-l-md md:p-10'
+        }
+      >
+        <ShapingScore score={shaping.score} />
+        <Separator />
+        <DialogDescription
+          className={'w-full text-lg text-gray-200 md:text-center md:text-2xl'}
         >
+          {lastAssistantMessage.comment}
+        </DialogDescription>
+      </DialogHeader>
+
+      <div
+        className={
+          'flex flex-col items-center justify-center gap-2 md:min-h-full md:basis-7/12'
+        }
+      >
+        <div className="flex w-full flex-col gap-2 px-10">
+          <Label htmlFor="description" className={'text-2xl'}>
+            {lastAssistantMessage.content}
+          </Label>
           <Textarea
             id="description"
             placeholder="Enter your answer"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            rows={3}
+            rows={8}
             required={true}
             disabled={state.type === 'loading'}
             ref={textAreaRef}
             className={'w-full'}
           />
+
           <Button
             className={'w-full'}
             onClick={() => load({ shapingId: shaping.id, message, clientId })}
@@ -218,13 +235,47 @@ export const ShapingChatForm = ({
           >
             Submit
           </Button>
-
-          <ShapingComment
-            comment={lastAssistantMessage.comment}
-            loading={state.type === 'loading'}
-          />
         </div>
       </div>
-    </>
+    </div>
   );
+
+  // return (
+  //   <>
+  //     <ShapingScore score={shaping.score} />
+  //
+  //     <div className="container mx-auto flex flex-col items-center justify-center gap-2 px-4 pb-20">
+  //       <DialogHeader className={'mb-4 flex flex-col items-center gap-2'}>
+  //         <DialogTitle className={'text-center text-2xl'}>
+  //           {lastAssistantMessage.content}
+  //         </DialogTitle>
+  //       </DialogHeader>
+  //
+  //       <div
+  //         className={
+  //           'flex w-full flex-col items-center justify-center gap-2 md:w-3/5'
+  //         }
+  //       >
+  //         <Textarea
+  //           id="description"
+  //           placeholder="Enter your answer"
+  //           value={message}
+  //           onChange={(e) => setMessage(e.target.value)}
+  //           rows={3}
+  //           required={true}
+  //           disabled={state.type === 'loading'}
+  //           ref={textAreaRef}
+  //           className={'w-full'}
+  //         />
+  //         <Button
+  //           className={'w-full'}
+  //           onClick={() => load({ shapingId: shaping.id, message, clientId })}
+  //           loading={state.type === 'loading'}
+  //         >
+  //           Submit
+  //         </Button>
+  //       </div>
+  //     </div>
+  //   </>
+  // );
 };

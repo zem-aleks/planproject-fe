@@ -66,18 +66,31 @@ export const FinishShapingForm = ({
       return (
         <div>
           <ConnectProjectForm project={state.data} />
-          <Card className={'mt-4 flex w-full max-w-[520px] flex-row gap-4 p-4'}>
-            <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
-            <div className={'flex-col gap-0'}>
-              <div className={'text-xl font-semibold'}>{state.data.title}</div>
-              <div className={'text-muted-foreground'}>
-                {state.data.description}
+          <div className={'relative mt-2 overflow-hidden rounded-lg p-[2px]'}>
+            <div className="absolute inset-0 animate-[gradient_4s_linear_infinite] bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 bg-[length:200%_200%]" />
+            <Card
+              className={
+                'relative flex w-full max-w-[520px] flex-row gap-4 overflow-hidden rounded-lg p-4'
+              }
+            >
+              {/* TODO: add logo loader here */}
+              <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
+              {/*<ProjectLogoBuilder project={state.data} onMsg={noOperation} />*/}
+              <div className={'flex-col gap-0'}>
+                <div className={'text-xl font-semibold'}>
+                  {state.data.title}
+                </div>
+                <div className={'text-muted-foreground'}>
+                  {state.data.description}
+                </div>
+                {state.data.daysNeeded && (
+                  <Badge>
+                    Initial estimation: {state.data.daysNeeded} days
+                  </Badge>
+                )}
               </div>
-              {state.data.daysNeeded && (
-                <Badge>±{state.data.daysNeeded} days</Badge>
-              )}
-            </div>
-          </Card>
+            </Card>
+          </div>
         </div>
       );
 
