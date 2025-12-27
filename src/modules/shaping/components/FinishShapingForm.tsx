@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
+import { ProjectLogoBuilder } from '@/modules/projects/components/ProjectLogoBuilder';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { finishStartShaping } from '@/modules/shaping/api/finishStartShaping';
 import { ConnectProjectForm } from '@/modules/shaping/components/ConnectProjectForm';
@@ -11,7 +12,7 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
-import { notReachable } from '@/utils/notReachable';
+import { noOperation, notReachable } from '@/utils/notReachable';
 import { useLoadableData } from '@/utils/useLoadableData';
 
 type Msg = { type: 'onFinish'; project: ProjectEntity };
@@ -74,8 +75,8 @@ export const FinishShapingForm = ({
               }
             >
               {/* TODO: add logo loader here */}
-              <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
-              {/*<ProjectLogoBuilder project={state.data} onMsg={noOperation} />*/}
+              {/*<Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />*/}
+              <ProjectLogoBuilder project={state.data} onMsg={noOperation} />
               <div className={'flex-col gap-0'}>
                 <div className={'text-xl font-semibold'}>
                   {state.data.title}

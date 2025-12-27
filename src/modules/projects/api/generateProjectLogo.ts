@@ -8,7 +8,7 @@ export const generateProjectLogo = async (
   config?: AxiosRequestConfig,
 ): Promise<ProjectEntity> => {
   return api.patch(
-    `/projects/${projectId}/logo`,
+    `/start/${projectId}/logo`,
     {},
     {
       signal: config?.signal,
