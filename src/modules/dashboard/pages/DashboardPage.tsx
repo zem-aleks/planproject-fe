@@ -45,7 +45,7 @@ export const DashboardPage = () => {
             <div className="flex grow flex-col gap-1">
               <h1
                 className={
-                  'flex items-center justify-between gap-2 text-2xl font-semibold text-gray-200'
+                  'flex items-center justify-between gap-2 text-2xl font-semibold text-gray-100'
                 }
               >
                 {project.title}

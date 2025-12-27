@@ -54,7 +54,7 @@ export const ProjectLogoBuilder = ({
     case 'error':
     case 'not_requested':
       return (
-        <div className={`size-[128px] shrink-0 rounded-md bg-blue-100`}>
+        <div className={`size-[128px] shrink-0 rounded-md bg-white`}>
           <img
             src={project.logoUrl}
             alt="Project Logo"
@@ -65,7 +65,7 @@ export const ProjectLogoBuilder = ({
 
     case 'loaded':
       return (
-        <div className={`size-[128px] shrink-0 rounded-md bg-blue-100`}>
+        <div className={`size-[128px] shrink-0 rounded-md bg-white`}>
           <img
             src={state.data.logoUrl || ''}
             alt="Project Logo"

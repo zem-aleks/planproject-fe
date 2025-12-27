@@ -195,7 +195,7 @@ export const ShapingChatForm = ({
     >
       <DialogHeader
         className={
-          'relative flex-col items-center justify-center gap-3 overflow-hidden bg-[#803698] p-4 md:flex md:h-full md:basis-5/12 md:items-start md:rounded-l-md md:p-10'
+          'relative flex-col items-center justify-center gap-3 overflow-hidden bg-[#803698] p-4 md:flex md:h-full md:basis-5/12 md:rounded-l-md md:p-10'
         }
       >
         <ShapingScore score={shaping.score} />

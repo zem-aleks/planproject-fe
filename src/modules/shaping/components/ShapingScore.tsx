@@ -1,8 +1,6 @@
 export const ShapingScore = ({ score }: { score: number }) => {
   return (
-    <div
-      className={'flex flex-col text-center text-2xl text-white md:text-left'}
-    >
+    <div className={'flex flex-col text-center text-2xl text-white'}>
       <div className={'text-4xl'}>Your score:</div>
       <div className={'flex items-end gap-2'}>
         <span
