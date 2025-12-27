@@ -45,13 +45,13 @@ export const DashboardPage = () => {
             <div className="flex grow flex-col gap-1">
               <h1
                 className={
-                  'flex items-center justify-between gap-2 text-2xl font-semibold'
+                  'flex items-center justify-between gap-2 text-2xl font-semibold text-gray-200'
                 }
               >
                 {project.title}
                 <ProjectStatusBadge status={project.status} />
               </h1>
-              <p className={'text-muted-foreground'}>
+              <p className={'text-gray-300'}>
                 {project.description || 'No description available'}
               </p>
             </div>

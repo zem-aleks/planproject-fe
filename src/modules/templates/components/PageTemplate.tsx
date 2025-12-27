@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 
+import { GradientBackground } from '@/modules/home/components/GradientBackground';
 import { AppSidebar } from '@/ui/components/app-sidebar.tsx';
 import { SiteHeader } from '@/ui/components/site-header.tsx';
 import { SidebarInset, SidebarProvider } from '@/ui/sidebar.tsx';
@@ -30,8 +31,11 @@ export const PageTemplate = ({ children, header }: Props) => {
           title={header.title}
           actions={header.actions}
         />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
+        <div className="relative flex flex-1 flex-col">
+          <div className={'absolute top-0 left-0 h-[700px] w-full opacity-80'}>
+            <GradientBackground />
+          </div>
+          <div className="@container/main relative flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               {children}
             </div>

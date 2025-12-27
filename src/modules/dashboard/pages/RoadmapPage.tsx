@@ -37,13 +37,13 @@ export const RoadmapPage = () => {
           <div className="flex grow flex-col gap-1">
             <h1
               className={
-                'flex items-center justify-between gap-2 text-2xl font-semibold'
+                'flex items-center justify-between gap-2 text-2xl font-semibold text-gray-200'
               }
             >
               {project.title} - Roadmap
               <ProjectStatusBadge status={project.status} />
             </h1>
-            <p className={'text-muted-foreground'}>
+            <p className={'text-gray-300'}>
               Overview of all project phases and their milestones. You can start
               the project immediately or modify the phases and milestones first.
             </p>

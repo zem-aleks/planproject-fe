@@ -20,7 +20,7 @@ import { ChartConfig, ChartContainer } from '@/ui/chart';
 const chartConfig = {
   day: {
     label: 'Day',
-    color: 'var(--chart-1)',
+    color: '#ad46ff',
   },
   label: {
     color: 'var(--background)',
@@ -78,7 +78,7 @@ export function PhasesTimeline({ phases }: { phases: PhaseEntity[] }) {
             />
             <Bar
               dataKey={({ startDay, endDay }) => [startDay, endDay]}
-              fill="#10b981"
+              fill="#ad46ff99"
               radius={5}
             >
               <LabelList

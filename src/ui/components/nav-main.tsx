@@ -1,9 +1,7 @@
-import { useContext } from 'react';
 import { Link, useLocation } from 'react-router';
 
 import { Map, Zap } from 'lucide-react';
 
-import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import {
   SidebarGroup,
@@ -12,15 +10,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
 } from '@/ui/sidebar';
 import { IconAdjustmentsStar, IconPackages } from '@tabler/icons-react';
 
 export function NavMain() {
   const { pathname } = useLocation();
-  const { projects } = useContext(ProjectsContext);
+  // const { projects } = useContext(ProjectsContext);
   const { project } = useProjectByUrlParam();
   const isProjectEditPage = pathname.startsWith('/projects/edit/');
 
@@ -31,29 +26,29 @@ export function NavMain() {
           <SidebarMenu>
             <SidebarMenuItem key={'projects'}>
               <Link to={'/projects'}>
-                <SidebarMenuButton isActive={true}>
+                <SidebarMenuButton isActive={true} className={''}>
                   <IconPackages />
-                  <span>Projects</span>
+                  <span>All Projects</span>
                 </SidebarMenuButton>
               </Link>
 
-              <SidebarMenuSub>
-                {projects.map((project) => (
-                  <SidebarMenuSubItem>
-                    <Link
-                      to={
-                        project.status === 'draft'
-                          ? `/projects/edit/${project.id}`
-                          : `/project/${project.id}`
-                      }
-                    >
-                      <SidebarMenuSubButton>
-                        <span>{project.title}</span>
-                      </SidebarMenuSubButton>
-                    </Link>
-                  </SidebarMenuSubItem>
-                ))}
-              </SidebarMenuSub>
+              {/*<SidebarMenuSub>*/}
+              {/*  {projects.map((project) => (*/}
+              {/*    <SidebarMenuSubItem>*/}
+              {/*      <Link*/}
+              {/*        to={*/}
+              {/*          project.status === 'draft'*/}
+              {/*            ? `/projects/edit/${project.id}`*/}
+              {/*            : `/project/${project.id}`*/}
+              {/*        }*/}
+              {/*      >*/}
+              {/*        <SidebarMenuSubButton>*/}
+              {/*          <span>{project.title}</span>*/}
+              {/*        </SidebarMenuSubButton>*/}
+              {/*      </Link>*/}
+              {/*    </SidebarMenuSubItem>*/}
+              {/*  ))}*/}
+              {/*</SidebarMenuSub>*/}
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroupContent>
