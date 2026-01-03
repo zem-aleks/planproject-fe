@@ -35,7 +35,9 @@ export const PhaseViewPage = () => {
                   daysCount={phase.maxDaysNeeded}
                 />
               )}
-              <h1 className={'text-2xl font-semibold'}>{phase.title}</h1>
+              <h1 className={'text-2xl font-semibold text-white'}>
+                {phase.title}
+              </h1>
               <PhaseDescription phase={phase} />
             </div>
 

@@ -18,7 +18,7 @@ export const MilestonesBlock = ({
       {(milestones, reload) => (
         <div className={'flex flex-col gap-2'}>
           <div className={'flex items-center justify-between'}>
-            <h2 className={'text-xl font-semibold'}>Milestones</h2>
+            <h2 className={'text-xl font-semibold text-white'}>Milestones</h2>
             <ModifyMilestonesForm phase={phase} onModified={reload} />
           </div>
 
