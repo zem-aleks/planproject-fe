@@ -17,6 +17,8 @@ export const ProjectLogoBuilder = ({
 }) => {
   const { state, load } = useLazyLoadableData(generateProjectLogo);
 
+  console.log(state);
+
   useEffect(() => {
     if (project.logoUrl) {
       return;
@@ -39,12 +41,6 @@ export const ProjectLogoBuilder = ({
     }
   }, [state, project]);
 
-  if (!project.logoUrl || project.logoUrl === 'loading') {
-    return (
-      <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
-    );
-  }
-
   switch (state.type) {
     case 'loading':
       return (
@@ -53,6 +49,12 @@ export const ProjectLogoBuilder = ({
 
     case 'error':
     case 'not_requested':
+      if (!project.logoUrl || project.logoUrl === 'loading') {
+        return (
+          <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
+        );
+      }
+
       return (
         <div className={`size-[128px] shrink-0 rounded-md bg-white`}>
           <img
