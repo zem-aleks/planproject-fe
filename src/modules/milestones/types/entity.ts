@@ -9,6 +9,8 @@ export type MilestoneEntity = {
   description: string;
   definitionOfDone: string;
   daysNeeded: number;
+  usefulResources: string | null;
+  steps: string | null;
   orderIndex: number;
   status: MilestoneStatus;
   completeMessage: string | null;

@@ -1,15 +1,17 @@
 import { useParams } from 'react-router';
 
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
+import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneWithTasksEntity } from '@/modules/milestones/types/entity';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { ProjectEntity } from '@/modules/projects/types/entity';
-import { TasksBlock } from '@/modules/tasks/components/TasksBlock';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
+import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
+import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
 import { useLoadableData } from '@/utils/useLoadableData';
@@ -45,8 +47,8 @@ const PageContent = ({
           }}
         >
           <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 pt-0">
-            <div className={'text-xl'}>Loading...</div>
-            <Spinner className={'size-20'} />
+            <div className={'text-xl text-white'}>Loading...</div>
+            <Spinner className={'size-20 text-white'} />
           </div>
         </PageTemplate>
       );
@@ -66,7 +68,7 @@ const PageContent = ({
           }}
         >
           <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 pt-0">
-            <div className={'text-xl'}>Something went wrong</div>
+            <div className={'text-xl text-white'}>Something went wrong</div>
             <Button onClick={reload} size={'lg'}>
               Try again
             </Button>
@@ -111,7 +113,7 @@ const LoadedContentPage = ({
           <div className="flex grow flex-col gap-1">
             <h1
               className={
-                'flex items-center justify-between gap-2 text-2xl font-semibold'
+                'flex items-center justify-between gap-2 text-2xl font-semibold text-white'
               }
             >
               {milestone.title}
@@ -126,17 +128,31 @@ const LoadedContentPage = ({
         </div>
 
         <div className={'flex flex-col gap-2'}>
-          <div className={'text-muted-foreground'}>{milestone.description}</div>
-          <div className={'flex items-center gap-1'}>
+          <div className={'text-gray-200'}>{milestone.description}</div>
+          <div className={'flex items-center gap-1 text-gray-300'}>
             <b>Estimation:</b>
             <Badge>{milestone.daysNeeded} days</Badge>
           </div>
-          <div className={''}>
-            <b>Definition of done:</b> <span>{milestone.definitionOfDone}</span>
+          <div className={'rounded-lg bg-green-600 p-2 px-4 text-gray-200'}>
+            <b className={'text-gray-300'}>Definition of done:</b>{' '}
+            <span>{milestone.definitionOfDone}</span>
           </div>
+
+          <Card className={'w-full gap-2 p-4'}>
+            <div className={'font-semibold'}>Steps:</div>
+            <MarkdownFormat>{milestone.steps}</MarkdownFormat>
+          </Card>
+          <Card className={'w-full gap-2 p-4'}>
+            <div className={'font-semibold'}>Useful resources:</div>
+            <MarkdownFormat>{milestone.usefulResources}</MarkdownFormat>
+          </Card>
         </div>
 
-        <TasksBlock milestone={milestone} />
+        {milestone.status !== 'completed' && (
+          <CompleteMilestoneForm milestone={milestone} onUpdate={() => {}} />
+        )}
+
+        {/*<TasksBlock milestone={milestone} />*/}
       </div>
     </PageTemplate>
   );
