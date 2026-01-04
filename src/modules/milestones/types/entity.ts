@@ -1,5 +1,4 @@
 import { PhaseEntity } from '@/modules/phases/types/entity';
-import { TaskEntity } from '@/modules/tasks/types/entity';
 
 export type MilestoneEntity = {
   id: string;
@@ -23,6 +22,6 @@ export type MilestoneEntity = {
 export type MilestoneStatus = 'notStarted' | 'inProgress' | 'completed';
 
 export type MilestoneWithTasksEntity = MilestoneEntity & {
-  tasks: TaskEntity[];
+  // tasks: TaskEntity[];
   phase: PhaseEntity;
 };
