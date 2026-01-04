@@ -4,12 +4,12 @@ import { LoginPage } from '@/modules/auth/pages/LoginPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
 import { RoadmapPage } from '@/modules/dashboard/pages/RoadmapPage';
 import { HomePage } from '@/modules/home/pages/HomePage';
+import { FocusPage } from '@/modules/milestones/pages/FocusPage';
 import { MilestonePage } from '@/modules/milestones/pages/MilestonePage';
 import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
 import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.tsx';
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
-import { TasksPage } from '@/modules/tasks/pages/TasksPage';
 import { InternalElement } from '@/routing/components/InternalElement';
 
 export const AppRoutes = () => {
@@ -60,10 +60,10 @@ export const AppRoutes = () => {
           }
         />
         <Route
-          path="/project/:projectId/tasks"
+          path="/project/:projectId/focus"
           element={
             <InternalElement>
-              <TasksPage />
+              <FocusPage />
             </InternalElement>
           }
         />

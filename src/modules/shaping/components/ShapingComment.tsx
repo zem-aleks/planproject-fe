@@ -1,4 +1,4 @@
-import { Badge } from '@/ui/badge';
+import { Card } from '@/ui/card';
 
 export const ShapingComment = ({
   comment,
@@ -16,10 +16,7 @@ export const ShapingComment = ({
         alt={'Funny fox'}
         className={'animate-in fade-in-0 h-24'}
       />
-      <Badge
-        variant={'outline'}
-        className={'shrink px-4 py-2 text-sm whitespace-normal sm:text-lg'}
-      >
+      <Card className={'shrink px-4 py-2 text-sm whitespace-normal sm:text-lg'}>
         {loading ? (
           <>
             <b className={'animate-bounce'}>.</b>
@@ -29,7 +26,7 @@ export const ShapingComment = ({
         ) : (
           <>{comment}</>
         )}
-      </Badge>
+      </Card>
     </div>
   );
 };

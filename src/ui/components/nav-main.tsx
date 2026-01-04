@@ -86,12 +86,12 @@ export function NavMain() {
 
           {project.status === 'active' && (
             <SidebarMenuItem>
-              <Link to={`/project/${project.id}/tasks`}>
+              <Link to={`/project/${project.id}/focus`}>
                 <SidebarMenuButton
-                  isActive={pathname === `/project/${project.id}/tasks`}
+                  isActive={pathname === `/project/${project.id}/focus`}
                 >
                   <Zap />
-                  <span>Tasks</span>
+                  <span>Focus Space</span>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
