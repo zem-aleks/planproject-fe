@@ -79,7 +79,10 @@ export const RoadmapPage = () => {
                     <AccordionContent className={'flex flex-col gap-2'}>
                       <div className={'mb-6'}>
                         <div className={'flex gap-4'}>
-                          <PhaseDescription phase={phase} />
+                          <PhaseDescription
+                            phase={phase}
+                            variant={'secondary'}
+                          />
 
                           {phase.status === 'inProgress' && (
                             <DaysCounter

@@ -35,7 +35,9 @@ export const ProjectActions = ({
           <div className={'relative flex w-40 items-center justify-center'}>
             <div className={'absolute w-full border-b'} />
             <div
-              className={'text-muted-foreground relative bg-white px-2 text-sm'}
+              className={
+                'text-muted-foreground relative rounded bg-white px-2 text-sm'
+              }
             >
               or
             </div>
