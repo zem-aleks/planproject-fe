@@ -58,8 +58,21 @@ export const FocusPage = () => {
         </div>
 
         <TodayTimelineLoader projectId={project.id}>
-          {(timelinePoint) => (
-            <TimelineContent project={project} timelinePoint={timelinePoint} />
+          {(timelinePoint, reload) => (
+            <TimelineContent
+              project={project}
+              timelinePoint={timelinePoint}
+              onMsg={(msg) => {
+                switch (msg.type) {
+                  case 'onMilestoneCompleted':
+                    reload();
+                    break;
+
+                  default:
+                    return notReachable(msg.type);
+                }
+              }}
+            />
           )}
         </TodayTimelineLoader>
       </div>
@@ -67,12 +80,16 @@ export const FocusPage = () => {
   );
 };
 
+type Msg = { type: 'onMilestoneCompleted' };
+
 const TimelineContent = ({
   timelinePoint,
   project,
+  onMsg,
 }: {
   timelinePoint: TimelinePointEntity | null;
   project: ProjectEntity;
+  onMsg: (msg: Msg) => void;
 }) => {
   if (!timelinePoint) {
     return (
@@ -116,7 +133,10 @@ const TimelineContent = ({
     <div className={'flex flex-col gap-2'}>
       <ShapingComment comment={timelinePoint.comment} />
       {timelinePoint.milestones.map((milestone) => (
-        <FocusMilestoneCard milestone={milestone} onUpdated={() => {}} />
+        <FocusMilestoneCard
+          milestone={milestone}
+          onUpdated={() => onMsg({ type: 'onMilestoneCompleted' })}
+        />
       ))}
       {/*<ActiveTasksList*/}
       {/*  tasks={timelinePoint.tasks}*/}
