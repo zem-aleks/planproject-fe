@@ -71,22 +71,22 @@ export const TasksPage = () => {
             return (
               <div className={'flex flex-col gap-2'}>
                 <ShapingComment comment={timelinePoint.comment} />
-                {timelinePoint.tasks.map((task) => (
-                  <ActiveTaskCard
-                    task={task}
-                    key={task.id}
-                    onMsg={(msg) => {
-                      switch (msg.type) {
-                        case 'onTaskUpdated':
-                          // onChange();
-                          break;
+                {/*{timelinePoint.tasks.map((task) => (*/}
+                {/*  <ActiveTaskCard*/}
+                {/*    task={task}*/}
+                {/*    key={task.id}*/}
+                {/*    onMsg={(msg) => {*/}
+                {/*      switch (msg.type) {*/}
+                {/*        case 'onTaskUpdated':*/}
+                {/*          // onChange();*/}
+                {/*          break;*/}
 
-                        default:
-                          return notReachable(msg.type);
-                      }
-                    }}
-                  />
-                ))}
+                {/*        default:*/}
+                {/*          return notReachable(msg.type);*/}
+                {/*      }*/}
+                {/*    }}*/}
+                {/*  />*/}
+                {/*))}*/}
                 {/*<ActiveTasksList*/}
                 {/*  tasks={timelinePoint.tasks}*/}
                 {/*  project={project}*/}

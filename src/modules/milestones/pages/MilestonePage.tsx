@@ -2,7 +2,7 @@ import { useParams } from 'react-router';
 
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
-import { MilestoneWithTasksEntity } from '@/modules/milestones/types/entity';
+import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { ProjectEntity } from '@/modules/projects/types/entity';
@@ -86,7 +86,7 @@ const LoadedContentPage = ({
   milestone,
 }: {
   project: ProjectEntity;
-  milestone: MilestoneWithTasksEntity;
+  milestone: MilestoneDetailsEntity;
 }) => {
   return (
     <PageTemplate
@@ -129,12 +129,12 @@ const LoadedContentPage = ({
 
         <div className={'flex flex-col gap-2'}>
           <div className={'text-gray-200'}>{milestone.description}</div>
-          <div className={'flex items-center gap-1 text-gray-300'}>
+          <div className={'flex items-center gap-1 text-gray-50'}>
             <b>Estimation:</b>
             <Badge>{milestone.daysNeeded} days</Badge>
           </div>
           <div className={'rounded-lg bg-green-600 p-2 px-4 text-gray-200'}>
-            <b className={'text-gray-300'}>Definition of done:</b>{' '}
+            <b className={'text-gray-50'}>Definition of done:</b>{' '}
             <span>{milestone.definitionOfDone}</span>
           </div>
 

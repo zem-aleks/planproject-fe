@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 
 import { Map } from 'lucide-react';
 
+import { FocusMilestoneCard } from '@/modules/milestones/components/FocusMilestoneCard';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { ProjectEntity } from '@/modules/projects/types/entity';
@@ -28,7 +29,7 @@ export const FocusPage = () => {
           { title: 'Projects', href: '/projects' },
           { title: project.title, href: `/project/${project.id}` },
         ],
-        title: `Tasks`,
+        title: `Focus Space`,
       }}
     >
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -72,20 +73,10 @@ export const FocusPage = () => {
             return (
               <div className={'flex flex-col gap-2'}>
                 <ShapingComment comment={timelinePoint.comment} />
-                {timelinePoint.tasks.map((task) => (
-                  <ActiveTaskCard
-                    task={task}
-                    key={task.id}
-                    onMsg={(msg) => {
-                      switch (msg.type) {
-                        case 'onTaskUpdated':
-                          // onChange();
-                          break;
-
-                        default:
-                          return notReachable(msg.type);
-                      }
-                    }}
+                {timelinePoint.milestones.map((milestone) => (
+                  <FocusMilestoneCard
+                    milestone={milestone}
+                    onUpdated={() => {}}
                   />
                 ))}
                 {/*<ActiveTasksList*/}

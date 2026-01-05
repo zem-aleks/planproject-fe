@@ -1,13 +1,13 @@
-import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
+import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 
 export type TimelinePointEntity = {
   id: string;
   projectId: string;
   projectDay: number;
   comment: string;
-  taskIds: string[];
+  milestoneIds: string[];
   completed: boolean;
   createdAt: Date;
   updatedAt: Date;
-  tasks: TaskDetailsEntity[];
+  milestones: MilestoneDetailsEntity[];
 };
