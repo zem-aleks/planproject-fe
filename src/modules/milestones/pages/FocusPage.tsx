@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 
 import { Map } from 'lucide-react';
 
+import { FocusCompletedMilestoneCard } from '@/modules/milestones/components/FocusCompletedMilestoneCard';
 import { FocusMilestoneCard } from '@/modules/milestones/components/FocusMilestoneCard';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
@@ -11,10 +12,13 @@ import { ActiveTaskCard } from '@/modules/tasks/components/ActiveTaskCard';
 import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { TodayTimelineLoader } from '@/modules/timeline/components/TodayTimelineLoader';
+import { TimelinePointEntity } from '@/modules/timeline/types/entity';
 import { Button } from '@/ui/button';
+import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/tabs';
 import { notReachable } from '@/utils/notReachable';
+import { IconCheck } from '@tabler/icons-react';
 
 export const FocusPage = () => {
   const { project } = useProjectByUrlParam();
@@ -54,42 +58,72 @@ export const FocusPage = () => {
         </div>
 
         <TodayTimelineLoader projectId={project.id}>
-          {(timelinePoint) => {
-            if (!timelinePoint) {
-              return (
-                <div className={'flex flex-col gap-2 text-gray-200'}>
-                  There no active tasks. Please review the phases and activate
-                  some of them to generate new tasks
-                  <Button asChild={true}>
-                    <Link to={`/project/${project.id}/roadmap`}>
-                      <Map />
-                      Roadmap
-                    </Link>
-                  </Button>
-                </div>
-              );
-            }
-
-            return (
-              <div className={'flex flex-col gap-2'}>
-                <ShapingComment comment={timelinePoint.comment} />
-                {timelinePoint.milestones.map((milestone) => (
-                  <FocusMilestoneCard
-                    milestone={milestone}
-                    onUpdated={() => {}}
-                  />
-                ))}
-                {/*<ActiveTasksList*/}
-                {/*  tasks={timelinePoint.tasks}*/}
-                {/*  project={project}*/}
-                {/*  onChange={() => {}}*/}
-                {/*/>*/}
-              </div>
-            );
-          }}
+          {(timelinePoint) => (
+            <TimelineContent project={project} timelinePoint={timelinePoint} />
+          )}
         </TodayTimelineLoader>
       </div>
     </PageTemplate>
+  );
+};
+
+const TimelineContent = ({
+  timelinePoint,
+  project,
+}: {
+  timelinePoint: TimelinePointEntity | null;
+  project: ProjectEntity;
+}) => {
+  if (!timelinePoint) {
+    return (
+      <div className={'flex flex-col gap-2 text-gray-200'}>
+        There no active tasks. Please review the phases and activate some of
+        them to generate new tasks
+        <Button asChild={true}>
+          <Link to={`/project/${project.id}/roadmap`}>
+            <Map />
+            Roadmap
+          </Link>
+        </Button>
+      </div>
+    );
+  }
+
+  const allMilestonesFinished = timelinePoint.milestones.every(
+    (m) => m.status === 'completed',
+  );
+
+  if (allMilestonesFinished) {
+    return (
+      <Card className={'flex flex-col items-center gap-6'}>
+        <div className={'flex flex-col items-center'}>
+          <IconCheck className={'size-20 text-green-600'} />
+          <div className={'mb-4 px-2 text-lg'}>
+            Well done! All tasks are finished for today!
+          </div>
+          <Button>Start New Milestone</Button>
+        </div>
+        <div className={'text-gray-200'}>
+          {timelinePoint.milestones.map((milestone) => (
+            <FocusCompletedMilestoneCard milestone={milestone} />
+          ))}
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <div className={'flex flex-col gap-2'}>
+      <ShapingComment comment={timelinePoint.comment} />
+      {timelinePoint.milestones.map((milestone) => (
+        <FocusMilestoneCard milestone={milestone} onUpdated={() => {}} />
+      ))}
+      {/*<ActiveTasksList*/}
+      {/*  tasks={timelinePoint.tasks}*/}
+      {/*  project={project}*/}
+      {/*  onChange={() => {}}*/}
+      {/*/>*/}
+    </div>
   );
 };
 

@@ -1,23 +1,18 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 
 import dayjs from 'dayjs';
 
-import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
-import {
-  MilestoneDetailsEntity,
-  MilestoneEntity,
-} from '@/modules/milestones/types/entity';
+import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { Badge } from '@/ui/badge';
+import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
-import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Separator } from '@/ui/separator';
 
-export const FocusMilestoneCard = ({
+export const FocusCompletedMilestoneCard = ({
   milestone,
-  onUpdated,
 }: {
   milestone: MilestoneDetailsEntity;
-  onUpdated: (milestone: MilestoneEntity) => void;
 }) => {
   const [currentMilestone, setCurrentMilestone] = useState(milestone);
 
@@ -56,43 +51,18 @@ export const FocusMilestoneCard = ({
             currentMilestone.status === 'inProgress' ? 'warning' : 'default'
           }
         >
-          {currentMilestone.status}
+          Completed
         </Badge>
       </div>
 
-      <div className={'flex flex-col gap-2'}>
-        <div className={''}>{milestone.description}</div>
-        {/*<div className={'flex items-center gap-1'}>*/}
-        {/*  <b>Estimation:</b>*/}
-        {/*  <Badge>{milestone.daysNeeded} days</Badge>*/}
-        {/*</div>*/}
-      </div>
-
-      <div className={'flex flex-col gap-4'}>
-        <div className={'rounded-lg bg-green-600 p-2 px-4 text-gray-50'}>
-          <b className={'text-gray-50'}>Definition of done:</b>{' '}
-          <span>{milestone.definitionOfDone}</span>
-        </div>
-
-        {milestone.steps && (
-          <Card className={'w-full gap-2 p-4'}>
-            <div className={'font-semibold'}>Steps:</div>
-            <MarkdownFormat>{milestone.steps}</MarkdownFormat>
-          </Card>
-        )}
-        {milestone.usefulResources && (
-          <Card className={'w-full gap-2 p-4'}>
-            <div className={'font-semibold'}>Useful resources:</div>
-            <MarkdownFormat>{milestone.usefulResources}</MarkdownFormat>
-          </Card>
-        )}
-      </div>
-
-      <div className={'flex flex-col gap-2'}>
-        {milestone.status !== 'completed' && (
-          <CompleteMilestoneForm milestone={milestone} onUpdate={onUpdated} />
-        )}
-      </div>
+      <Button variant="warning" className={'w-full py-2'} asChild>
+        <Link
+          to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
+          className="w-full"
+        >
+          View Details
+        </Link>
+      </Button>
 
       {/*<TasksBlock milestone={milestone} />*/}
     </Card>

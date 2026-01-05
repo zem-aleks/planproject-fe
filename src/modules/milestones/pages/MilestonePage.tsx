@@ -152,6 +152,13 @@ const LoadedContentPage = ({
           <CompleteMilestoneForm milestone={milestone} onUpdate={() => {}} />
         )}
 
+        {milestone.status === 'completed' && milestone.completeMessage && (
+          <Card className={'w-full gap-2 bg-pink-100 p-4'}>
+            <div className={'font-semibold'}>Completed with comment:</div>
+            <MarkdownFormat>{milestone.completeMessage}</MarkdownFormat>
+          </Card>
+        )}
+
         {/*<TasksBlock milestone={milestone} />*/}
       </div>
     </PageTemplate>
