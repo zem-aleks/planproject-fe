@@ -11,6 +11,7 @@ import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
 import { ActiveTaskCard } from '@/modules/tasks/components/ActiveTaskCard';
 import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
+import { StartNewMilestoneForm } from '@/modules/timeline/components/StartNewMilestoneForm';
 import { TodayTimelineLoader } from '@/modules/timeline/components/TodayTimelineLoader';
 import { TimelinePointEntity } from '@/modules/timeline/types/entity';
 import { Button } from '@/ui/button';
@@ -64,12 +65,13 @@ export const FocusPage = () => {
               timelinePoint={timelinePoint}
               onMsg={(msg) => {
                 switch (msg.type) {
+                  case 'onNewMilestoneActivated':
                   case 'onMilestoneCompleted':
                     reload();
                     break;
 
                   default:
-                    return notReachable(msg.type);
+                    return notReachable(msg);
                 }
               }}
             />
@@ -80,7 +82,9 @@ export const FocusPage = () => {
   );
 };
 
-type Msg = { type: 'onMilestoneCompleted' };
+type Msg =
+  | { type: 'onMilestoneCompleted' }
+  | { type: 'onNewMilestoneActivated' };
 
 const TimelineContent = ({
   timelinePoint,
@@ -118,7 +122,10 @@ const TimelineContent = ({
           <div className={'mb-4 px-2 text-lg'}>
             Well done! All tasks are finished for today!
           </div>
-          <Button>Start New Milestone</Button>
+          <StartNewMilestoneForm
+            onUpdate={() => onMsg({ type: 'onNewMilestoneActivated' })}
+            project={project}
+          />
         </div>
         <div className={'text-gray-200'}>
           {timelinePoint.milestones.map((milestone) => (
@@ -132,12 +139,18 @@ const TimelineContent = ({
   return (
     <div className={'flex flex-col gap-2'}>
       <ShapingComment comment={timelinePoint.comment} />
-      {timelinePoint.milestones.map((milestone) => (
-        <FocusMilestoneCard
-          milestone={milestone}
-          onUpdated={() => onMsg({ type: 'onMilestoneCompleted' })}
-        />
-      ))}
+      {timelinePoint.milestones.map((milestone) => {
+        if (milestone.status === 'completed') {
+          return <FocusCompletedMilestoneCard milestone={milestone} />;
+        }
+
+        return (
+          <FocusMilestoneCard
+            milestone={milestone}
+            onUpdated={() => onMsg({ type: 'onMilestoneCompleted' })}
+          />
+        );
+      })}
       {/*<ActiveTasksList*/}
       {/*  tasks={timelinePoint.tasks}*/}
       {/*  project={project}*/}
