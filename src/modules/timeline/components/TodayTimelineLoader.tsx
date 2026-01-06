@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { getTodayTimeline } from '@/modules/timeline/api/getTodayTimeline';
 import { TimelinePointEntity } from '@/modules/timeline/types/entity';
 import { Button } from '@/ui/button.tsx';
+import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
 import { useReloadableData } from '@/utils/useReloadableData.ts';
@@ -31,11 +32,11 @@ export const TodayTimelineLoader = ({
 
     case 'error':
       return (
-        <div className={'flex flex-col items-center gap-2 py-4'}>
+        <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Timeline loading error</p>
-          <p className={'text-muted-foreground pb-2'}>{state.error.message}</p>
+          <p className={'pb-2'}>{state.error.message}</p>
           <Button onClick={reload}>Try again</Button>
-        </div>
+        </Card>
       );
 
     case 'reloading':
