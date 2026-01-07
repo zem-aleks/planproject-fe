@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
@@ -54,7 +53,6 @@ const StartProjectModal = ({
   onStarted: () => void;
   onClose: () => void;
 }) => {
-  const navigate = useNavigate();
   const { state, load } = useLazyLoadableData(startProject);
 
   useEffect(() => {
@@ -71,7 +69,6 @@ const StartProjectModal = ({
 
       case 'loaded':
         onStarted();
-        navigate(`/project/${project.id}/tasks`);
         toast.success(`Project started successfully!`);
         break;
 

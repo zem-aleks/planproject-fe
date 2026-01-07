@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router';
+
 import { MilestonesBlock } from '@/modules/milestones/components/MilestonesBlock';
 import { PhaseDescription } from '@/modules/phases/components/PhaseDescription';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
@@ -17,6 +19,7 @@ import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { notReachable } from '@/utils/notReachable';
 
 export const RoadmapPage = () => {
+  const navigate = useNavigate();
   const { project, reload } = useProjectByUrlParam();
   if (!project || project.status === 'draft') {
     return <ProjectNotFound />;
@@ -53,6 +56,10 @@ export const RoadmapPage = () => {
               onMsg={(msg) => {
                 switch (msg.type) {
                   case 'onProjectStarted':
+                    reload();
+                    navigate(`/project/${project.id}/focus`);
+                    break;
+
                   case 'onPhasesChanged':
                     reload();
                     break;

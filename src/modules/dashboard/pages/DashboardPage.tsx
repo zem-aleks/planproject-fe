@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { Map } from 'lucide-react';
 
@@ -20,6 +20,7 @@ import { Separator } from '@/ui/separator';
 import { notReachable } from '@/utils/notReachable';
 
 export const DashboardPage = () => {
+  const navigate = useNavigate();
   const { project, reload } = useProjectByUrlParam();
   if (!project || project.status === 'draft') {
     return <ProjectNotFound />;
@@ -77,6 +78,10 @@ export const DashboardPage = () => {
             onMsg={(msg) => {
               switch (msg.type) {
                 case 'onProjectStarted':
+                  reload();
+                  navigate(`/project/${project.id}/focus`);
+                  break;
+
                 case 'onPhasesChanged':
                   reload();
                   break;
