@@ -28,7 +28,7 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
     case 'draft':
       return (
         <Card
-          className="@container/card cursor-pointer gap-4 bg-gradient-to-b py-6 transition-shadow hover:shadow-lg"
+          className="@container/card cursor-pointer gap-4 bg-white py-6 transition-shadow hover:shadow-lg"
           tabIndex={0}
           aria-role="button"
           onClick={() => onMsg({ type: 'onProjectSelect', project })}

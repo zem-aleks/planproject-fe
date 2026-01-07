@@ -23,6 +23,7 @@ export const ProjectsPage = () => {
         breadcrumbs: [],
         title: 'Projects',
         actions: (
+          // <CreateProjectAction />
           <Button asChild size="sm" className="hidden sm:flex">
             <Link to={'/projects/create'}>Create Project</Link>
           </Button>

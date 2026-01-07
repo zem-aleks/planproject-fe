@@ -18,11 +18,11 @@ export const ShapingComment = ({
       />
       <Card className={'shrink px-4 py-2 text-sm whitespace-normal sm:text-lg'}>
         {loading ? (
-          <>
+          <div className={'flex gap-1'}>
             <b className={'animate-bounce'}>.</b>
             <b className={'animate-bounce delay-100'}>.</b>
             <b className={'animate-bounce delay-300'}>.</b>
-          </>
+          </div>
         ) : (
           <>{comment}</>
         )}

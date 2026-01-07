@@ -12,6 +12,7 @@ import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
 import { ShapingScore } from '@/modules/shaping/components/ShapingScore';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
+import { Card } from '@/ui/card';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable.ts';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
@@ -63,35 +64,40 @@ export const ProjectShapingForm = ({
         <div
           className={'flex w-full flex-col items-center justify-center gap-2'}
         >
-          <h1 className={'w-full text-2xl font-semibold'}>New Project</h1>
-          <div className={'w-full'}>
-            <div className={'text-lg'}>{lastAssistantMessage.content}</div>
-          </div>
-          <Textarea
-            id="description"
-            placeholder="Enter your answer"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={3}
-            required={true}
-            disabled={state.type === 'loading'}
-            ref={textAreaRef}
-            className={'w-full'}
-          />
-          <Button
-            className={'w-full'}
-            onClick={() => load({ clientId, message, shapingId: shaping.id })}
-            loading={state.type === 'loading'}
-          >
-            Submit
-          </Button>
-          <ShapingComment
-            comment={lastAssistantMessage.comment}
-            loading={state.type === 'loading'}
-          />
-        </div>
+          <h1 className={'w-full text-2xl font-semibold text-white'}>
+            New Project
+          </h1>
 
-        <ShapingScore score={shaping.score} />
+          <ShapingScore score={shaping.score} />
+
+          <Card className={'mt-2 w-full p-4'}>
+            <div className={'w-full'}>
+              <div className={'text-lg'}>{lastAssistantMessage.content}</div>
+            </div>
+            <Textarea
+              id="description"
+              placeholder="Enter your answer"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={3}
+              required={true}
+              disabled={state.type === 'loading'}
+              ref={textAreaRef}
+              className={'w-full'}
+            />
+            <Button
+              className={'w-full'}
+              onClick={() => load({ clientId, message, shapingId: shaping.id })}
+              loading={state.type === 'loading'}
+            >
+              Submit
+            </Button>
+            <ShapingComment
+              comment={lastAssistantMessage.comment}
+              loading={state.type === 'loading'}
+            />
+          </Card>
+        </div>
       </div>
 
       <FinishShapingButton
