@@ -1,4 +1,5 @@
 import { PhaseEntity } from '@/modules/phases/types/entity';
+import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
 import { ModifyPhasesForm } from '@/modules/projects/components/forms/ModifyPhasesForm';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
 import { ProjectEntity } from '@/modules/projects/types/entity';
@@ -18,11 +19,13 @@ export const ProjectActions = ({
   switch (project.status) {
     case 'draft':
     case 'shaping':
-    case 'active':
     case 'completed':
     case 'onHold':
     case 'cancelled':
       return null;
+
+    case 'active':
+      return <ProjectProgressCard project={project} />;
 
     case 'analyzing':
       return (
