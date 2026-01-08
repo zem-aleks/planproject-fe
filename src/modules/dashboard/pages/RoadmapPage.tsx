@@ -98,52 +98,6 @@ export const RoadmapPage = () => {
                             />
                           )}
                         </div>
-                        {/*Actions*/}
-                        {/*<div className={'mt-2 flex items-center gap-2'}>*/}
-                        {/*  <Button size={'sm'} asChild>*/}
-                        {/*    <Link*/}
-                        {/*      to={`/project/${project.id}/phase/${phase.id}`}*/}
-                        {/*    >*/}
-                        {/*      View Phase Details*/}
-                        {/*    </Link>*/}
-                        {/*  </Button>*/}
-                        {/*  {phase.status === 'inProgress' && (*/}
-                        {/*    <CompletePhaseForm*/}
-                        {/*      variant={'button'}*/}
-                        {/*      phase={phase}*/}
-                        {/*      onCompleted={(newPhase) => {*/}
-                        {/*        setPhases(*/}
-                        {/*          phases.map((p) =>*/}
-                        {/*            p.id === newPhase.id*/}
-                        {/*              ? {*/}
-                        {/*                  ...newPhase,*/}
-                        {/*                  milestones: phase.milestones,*/}
-                        {/*                }*/}
-                        {/*              : p,*/}
-                        {/*          ),*/}
-                        {/*        );*/}
-                        {/*      }}*/}
-                        {/*    />*/}
-                        {/*  )}*/}
-                        {/*  {phase.status === 'notStarted' && (*/}
-                        {/*    <StartPhaseForm*/}
-                        {/*      variant={'button'}*/}
-                        {/*      phase={phase}*/}
-                        {/*      onStarted={(newPhase) => {*/}
-                        {/*        setPhases(*/}
-                        {/*          phases.map((p) =>*/}
-                        {/*            p.id === newPhase.id*/}
-                        {/*              ? {*/}
-                        {/*                  ...newPhase,*/}
-                        {/*                  milestones: phase.milestones,*/}
-                        {/*                }*/}
-                        {/*              : p,*/}
-                        {/*          ),*/}
-                        {/*        );*/}
-                        {/*      }}*/}
-                        {/*    />*/}
-                        {/*  )}*/}
-                        {/*</div>*/}
                       </div>
                       <MilestonesBlock
                         phase={phase}

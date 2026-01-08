@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router';
 
-import { Map, Zap } from 'lucide-react';
+import { ChartGantt, Map, Zap } from 'lucide-react';
 
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import {
@@ -85,16 +85,28 @@ export function NavMain() {
           </SidebarMenuItem>
 
           {project.status === 'active' && (
-            <SidebarMenuItem>
-              <Link to={`/project/${project.id}/focus`}>
-                <SidebarMenuButton
-                  isActive={pathname === `/project/${project.id}/focus`}
-                >
-                  <Zap />
-                  <span>Focus Space</span>
-                </SidebarMenuButton>
-              </Link>
-            </SidebarMenuItem>
+            <>
+              <SidebarMenuItem>
+                <Link to={`/project/${project.id}/focus`}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/project/${project.id}/focus`}
+                  >
+                    <Zap />
+                    <span>Focus Space</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to={`/project/${project.id}/timeline`}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/project/${project.id}/timeline`}
+                  >
+                    <ChartGantt />
+                    <span>Timeline</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            </>
           )}
         </SidebarMenu>
       </SidebarGroupContent>
