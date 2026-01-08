@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 
 import { LoginPage } from '@/modules/auth/pages/LoginPage';
+import { CompetitorsPage } from '@/modules/competitors/pages/CompetitorsPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
 import { RoadmapPage } from '@/modules/dashboard/pages/RoadmapPage';
 import { HomePage } from '@/modules/home/pages/HomePage';
@@ -74,6 +75,15 @@ export const AppRoutes = () => {
           element={
             <InternalElement>
               <TimelinePage />
+            </InternalElement>
+          }
+        />
+
+        <Route
+          path="/project/:projectId/competitors"
+          element={
+            <InternalElement>
+              <CompetitorsPage />
             </InternalElement>
           }
         />

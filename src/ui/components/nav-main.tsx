@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router';
 
-import { ChartGantt, Map, Zap } from 'lucide-react';
+import { ChartGantt, EqualApproximately, Map, Zap } from 'lucide-react';
 
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import {
@@ -93,6 +93,16 @@ export function NavMain() {
                   >
                     <Zap />
                     <span>Focus Space</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to={`/project/${project.id}/competitors`}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/project/${project.id}/competitors`}
+                  >
+                    <EqualApproximately />
+                    <span>Competitors</span>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
