@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 
+import { AuditoryPage } from '@/modules/auditory/pages/AuditoryPage';
 import { LoginPage } from '@/modules/auth/pages/LoginPage';
 import { CompetitorsPage } from '@/modules/competitors/pages/CompetitorsPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
@@ -84,6 +85,15 @@ export const AppRoutes = () => {
           element={
             <InternalElement>
               <CompetitorsPage />
+            </InternalElement>
+          }
+        />
+
+        <Route
+          path="/project/:projectId/auditory"
+          element={
+            <InternalElement>
+              <AuditoryPage />
             </InternalElement>
           }
         />
