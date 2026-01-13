@@ -5,7 +5,10 @@ import { LoginPage } from '@/modules/auth/pages/LoginPage';
 import { CompetitorsPage } from '@/modules/competitors/pages/CompetitorsPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
 import { RoadmapPage } from '@/modules/dashboard/pages/RoadmapPage';
+import { privacyPolicyContent } from '@/modules/home/data/privacy';
+import { termsOfUseContent } from '@/modules/home/data/terms';
 import { HomePage } from '@/modules/home/pages/HomePage';
+import { StaticPage } from '@/modules/home/pages/StaticPage';
 import { FocusPage } from '@/modules/milestones/pages/FocusPage';
 import { MilestonePage } from '@/modules/milestones/pages/MilestonePage';
 import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
@@ -20,6 +23,14 @@ export const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route
+          path="/p/terms"
+          element={<StaticPage content={termsOfUseContent} />}
+        />
+        <Route
+          path="/p/privacy-policy"
+          element={<StaticPage content={privacyPolicyContent} />}
+        />
         <Route path="/login" element={<LoginPage />} />
 
         <Route
