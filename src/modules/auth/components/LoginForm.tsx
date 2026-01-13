@@ -37,7 +37,7 @@ export function LoginForm({
           }}
           providers={['google']}
           showLinks={false}
-          redirectTo={'/'}
+          redirectTo={'/projects'}
         />
       </div>
 
