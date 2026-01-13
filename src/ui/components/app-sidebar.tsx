@@ -15,12 +15,6 @@ import {
 } from '@/ui/sidebar';
 
 const data = {
-  user: {
-    name: '',
-    email: 'nlight115@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-
   navClouds: [
     // {
     //   title: 'Capture',
@@ -128,13 +122,7 @@ export function AppSidebar() {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser
-          user={{
-            name: data.user.name,
-            email: data.user.email,
-            avatar: data.user.avatar,
-          }}
-        />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   );
