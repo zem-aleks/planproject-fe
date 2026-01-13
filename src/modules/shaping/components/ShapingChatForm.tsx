@@ -102,7 +102,7 @@ export const ShapingChatForm = ({
                     },
                   },
                 }}
-                providers={[]}
+                providers={['google']}
                 showLinks={true}
               />
             </div>
@@ -164,7 +164,7 @@ export const ShapingChatForm = ({
                     },
                   },
                 }}
-                providers={[]}
+                providers={['google']}
                 showLinks={true}
               />
             </div>

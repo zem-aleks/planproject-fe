@@ -35,7 +35,7 @@ export function LoginForm({
               },
             },
           }}
-          providers={[]}
+          providers={['google']}
           showLinks={false}
           redirectTo={'/'}
         />
