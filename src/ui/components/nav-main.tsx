@@ -90,6 +90,27 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
 
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}/competitors`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/competitors`}
+              >
+                <EqualApproximately />
+                <span>Competitors</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}/auditory`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/auditory`}
+              >
+                <PersonStanding />
+                <span>Auditory</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+
           {project.status === 'active' && (
             <>
               <SidebarMenuItem>
@@ -102,26 +123,7 @@ export function NavMain() {
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link to={`/project/${project.id}/competitors`}>
-                  <SidebarMenuButton
-                    isActive={pathname === `/project/${project.id}/competitors`}
-                  >
-                    <EqualApproximately />
-                    <span>Competitors</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <Link to={`/project/${project.id}/auditory`}>
-                  <SidebarMenuButton
-                    isActive={pathname === `/project/${project.id}/auditory`}
-                  >
-                    <PersonStanding />
-                    <span>Auditory</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
+
               <SidebarMenuItem>
                 <Link to={`/project/${project.id}/timeline`}>
                   <SidebarMenuButton

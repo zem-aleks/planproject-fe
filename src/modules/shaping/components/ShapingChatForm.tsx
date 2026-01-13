@@ -228,6 +228,25 @@ export const ShapingChatForm = ({
             className={'w-full'}
           />
 
+          {state.type !== 'loading' && (
+            <div className={'flex flex-wrap gap-2'}>
+              {lastAssistantMessage.answers.map((answer) => (
+                <Button
+                  variant={'outline'}
+                  className={
+                    'active:bg grow cursor-pointer rounded-md p-1 px-3'
+                  }
+                  onClick={() => {
+                    setMessage(answer);
+                    // load({ shapingId: shaping.id, message, clientId });
+                  }}
+                >
+                  {answer}
+                </Button>
+              ))}
+            </div>
+          )}
+
           <Button
             className={'w-full'}
             onClick={() => load({ shapingId: shaping.id, message, clientId })}
