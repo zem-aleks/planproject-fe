@@ -1,5 +1,5 @@
+import { useUser } from '@/modules/auth/contexts/UserContext';
 import { supabase } from '@/modules/supabase/client';
-import { Avatar, AvatarFallback, AvatarImage } from '@/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,24 +16,15 @@ import {
   useSidebar,
 } from '@/ui/sidebar';
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
-  IconNotification,
   IconUserCircle,
 } from '@tabler/icons-react';
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-}) {
+export function NavUser() {
   // const navigate = useNavigate();
   const { isMobile } = useSidebar();
+  const { user } = useUser();
 
   return (
     <SidebarMenu>
@@ -44,14 +35,19 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-              </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+              {/*<Avatar className="h-8 w-8 rounded-lg grayscale">*/}
+              {/*  <AvatarImage*/}
+              {/*    src={user?.avatarUrl ?? undefined}*/}
+              {/*    alt={user?.email}*/}
+              {/*  />*/}
+              {/*  <AvatarFallback className="rounded-lg">*/}
+              {/*    PlanProject*/}
+              {/*  </AvatarFallback>*/}
+              {/*</Avatar>*/}
+              <div className="grid flex-1 pl-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{user?.email}</span>
                 <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
-                  {user.email}
+                  {user?.email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -65,14 +61,17 @@ export function NavUser({
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                {/*<Avatar className="h-8 w-8 rounded-lg">*/}
+                {/*  <AvatarImage*/}
+                {/*    src={user?.avatarUrl ?? undefined}*/}
+                {/*    alt={user?.email}*/}
+                {/*  />*/}
+                {/*  <AvatarFallback className="rounded-lg">CN</AvatarFallback>*/}
+                {/*</Avatar>*/}
+                <div className="grid flex-1 pl-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{user?.email}</span>
                   <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
-                    {user.email}
+                    {user?.email}
                   </span>
                 </div>
               </div>
@@ -83,14 +82,14 @@ export function NavUser({
                 <IconUserCircle />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
-              </DropdownMenuItem>
+              {/*<DropdownMenuItem>*/}
+              {/*  <IconCreditCard />*/}
+              {/*  Billing*/}
+              {/*</DropdownMenuItem>*/}
+              {/*<DropdownMenuItem>*/}
+              {/*  <IconNotification />*/}
+              {/*  Notifications*/}
+              {/*</DropdownMenuItem>*/}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => supabase.auth.signOut()}>
