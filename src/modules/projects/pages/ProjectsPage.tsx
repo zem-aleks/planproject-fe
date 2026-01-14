@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 
+import { NewProjectsChecker } from '@/modules/projects/components/NewProjectsChecker';
 import {
   ProjectCard,
   Msg as ProjectCardMsg,
@@ -30,6 +31,16 @@ export const ProjectsPage = () => {
         ),
       }}
     >
+      <NewProjectsChecker
+        onConnected={(newProject) => {
+          reload();
+          if (newProject.status === 'draft') {
+            navigate(`/projects/edit/${newProject.id}`);
+          } else {
+            navigate(`/project/${newProject.id}?new=true`);
+          }
+        }}
+      />
       <ProjectsList
         projects={projects}
         onMsg={(msg) => {

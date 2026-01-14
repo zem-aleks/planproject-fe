@@ -1,0 +1,86 @@
+import { useEffect } from 'react';
+
+import { LoaderCircle } from 'lucide-react';
+
+import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
+import { ProjectEntity } from '@/modules/projects/types/entity';
+import { bindShaping } from '@/modules/shaping/api/bindShaping';
+import { getStartShaping } from '@/modules/shaping/api/getStartShaping';
+import { Button } from '@/ui/button';
+import { Card } from '@/ui/card';
+import { notReachable } from '@/utils/notReachable';
+import { useLoadableData } from '@/utils/useLoadableData';
+
+export const NewProjectsChecker = ({
+  onConnected,
+}: {
+  onConnected: (project: ProjectEntity) => void;
+}) => {
+  const { clientId } = useAuthSession();
+  const { state } = useLoadableData(getStartShaping, clientId);
+
+  switch (state.type) {
+    case 'loading':
+    case 'error':
+      return null;
+
+    case 'loaded':
+      if (!state.data) {
+        return null;
+      }
+      return (
+        <ShapingBinder shapingId={state.data.id} onConnected={onConnected} />
+      );
+
+    default:
+      return notReachable(state);
+  }
+};
+
+export const ShapingBinder = ({
+  shapingId,
+  onConnected,
+}: {
+  shapingId: string;
+  onConnected: (project: ProjectEntity) => void;
+}) => {
+  const { clientId } = useAuthSession();
+  const { state, reload } = useLoadableData(bindShaping, {
+    shapingId,
+    clientId,
+  });
+
+  useEffect(() => {
+    if (state.type === 'loaded') {
+      onConnected(state.data);
+    }
+  }, [state]);
+
+  switch (state.type) {
+    case 'loading':
+      return (
+        <Card
+          className={'mx-4 flex flex-row gap-2 bg-green-600 p-2 text-white'}
+        >
+          <LoaderCircle className={'animate-spin'} />
+          <div className={'text-lg'}>Connecting new projects...</div>
+        </Card>
+      );
+
+    case 'loaded':
+      return null;
+
+    case 'error':
+      return (
+        <Card
+          className={'mx-4 flex flex-row gap-2 bg-green-600 p-2 text-white'}
+        >
+          Something went wrong
+          <Button onClick={reload}>Try again</Button>
+        </Card>
+      );
+
+    default:
+      return notReachable(state);
+  }
+};

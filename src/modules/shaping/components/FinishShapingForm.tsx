@@ -74,8 +74,6 @@ export const FinishShapingForm = ({
                 'relative flex w-full max-w-[520px] flex-row gap-4 overflow-hidden rounded-lg p-4'
               }
             >
-              {/* TODO: add logo loader here */}
-              {/*<Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />*/}
               <ProjectLogoBuilder project={state.data} onMsg={noOperation} />
               <div className={'flex-col gap-0'}>
                 <div className={'text-xl font-semibold'}>

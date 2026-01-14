@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
@@ -17,7 +18,6 @@ import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { IconCheck } from '@tabler/icons-react';
 
 export type Msg = { type: 'onUpdate'; shaping: ShapingEntity };
 
@@ -71,56 +71,28 @@ export const ShapingChatForm = ({
             <DialogTitle
               className={'text-center text-3xl md:mb-[-20px] md:py-4'}
             >
-              All data is here! Please sign up to see your results.
+              All data is here! Please <strong>sign up</strong> to see your
+              results
             </DialogTitle>
           </DialogHeader>
         </div>
 
-        <div className={'flex w-[300px] justify-center'}>
-          {session ? (
-            <IconCheck className={'size-20 text-green-600'} />
-          ) : (
-            <div className={'w-120 max-w-full rounded-md border px-6 py-2'}>
-              <Auth
-                view="sign_in"
-                supabaseClient={supabase}
-                appearance={{
-                  theme: ThemeSupa,
+        <div className={'flex flex-row items-center gap-8'}>
+          <SignCard signedIn={!!session} view="sign_in" />
 
-                  style: {
-                    button: {
-                      borderRadius: '5px',
-                      borderColor: 'rgba(0,0,0,0.2)',
-                    },
-                  },
-                  variables: {
-                    default: {
-                      colors: {
-                        brand: '#000',
-                        brandAccent: '#cfd1ff',
-                      },
-                    },
-                  },
-                }}
-                providers={['google']}
-                showLinks={true}
-              />
-            </div>
-          )}
+          <FinishShapingForm
+            shaping={shaping}
+            onMsg={(msg) => {
+              switch (msg.type) {
+                case 'onFinish':
+                  break;
+
+                default:
+                  return notReachable(msg.type);
+              }
+            }}
+          />
         </div>
-
-        <FinishShapingForm
-          shaping={shaping}
-          onMsg={(msg) => {
-            switch (msg.type) {
-              case 'onFinish':
-                break;
-
-              default:
-                return notReachable(msg.type);
-            }
-          }}
-        />
       </>
     );
   }
@@ -133,56 +105,28 @@ export const ShapingChatForm = ({
             <DialogTitle
               className={'text-center text-3xl md:mb-[-20px] md:py-4'}
             >
-              All data is here! Please sign up to see your results.
+              All data is here! Please <strong>sign up</strong> to see your
+              results
             </DialogTitle>
           </DialogHeader>
         </div>
 
-        <div className={'flex w-[300px] justify-center'}>
-          {session ? (
-            <IconCheck className={'size-20 text-green-600'} />
-          ) : (
-            <div className={'w-120 max-w-full rounded-md border px-6 py-2'}>
-              <Auth
-                view="sign_up"
-                supabaseClient={supabase}
-                appearance={{
-                  theme: ThemeSupa,
+        <div className={'flex flex-row items-center gap-8'}>
+          <SignCard signedIn={!!session} view={'sign_up'} />
 
-                  style: {
-                    button: {
-                      borderRadius: '5px',
-                      borderColor: 'rgba(0,0,0,0.2)',
-                    },
-                  },
-                  variables: {
-                    default: {
-                      colors: {
-                        brand: '#000',
-                        brandAccent: '#cfd1ff',
-                      },
-                    },
-                  },
-                }}
-                providers={['google']}
-                showLinks={true}
-              />
-            </div>
-          )}
+          <FinishShapingForm
+            shaping={shaping}
+            onMsg={(msg) => {
+              switch (msg.type) {
+                case 'onFinish':
+                  break;
+
+                default:
+                  return notReachable(msg.type);
+              }
+            }}
+          />
         </div>
-
-        <FinishShapingForm
-          shaping={shaping}
-          onMsg={(msg) => {
-            switch (msg.type) {
-              case 'onFinish':
-                break;
-
-              default:
-                return notReachable(msg.type);
-            }
-          }}
-        />
       </>
     );
   }
@@ -297,4 +241,63 @@ export const ShapingChatForm = ({
   //     </div>
   //   </>
   // );
+};
+
+const SignCard = ({
+  signedIn,
+  view,
+}: {
+  signedIn: boolean;
+  view: 'sign_in' | 'sign_up';
+}) => {
+  if (signedIn) {
+    return (
+      <div className={'flex w-[300px] justify-center'}>
+        <div
+          className={
+            'flex w-120 max-w-full flex-col items-center justify-center rounded-md border px-6 py-2'
+          }
+        >
+          <div className={'py-2 text-center text-lg font-semibold'}>
+            You're signed in
+          </div>
+          <LoaderCircle className={'mb-4 size-14 animate-spin'} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={'flex w-[300px] justify-center'}>
+      <div className={'w-120 max-w-full rounded-md border px-6 py-2'}>
+        <div className={'py-2 text-center text-lg font-semibold'}>
+          Enter your credentials
+        </div>
+        <Auth
+          view={view}
+          supabaseClient={supabase}
+          appearance={{
+            theme: ThemeSupa,
+
+            style: {
+              button: {
+                borderRadius: '5px',
+                borderColor: 'rgba(0,0,0,0.2)',
+              },
+            },
+            variables: {
+              default: {
+                colors: {
+                  brand: '#000',
+                  brandAccent: '#cfd1ff',
+                },
+              },
+            },
+          }}
+          providers={['google']}
+          showLinks={true}
+        />
+      </div>
+    </div>
+  );
 };
