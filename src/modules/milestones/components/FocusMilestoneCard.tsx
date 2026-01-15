@@ -69,8 +69,8 @@ export const FocusMilestoneCard = ({
       </div>
 
       <div className={'flex flex-col gap-4'}>
-        <div className={'rounded-lg bg-green-600 p-2 px-4 text-gray-50'}>
-          <b className={'text-gray-50'}>Definition of done:</b>{' '}
+        <div className={'rounded-lg border-2 border-green-600 p-2 px-4'}>
+          <b className={''}>Definition of done:</b>{' '}
           <span>{milestone.definitionOfDone}</span>
         </div>
 

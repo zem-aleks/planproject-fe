@@ -54,7 +54,13 @@ const PageContent = ({
       );
 
     case 'loaded':
-      return <LoadedContentPage project={project} milestone={state.data} />;
+      return (
+        <LoadedContentPage
+          project={project}
+          milestone={state.data}
+          onChanged={reload}
+        />
+      );
 
     case 'error':
       return (
@@ -84,9 +90,11 @@ const PageContent = ({
 const LoadedContentPage = ({
   project,
   milestone,
+  onChanged,
 }: {
   project: ProjectEntity;
   milestone: MilestoneDetailsEntity;
+  onChanged: () => void;
 }) => {
   return (
     <PageTemplate
@@ -149,7 +157,7 @@ const LoadedContentPage = ({
         </div>
 
         {milestone.status !== 'completed' && (
-          <CompleteMilestoneForm milestone={milestone} onUpdate={() => {}} />
+          <CompleteMilestoneForm milestone={milestone} onUpdate={onChanged} />
         )}
 
         {milestone.status === 'completed' && milestone.completeMessage && (
