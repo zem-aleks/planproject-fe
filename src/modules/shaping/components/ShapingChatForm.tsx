@@ -296,7 +296,7 @@ const SignCard = ({
           }}
           providers={['google']}
           showLinks={true}
-          redirectTo={'/projects'}
+          redirectTo={`${window.location.origin}/auth/callback`}
         />
       </div>
     </div>

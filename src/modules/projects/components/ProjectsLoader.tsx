@@ -29,7 +29,7 @@ export const ProjectsLoader = ({ children }: Props): ReactNode => {
     case 'error':
       return (
         <div className={'flex flex-col items-center gap-2 py-4'}>
-          <p className={'text-xl text-red-700'}>Project loading error</p>
+          <p className={'text-xl text-red-700'}>Projects loading error</p>
           <p className={'text-muted-foreground pb-2'}>{state.error.message}</p>
           <Button onClick={reload}>Try again</Button>
         </div>

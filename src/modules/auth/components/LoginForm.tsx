@@ -37,7 +37,7 @@ export function LoginForm({
           }}
           providers={['google']}
           showLinks={false}
-          redirectTo={'/projects'}
+          redirectTo={`${window.location.origin}/auth/callback`}
         />
       </div>
 

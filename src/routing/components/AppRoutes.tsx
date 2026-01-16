@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 
 import { AuditoryPage } from '@/modules/auditory/pages/AuditoryPage';
+import { AuthCallbackPage } from '@/modules/auth/pages/AuthCallbackPage';
 import { LoginPage } from '@/modules/auth/pages/LoginPage';
 import { CompetitorsPage } from '@/modules/competitors/pages/CompetitorsPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
@@ -32,6 +33,7 @@ export const AppRoutes = () => {
           element={<StaticPage content={privacyPolicyContent} />}
         />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
         <Route
           path="/projects"
