@@ -296,6 +296,7 @@ const SignCard = ({
           }}
           providers={['google']}
           showLinks={true}
+          redirectTo={'/projects'}
         />
       </div>
     </div>
