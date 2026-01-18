@@ -12,7 +12,7 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
-import { noOperation, notReachable } from '@/utils/notReachable';
+import { notReachable } from '@/utils/notReachable';
 import { useLoadableData } from '@/utils/useLoadableData';
 
 type Msg = { type: 'onFinish'; project: ProjectEntity };
@@ -74,7 +74,7 @@ export const FinishShapingForm = ({
                 'relative flex w-full max-w-[520px] flex-row gap-4 overflow-hidden rounded-lg p-4'
               }
             >
-              <ProjectLogoBuilder project={state.data} onMsg={noOperation} />
+              <ProjectLogoBuilder project={state.data} />
               <div className={'flex-col gap-0'}>
                 <div className={'text-xl font-semibold'}>
                   {state.data.title}
