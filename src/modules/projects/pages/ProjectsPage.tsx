@@ -32,12 +32,23 @@ export const ProjectsPage = () => {
       }}
     >
       <NewProjectsChecker
-        onConnected={(newProject) => {
-          reload();
-          if (newProject.status === 'draft') {
-            navigate(`/projects/edit/${newProject.id}`);
-          } else {
-            navigate(`/project/${newProject.id}?new=true`);
+        onMsg={(msg) => {
+          switch (msg.type) {
+            case 'onNothingToConnect':
+              break;
+
+            case 'onConnected': {
+              reload();
+              if (msg.project.status === 'draft') {
+                navigate(`/projects/edit/${msg.project.id}`);
+              } else {
+                navigate(`/project/${msg.project.id}?new=true`);
+              }
+              break;
+            }
+
+            default:
+              notReachable(msg);
           }
         }}
       />

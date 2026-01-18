@@ -1,11 +1,11 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 import { getPhases } from '@/modules/phases/api/getPhases';
 import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData.ts';
+import { usePollingData } from '@/utils/usePollableData';
 
 type Props = {
   projectId: string;
@@ -17,7 +17,17 @@ type Props = {
 };
 
 export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
-  const { state, reload, setData } = useReloadableData(getPhases, projectId);
+  const { state, reload, setData, stopPolling } = usePollingData(
+    getPhases,
+    projectId,
+    1000,
+  );
+
+  useEffect(() => {
+    if (state.type === 'loaded' && state.data.length > 0) {
+      stopPolling();
+    }
+  }, [state]);
 
   switch (state.type) {
     case 'loading':
@@ -35,6 +45,21 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
           <Button onClick={reload}>Try again</Button>
         </div>
       );
+
+    case 'stopped': {
+      if (!state.data) {
+        return (
+          <div className={'flex flex-col items-center gap-2 py-4'}>
+            <p className={'text-xl text-red-700'}>Phases loading stopped</p>
+            <p className={'text-muted-foreground pb-2'}>
+              Please press button below to load the data
+            </p>
+            <Button onClick={reload}>Load Phases</Button>
+          </div>
+        );
+      }
+      return <>{children(state.data, reload, setData)}</>;
+    }
 
     case 'reloading':
     case 'loaded':

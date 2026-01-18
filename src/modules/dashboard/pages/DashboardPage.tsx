@@ -11,7 +11,6 @@ import { ProjectLogoBuilder } from '@/modules/projects/components/ProjectLogoBui
 import { ProjectStatusBadge } from '@/modules/projects/components/ProjectStatus';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
-import { FinishShapingFormInternal } from '@/modules/shaping/components/FinishShapingFormInternal';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -57,19 +56,7 @@ export const DashboardPage = () => {
               </p>
             </div>
             <div className={'flex flex-col gap-2'}>
-              <ProjectLogoBuilder
-                project={project}
-                onMsg={(msg) => {
-                  switch (msg.type) {
-                    case 'onProjectUpdated':
-                      reload();
-                      break;
-
-                    default:
-                      return notReachable(msg.type);
-                  }
-                }}
-              />
+              <ProjectLogoBuilder project={project} />
             </div>
           </div>
 
@@ -92,56 +79,38 @@ export const DashboardPage = () => {
             }}
           />
 
-          {project.status === 'shaping' ? (
-            <FinishShapingFormInternal
-              shapingId={project.shapingId}
-              onMsg={(msg) => {
-                switch (msg.type) {
-                  case 'onFinish':
-                    reload();
-                    break;
-
-                  default:
-                    return notReachable(msg.type);
-                }
-              }}
-            />
-          ) : (
-            <PhasesLoader projectId={project.id}>
-              {(phases) => (
-                <div className={'flex flex-col gap-4'}>
-                  <Card className={'mt-4 flex flex-col gap-2 p-4 px-4'}>
-                    <div className={'mb-4 flex flex-col gap-2'}>
-                      <div
-                        className={'flex items-center justify-between gap-2'}
-                      >
-                        <h2 className={'text-lg font-semibold'}>Main phases</h2>
-                        <Button variant={'outline'} size={'sm'} asChild={true}>
-                          <Link to={`/project/${project.id}/roadmap`}>
-                            <Map />
-                            Full Roadmap
-                          </Link>
-                        </Button>
-                      </div>
-                      <ol className={'flex flex-col gap-2'}>
-                        {phases.map((phase, index) => (
-                          <li key={phase.id} className={''}>
-                            <PhaseItemBuilder
-                              phase={phase}
-                              project={project}
-                              index={index}
-                            />
-                            <Separator />
-                          </li>
-                        ))}
-                      </ol>
+          <PhasesLoader projectId={project.id}>
+            {(phases) => (
+              <div className={'flex flex-col gap-4'}>
+                <Card className={'mt-4 flex flex-col gap-2 p-4 px-4'}>
+                  <div className={'mb-4 flex flex-col gap-2'}>
+                    <div className={'flex items-center justify-between gap-2'}>
+                      <h2 className={'text-lg font-semibold'}>Main phases</h2>
+                      <Button variant={'outline'} size={'sm'} asChild={true}>
+                        <Link to={`/project/${project.id}/roadmap`}>
+                          <Map />
+                          Full Roadmap
+                        </Link>
+                      </Button>
                     </div>
-                  </Card>
-                  <PhasesTimeline phases={phases} />
-                </div>
-              )}
-            </PhasesLoader>
-          )}
+                    <ol className={'flex flex-col gap-2'}>
+                      {phases.map((phase, index) => (
+                        <li key={phase.id} className={''}>
+                          <PhaseItemBuilder
+                            phase={phase}
+                            project={project}
+                            index={index}
+                          />
+                          <Separator />
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </Card>
+                <PhasesTimeline phases={phases} />
+              </div>
+            )}
+          </PhasesLoader>
         </div>
       </PageTemplate>
     </>

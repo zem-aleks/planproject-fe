@@ -11,10 +11,14 @@ import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable';
 import { useLoadableData } from '@/utils/useLoadableData';
 
+type Msg =
+  | { type: 'onConnected'; project: ProjectEntity }
+  | { type: 'onNothingToConnect' };
+
 export const NewProjectsChecker = ({
-  onConnected,
+  onMsg,
 }: {
-  onConnected: (project: ProjectEntity) => void;
+  onMsg: (msg: Msg) => void;
 }) => {
   const { clientId } = useAuthSession();
   const { state } = useLoadableData(getStartShaping, clientId);
@@ -26,10 +30,14 @@ export const NewProjectsChecker = ({
 
     case 'loaded':
       if (!state.data) {
+        onMsg({ type: 'onNothingToConnect' });
         return null;
       }
       return (
-        <ShapingBinder shapingId={state.data.id} onConnected={onConnected} />
+        <ShapingBinder
+          shapingId={state.data.id}
+          onConnected={(project) => onMsg({ type: 'onConnected', project })}
+        />
       );
 
     default:
