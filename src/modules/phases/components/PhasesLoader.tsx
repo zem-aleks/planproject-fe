@@ -1,11 +1,13 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useContext, useEffect } from 'react';
 
 import { getPhases } from '@/modules/phases/api/getPhases';
 import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
+import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
 import { usePollingData } from '@/utils/usePollableData';
+import { useReloadableData } from '@/utils/useReloadableData';
 
 type Props = {
   projectId: string;
@@ -17,6 +19,50 @@ type Props = {
 };
 
 export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
+  const { reload: reloadProjects } = useContext(ProjectsContext);
+  const { state, reload, setData } = useReloadableData(getPhases, projectId);
+
+  switch (state.type) {
+    case 'reloading':
+    case 'loading':
+      return (
+        <div className="flex flex-1 flex-col gap-4">
+          <Skeleton className="aspect-video rounded-xl" />
+        </div>
+      );
+
+    case 'error':
+      return (
+        <div className={'flex flex-col items-center gap-2 py-4'}>
+          <p className={'text-xl text-red-700'}>Phases loading error</p>
+          <p className={'text-muted-foreground pb-2'}>{state.error.message}</p>
+          <Button onClick={reload}>Try again</Button>
+        </div>
+      );
+
+    case 'loaded':
+      if (state.data.length === 0) {
+        return (
+          <PhasesPoller
+            projectId={projectId}
+            children={children}
+            onLoaded={reloadProjects}
+          />
+        );
+      }
+
+      return <>{children(state.data, reload, setData)}</>;
+
+    default:
+      return notReachable(state);
+  }
+};
+
+export const PhasesPoller = ({
+  projectId,
+  children,
+  onLoaded,
+}: Props & { onLoaded: () => void }): ReactNode => {
   const { state, reload, setData, stopPolling } = usePollingData(
     getPhases,
     projectId,
@@ -26,6 +72,7 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
   useEffect(() => {
     if (state.type === 'loaded' && state.data.length > 0) {
       stopPolling();
+      onLoaded();
     }
   }, [state]);
 
@@ -63,7 +110,15 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
 
     case 'reloading':
     case 'loaded':
-      return <>{children(state.data, reload, setData)}</>;
+      if (state.data.length > 0) {
+        return <>{children(state.data, reload, setData)}</>;
+      }
+
+      return (
+        <div className="flex flex-1 flex-col gap-4">
+          <Skeleton className="aspect-video rounded-xl" />
+        </div>
+      );
 
     default:
       return notReachable(state);
