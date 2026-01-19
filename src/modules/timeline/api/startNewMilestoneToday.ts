@@ -1,12 +1,12 @@
 import { AxiosRequestConfig } from 'axios';
 
 import { api } from '@/modules/api/api';
-import { TimelinePointEntity } from '@/modules/timeline/types/entity';
+import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 
 export const startNewMilestoneToday = async (
   projectId: string,
   config?: AxiosRequestConfig,
-): Promise<TimelinePointEntity | null> => {
+): Promise<MilestoneDetailsEntity | null> => {
   return api.post(`/timeline/${projectId}/extend-today`, {
     signal: config?.signal,
   });

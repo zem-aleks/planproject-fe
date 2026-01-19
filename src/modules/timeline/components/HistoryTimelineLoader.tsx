@@ -1,22 +1,21 @@
 import { ReactNode } from 'react';
 
-import { TimelineMilestoneCard } from '@/modules/milestones/components/TimelineMilestoneCard';
-import { getDaySince } from '@/modules/projects/helpers/getDaySince';
+import dayjs from 'dayjs';
+import { Flag, Goal } from 'lucide-react';
+
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { getHistoryTimeline } from '@/modules/timeline/api/getHistoryTimeline';
-import { TimelinePointEntity } from '@/modules/timeline/types/entity';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/ui/accordion';
+  TimelineDot,
+  TimelineLine,
+} from '@/modules/timeline/components/Timeline';
+import { TimelineEventHydrated } from '@/modules/timeline/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
-import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable.ts';
 import { useLoadableData } from '@/utils/useLoadableData';
+import { IconCheck, IconCompass, IconProgress } from '@tabler/icons-react';
 
 type Props = {
   project: ProjectEntity;
@@ -24,8 +23,6 @@ type Props = {
 
 export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
   const { state, reload } = useLoadableData(getHistoryTimeline, project.id);
-  const projectDay = getDaySince(project.startedAt);
-  const days = Array.from({ length: projectDay }, (_, i) => projectDay - i);
 
   switch (state.type) {
     case 'error':
@@ -38,97 +35,132 @@ export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
       );
 
     case 'loading':
-    case 'loaded':
+      return <Skeleton className="h-[500px] w-full rounded-xl" />;
+
+    case 'loaded': {
+      const events = state.data.filter((p) => p.events.length > 0);
+      if (events.length === 0) {
+        return (
+          <Card className={'flex flex-col items-center gap-2 py-4'}>
+            <p className={'text-xl'}>Nothing happened yet</p>
+          </Card>
+        );
+      }
       return (
-        <Card className={'p-4 py-1'}>
-          <Accordion type="multiple">
-            {days.map((day, index) => (
-              <AccordionItem value={`day-${day}`}>
-                <AccordionTrigger className={'items-center'}>
-                  <div>
-                    <div className={'flex items-center gap-2 text-2xl'}>
-                      {state.type === 'loading' && <Spinner />} Day {day}{' '}
-                      {index === 0 && <>(today)</>}
-                    </div>
-                    {state.type === 'loaded' && (
-                      <div className={'text-muted-foreground no-underline'}>
-                        {state.data.find((t) => t.projectDay === day)
-                          ?.milestones.length ?? 0}{' '}
-                        milestone(s)
-                      </div>
-                    )}
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent>
-                  <DayContent
-                    projectStartDate={project.startedAt}
-                    projectDay={day}
-                    state={
-                      state.type === 'loading'
-                        ? { type: 'loading' }
-                        : {
-                            type: 'loaded',
-                            data:
-                              state.data.find((t) => t.projectDay === day) ||
-                              null,
-                          }
-                    }
-                  />
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-        </Card>
+        <div
+          className={
+            'flex w-full flex-col items-start justify-center gap-4 pb-96'
+          }
+        >
+          {events.map((point) => (
+            <div className={'flex items-end gap-8'}>
+              <div
+                className={
+                  'mt-20 flex h-16 w-30 translate-y-1/3 flex-col items-center justify-center rounded-md bg-gray-50 shadow shadow-pink-900'
+                }
+              >
+                <div className={'font-semibold'}>Day {point.projectDay}</div>
+                <div className={'text-foreground text-sm'}>
+                  {dayjs(point.createdAt).format('D MMM YYYY')}
+                </div>
+              </div>
+              <div
+                className={
+                  'flex h-full grow flex-col items-center justify-center gap-4'
+                }
+              >
+                <TimelineLine />
+                <TimelineDot />
+              </div>
+              <EventsCard events={point.events} />
+            </div>
+          ))}
+        </div>
       );
+    }
 
     default:
       return notReachable(state);
   }
 };
 
-type DayContentState =
-  | { type: 'loading' }
-  | { type: 'loaded'; data: TimelinePointEntity | null };
+const EventsCard = ({ events }: { events: TimelineEventHydrated[] }) => {
+  return (
+    <div
+      className={
+        'mt-20 grow translate-y-1/3 rounded-md bg-gray-50 px-2 py-2 shadow shadow-pink-900'
+      }
+    >
+      <ul className={'flex flex-col gap-1'}>
+        {events.map((event) => (
+          <li>
+            <EventCard event={event} />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
 
-const DayContent = ({
-  state,
-  projectDay,
-  projectStartDate,
-}: {
-  state: DayContentState;
-  projectDay: number;
-  projectStartDate: Date;
-}) => {
-  switch (state.type) {
-    case 'loading':
+const EventCard = ({ event }: { event: TimelineEventHydrated }) => {
+  switch (event.type) {
+    case 'milestone.started':
       return (
-        <div className="flex flex-1 flex-col gap-4">
-          <Skeleton className="aspect-video rounded-xl" />
+        <div className={''}>
+          <IconCompass className={'mr-1 inline-block text-orange-400'} />
+          Milestone <strong>{event.milestone.title}</strong> was started
         </div>
       );
 
-    case 'loaded':
-      if (!state.data) {
-        return (
-          <div className={'text-muted-foreground'}>
-            It looks like you had no activity this day or you was focused on the
-            previous day tasks
-          </div>
-        );
-      }
+    case 'milestone.continue':
       return (
-        <div className="flex flex-col gap-4">
-          {state.data.milestones.map((milestone) => (
-            <TimelineMilestoneCard
-              milestone={milestone}
-              projectDay={projectDay}
-              projectStartDate={projectStartDate}
-            />
-          ))}
+        <div className={''}>
+          <IconProgress className={'mr-1 inline-block text-blue-700'} />
+          Milestone <strong>{event.milestone.title}</strong> in progress
+        </div>
+      );
+
+    case 'milestone.completed':
+      return (
+        <div className={''}>
+          <IconCheck className={'inline-block text-green-600'} /> Milestone{' '}
+          <strong>{event.milestone.title}</strong> was completed
+        </div>
+      );
+
+    case 'phase.started':
+      return (
+        <div className={''}>
+          <IconCompass className={'mr-1 inline-block text-orange-400'} />
+          Phase <strong>{event.phase.title}</strong> was started
+        </div>
+      );
+
+    case 'phase.completed':
+      return (
+        <div className={''}>
+          <IconCheck className={'inline-block text-green-600'} /> Phase{' '}
+          <strong>{event.phase.title}</strong> was completed
+        </div>
+      );
+
+    case 'project.started':
+      return (
+        <div className={''}>
+          <Goal className={'inline-block text-pink-700'} /> Project{' '}
+          <strong>{event.project.title}</strong> was started!
+        </div>
+      );
+
+    case 'project.completed':
+      return (
+        <div className={''}>
+          <Flag className={'inline-block text-green-600'} /> Congratulations!
+          You completed the project!
         </div>
       );
 
     default:
-      return notReachable(state);
+      return notReachable(event);
   }
 };

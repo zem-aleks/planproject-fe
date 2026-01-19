@@ -44,10 +44,10 @@ export const FocusPage = () => {
         </div>
 
         <TodayTimelineLoader projectId={project.id}>
-          {(timelinePoint, reload) => (
+          {(milestone, reload) => (
             <TodayTimelineContent
               project={project}
-              timelinePoint={timelinePoint}
+              milestone={milestone}
               onMsg={(msg) => {
                 switch (msg.type) {
                   case 'onNewMilestoneActivated':
@@ -66,70 +66,3 @@ export const FocusPage = () => {
     </PageTemplate>
   );
 };
-//
-// export const ActiveTasksList = ({
-//   // project,
-//   tasks,
-//   onChange,
-// }: {
-//   project: ProjectEntity;
-//   tasks: TaskDetailsEntity[];
-//   onChange: () => void;
-// }) => {
-//   const tasksByDay = tasks.reduce(
-//     (acc, task) => {
-//       if (!acc[task.day]) {
-//         acc[task.day] = [];
-//       }
-//       acc[task.day].push(task);
-//       return acc;
-//     },
-//     {} as Record<number, TaskDetailsEntity[]>,
-//   );
-//
-//   if (tasks.length === 0) {
-//     return (
-//       <div className={'flex flex-col items-center gap-2 py-4'}>
-//         <p className={'text-xl'}>No active tasks</p>
-//         <p className={'text-muted-foreground pb-2'}>
-//           All tasks are completed or the project is in draft status.
-//         </p>
-//       </div>
-//     );
-//   }
-//
-//   return (
-//     <Tabs defaultValue={`day-${Object.keys(tasksByDay)[0]}`} className="w-full">
-//       <TabsList>
-//         {Object.keys(tasksByDay).map((day) => (
-//           <TabsTrigger value={`day-${day}`} className={'px-4 py-2 text-lg'}>
-//             Day {day}
-//           </TabsTrigger>
-//         ))}
-//       </TabsList>
-//
-//       {Object.entries(tasksByDay).map(([day, tasks]) => (
-//         <TabsContent value={`day-${day}`} className={''}>
-//           {/*<div className={'grid grid-cols-1 gap-4 md:grid-cols-2'}>*/}
-//           {tasks.map((task) => (
-//             <ActiveTaskCard
-//               task={task}
-//               key={task.id}
-//               onMsg={(msg) => {
-//                 switch (msg.type) {
-//                   case 'onTaskUpdated':
-//                     onChange();
-//                     break;
-//
-//                   default:
-//                     return notReachable(msg.type);
-//                 }
-//               }}
-//             />
-//           ))}
-//           {/*</div>*/}
-//         </TabsContent>
-//       ))}
-//     </Tabs>
-//   );
-// };

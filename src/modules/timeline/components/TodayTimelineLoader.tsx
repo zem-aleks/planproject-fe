@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
+import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { getTodayTimeline } from '@/modules/timeline/api/getTodayTimeline';
-import { TimelinePointEntity } from '@/modules/timeline/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
@@ -11,7 +11,7 @@ import { useReloadableData } from '@/utils/useReloadableData.ts';
 type Props = {
   projectId: string;
   children: (
-    timelinePoint: TimelinePointEntity | null,
+    milestone: MilestoneDetailsEntity | null,
     reload: () => void,
   ) => ReactNode;
 };
@@ -31,6 +31,7 @@ export const TodayTimelineLoader = ({
       );
 
     case 'error':
+      // TODO: process different error properly / project completed
       return (
         <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Timeline loading error</p>

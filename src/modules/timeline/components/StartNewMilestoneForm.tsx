@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import { toast } from 'sonner';
 
+import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { startNewMilestoneToday } from '@/modules/timeline/api/startNewMilestoneToday';
 import { Button } from '@/ui/button';
@@ -12,7 +13,7 @@ export const StartNewMilestoneForm = ({
   onUpdate,
   project,
 }: {
-  onUpdate: () => void;
+  onUpdate: (milestone: MilestoneDetailsEntity | null) => void;
   project: ProjectEntity;
 }) => {
   const { load, state } = useLazyLoadableData(startNewMilestoneToday);
@@ -30,7 +31,7 @@ export const StartNewMilestoneForm = ({
         break;
 
       case 'loaded':
-        onUpdate();
+        onUpdate(state.data);
         break;
 
       default:
