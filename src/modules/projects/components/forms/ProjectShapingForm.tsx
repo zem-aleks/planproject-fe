@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
+import { AnswersBlock } from '@/modules/projects/components/forms/AnswersBlock';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { addShapingUserMessage } from '@/modules/shaping/api/addShapingUserMessage';
@@ -87,22 +88,11 @@ export const ProjectShapingForm = ({
             />
 
             {state.type !== 'loading' && (
-              <div className={'flex flex-wrap gap-2'}>
-                {lastAssistantMessage.answers.map((answer) => (
-                  <Button
-                    variant={'outline'}
-                    className={
-                      'active:bg grow cursor-pointer rounded-md p-1 px-3'
-                    }
-                    onClick={() => {
-                      setMessage(answer);
-                      // load({ shapingId: shaping.id, message, clientId });
-                    }}
-                  >
-                    {answer}
-                  </Button>
-                ))}
-              </div>
+              <AnswersBlock
+                answers={lastAssistantMessage.answers}
+                message={message}
+                onChange={setMessage}
+              />
             )}
 
             <Button

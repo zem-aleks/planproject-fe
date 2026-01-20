@@ -4,6 +4,7 @@ import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
+import { AnswersBlock } from '@/modules/projects/components/forms/AnswersBlock';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
 import { FinishShapingForm } from '@/modules/shaping/components/FinishShapingForm';
 import { ShapingScore } from '@/modules/shaping/components/ShapingScore';
@@ -173,22 +174,11 @@ export const ShapingChatForm = ({
           />
 
           {state.type !== 'loading' && (
-            <div className={'flex flex-wrap gap-2'}>
-              {lastAssistantMessage.answers.map((answer) => (
-                <Button
-                  variant={'outline'}
-                  className={
-                    'active:bg grow cursor-pointer rounded-md p-1 px-3'
-                  }
-                  onClick={() => {
-                    setMessage(answer);
-                    // load({ shapingId: shaping.id, message, clientId });
-                  }}
-                >
-                  {answer}
-                </Button>
-              ))}
-            </div>
+            <AnswersBlock
+              answers={lastAssistantMessage.answers}
+              message={message}
+              onChange={setMessage}
+            />
           )}
 
           <Button
