@@ -13,8 +13,6 @@ export const ProjectLogo = ({
     large: 'size-20',
   };
 
-  console.log(url);
-
   if (url === 'loading')
     return (
       <Skeleton

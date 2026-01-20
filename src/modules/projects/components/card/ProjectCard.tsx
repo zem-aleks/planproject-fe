@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 
 import { ProjectLogo } from '@/modules/projects/components/ProjectLogo';
+import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
 import { ProjectStatusBadge } from '@/modules/projects/components/ProjectStatus';
 import {
   ProjectMenuActions,
@@ -71,17 +72,21 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
                 <ProjectLogo url={project.logoUrl} size={'medium'} />
               </div>
               <div>
-                <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                <CardTitle className="flex items-center gap-2 text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
                   {project.title}
+                  <ProjectStatusBadge status={project.status} />
                 </CardTitle>
+                <div>{project.description}</div>
               </div>
             </div>
             <CardAction>
               <ProjectMenuActions project={project} onMsg={onMsg} />
             </CardAction>
           </CardHeader>
-          <CardFooter className="w-full flex-row items-start justify-between">
-            <ProjectStatusBadge status={project.status} />
+          <CardFooter className="w-full flex-row items-start justify-between gap-4">
+            <div className={'grow'}>
+              <ProjectProgressCard project={project} />
+            </div>
           </CardFooter>
         </Card>
       );
