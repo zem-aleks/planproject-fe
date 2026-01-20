@@ -1,4 +1,5 @@
 import { Card } from '@/ui/card';
+import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 
 export const ShapingComment = ({
   comment,
@@ -24,7 +25,7 @@ export const ShapingComment = ({
             <b className={'animate-bounce delay-300'}>.</b>
           </div>
         ) : (
-          <>{comment}</>
+          <MarkdownFormat>{comment}</MarkdownFormat>
         )}
       </Card>
     </div>

@@ -9,6 +9,7 @@ import { RoadmapPage } from '@/modules/dashboard/pages/RoadmapPage';
 import { privacyPolicyContent } from '@/modules/home/data/privacy';
 import { termsOfUseContent } from '@/modules/home/data/terms';
 import { HomePage } from '@/modules/home/pages/HomePage';
+import { PricingPage } from '@/modules/home/pages/PricingPage';
 import { StaticPage } from '@/modules/home/pages/StaticPage';
 import { FocusPage } from '@/modules/milestones/pages/FocusPage';
 import { MilestonePage } from '@/modules/milestones/pages/MilestonePage';
@@ -24,6 +25,7 @@ export const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route
           path="/p/terms"
           element={<StaticPage content={termsOfUseContent} />}

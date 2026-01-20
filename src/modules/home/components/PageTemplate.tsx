@@ -43,9 +43,22 @@ export const PageTemplate = ({
       <header className={'absolute top-0 z-50 w-full border-b'}>
         <div className="container mx-auto px-4">
           <div className={'flex h-16 items-center justify-between'}>
-            <Link to={'/'}>
-              <LogoBlockWhite />
-            </Link>
+            <nav className={'flex items-center'}>
+              <Link to={'/'} className={'mr-8 mb-[-2px]'}>
+                <LogoBlockWhite />
+              </Link>
+
+              <Button
+                variant={'link'}
+                size={'lg'}
+                asChild={true}
+                className={
+                  'text-[16px] font-normal text-gray-50 decoration-0 hover:text-orange-400 hover:no-underline'
+                }
+              >
+                <Link to={'/pricing'}>Pricing</Link>
+              </Button>
+            </nav>
 
             {session ? (
               <Button asChild>
