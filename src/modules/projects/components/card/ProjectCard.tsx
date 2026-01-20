@@ -38,18 +38,20 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
             <div className={'flex gap-4 pr-2'}>
               <ProjectLogo url={project.logoUrl} size={'medium'} />
               <div>
-                <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                <CardTitle className="flex items-center gap-2 text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
                   {project.title}
+                  <ProjectStatusBadge status={project.status} />
                 </CardTitle>
+                <div>
+                  Finish this project description to get it's plan and insights
+                </div>
               </div>
             </div>
             <CardAction>
               <ProjectMenuActions project={project} onMsg={onMsg} />
             </CardAction>
           </CardHeader>
-          <CardFooter className="w-full flex-row items-start justify-between">
-            <ProjectStatusBadge status={project.status} />
-          </CardFooter>
+          <CardFooter className="w-full flex-row items-start justify-between"></CardFooter>
         </Card>
       );
 
