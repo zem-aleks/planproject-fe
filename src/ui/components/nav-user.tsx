@@ -1,4 +1,5 @@
 import { useUser } from '@/modules/auth/contexts/UserContext';
+import { SUBSCRIPTION_TITLES } from '@/modules/subscriptions/data/subscriptions';
 import { supabase } from '@/modules/supabase/client';
 import {
   DropdownMenu,
@@ -26,6 +27,10 @@ export function NavUser() {
   const { isMobile } = useSidebar();
   const { user } = useUser();
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -45,9 +50,11 @@ export function NavUser() {
               {/*  </AvatarFallback>*/}
               {/*</Avatar>*/}
               <div className="grid flex-1 pl-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user?.email}</span>
+                <span className="truncate font-medium">
+                  {SUBSCRIPTION_TITLES[user.subscription]}
+                </span>
                 <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
-                  {user?.email}
+                  {user.email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -69,9 +76,11 @@ export function NavUser() {
                 {/*  <AvatarFallback className="rounded-lg">CN</AvatarFallback>*/}
                 {/*</Avatar>*/}
                 <div className="grid flex-1 pl-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user?.email}</span>
+                  <span className="truncate font-medium">
+                    {SUBSCRIPTION_TITLES[user.subscription]}
+                  </span>
                   <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
-                    {user?.email}
+                    {user.email}
                   </span>
                 </div>
               </div>
