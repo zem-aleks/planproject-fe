@@ -32,7 +32,10 @@ export function NavMain() {
           <SidebarMenu>
             <SidebarMenuItem key={'projects'}>
               <Link to={'/projects'}>
-                <SidebarMenuButton isActive={true} className={''}>
+                <SidebarMenuButton
+                  isActive={pathname === `/projects`}
+                  className={''}
+                >
                   <IconPackages />
                   <span>All Projects</span>
                 </SidebarMenuButton>

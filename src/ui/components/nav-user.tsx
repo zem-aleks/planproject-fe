@@ -1,3 +1,5 @@
+import { Link } from 'react-router';
+
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { SUBSCRIPTION_TITLES } from '@/modules/subscriptions/data/subscriptions';
 import { supabase } from '@/modules/supabase/client';
@@ -87,10 +89,13 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <IconUserCircle />
-                Account
+              <DropdownMenuItem asChild={true}>
+                <Link to={'/account'}>
+                  <IconUserCircle />
+                  Account
+                </Link>
               </DropdownMenuItem>
+
               {/*<DropdownMenuItem>*/}
               {/*  <IconCreditCard />*/}
               {/*  Billing*/}

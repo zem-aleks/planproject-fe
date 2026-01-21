@@ -18,6 +18,7 @@ import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.ts
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
 import { TimelinePage } from '@/modules/timeline/pages/TimelinePage';
+import { AccountPage } from '@/modules/users/pages/AccountPage';
 import { InternalElement } from '@/routing/components/InternalElement';
 
 export const AppRoutes = () => {
@@ -37,6 +38,14 @@ export const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
+        <Route
+          path="/account"
+          element={
+            <InternalElement>
+              <AccountPage />
+            </InternalElement>
+          }
+        />
         <Route
           path="/projects"
           element={
