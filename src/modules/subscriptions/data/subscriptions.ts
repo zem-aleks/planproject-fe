@@ -1,4 +1,4 @@
-import { SubscriptionType } from '@/modules/auth/types/user';
+import { SubscriptionType } from '@/modules/users/types/user';
 
 export const SUBSCRIPTION_TITLES: Record<SubscriptionType, string> = {
   basic: 'Basic Plan',

@@ -2,7 +2,7 @@ import { ReactNode, createContext, useContext } from 'react';
 
 import { getUser } from '@/modules/auth/api/getUser';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
-import { UserEntity } from '@/modules/auth/types/user';
+import { UserEntity } from '@/modules/users/types/user';
 import { noOperation, notReachable } from '@/utils/notReachable';
 import { useLoadableData } from '@/utils/useLoadableData';
 

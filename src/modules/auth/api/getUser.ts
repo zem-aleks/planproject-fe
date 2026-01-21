@@ -1,7 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 
 import { api } from '@/modules/api/api';
-import { UserEntity } from '@/modules/auth/types/user';
+import { UserEntity } from '@/modules/users/types/user';
 
 export const getUser = async (
   _: void,
