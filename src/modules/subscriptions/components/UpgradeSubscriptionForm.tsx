@@ -2,10 +2,17 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 
 import { createCheckoutSession } from '@/modules/subscriptions/api/createCheckoutSession';
+import {
+  SubscriptionPeriod,
+  SubscriptionType,
+} from '@/modules/users/types/user';
 import { Button } from '@/ui/button';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
-export const UpgradeSubscriptionForm = ({ priceId }: { priceId: string }) => {
+export const UpgradeSubscriptionForm = (data: {
+  type: SubscriptionType;
+  period: SubscriptionPeriod;
+}) => {
   const { state, load } = useLazyLoadableData(createCheckoutSession);
   const navigate = useNavigate();
 
@@ -19,7 +26,7 @@ export const UpgradeSubscriptionForm = ({ priceId }: { priceId: string }) => {
     <Button
       className={'w-full'}
       variant={'warning'}
-      onClick={() => load({ priceId })}
+      onClick={() => load(data)}
       loading={state.type === 'loading'}
     >
       Upgrade

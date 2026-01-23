@@ -76,11 +76,15 @@ export const PriceCard = ({
         </ul>
       </div>
 
-      {showUpgradeForm && price.priceId && (
-        <div className={'w-full'}>
-          <UpgradeSubscriptionForm priceId={price.priceId} />
-        </div>
-      )}
+      {showUpgradeForm &&
+        (subscription === 'pro' || subscription === 'business') && (
+          <div className={'w-full'}>
+            <UpgradeSubscriptionForm
+              type={subscription}
+              period={yearly ? 'yearly' : 'monthly'}
+            />
+          </div>
+        )}
     </div>
   );
 };

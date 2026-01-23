@@ -3,7 +3,6 @@ import { SubscriptionType } from '@/modules/users/types/user';
 export type Price = {
   price: number;
   discountPrice: number | null;
-  priceId: string | null;
 };
 
 export type PriceBlock = {
@@ -25,12 +24,10 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
     monthly: {
       price: 0,
       discountPrice: null,
-      priceId: null,
     },
     yearly: {
       price: 0,
       discountPrice: null,
-      priceId: null,
     },
   },
   pro: {
@@ -45,12 +42,10 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
     monthly: {
       price: 19,
       discountPrice: null,
-      priceId: 'price_1SrgPRAswqBbSEmRvR31qSjH',
     },
     yearly: {
       price: 190,
       discountPrice: null,
-      priceId: 'price_1SrgPRAswqBbSEmRbMdl7rjf',
     },
   },
   business: {
@@ -67,12 +62,10 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
     monthly: {
       price: 39,
       discountPrice: 49,
-      priceId: 'price_1SsLd0AswqBbSEmRhrduwsnY',
     },
     yearly: {
       price: 390,
       discountPrice: 490,
-      priceId: 'price_1SsLdyAswqBbSEmRfuftUEyG',
     },
   },
 };
