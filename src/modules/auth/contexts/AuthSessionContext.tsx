@@ -13,9 +13,17 @@ import { setApiAuth } from '@/modules/api/api';
 import { supabase } from '@/modules/supabase/client';
 import { Session } from '@supabase/auth-js';
 
-type AuthContextData = { session: Session | null; clientId: string };
+type AuthContextData = {
+  session: Session | null;
+  clientId: string;
+  loaded: boolean;
+};
 
-const emptyContextValue: AuthContextData = { session: null, clientId: '' };
+const emptyContextValue: AuthContextData = {
+  session: null,
+  clientId: '',
+  loaded: false,
+};
 
 export const AuthSessionContext =
   createContext<AuthContextData>(emptyContextValue);
@@ -30,11 +38,13 @@ export const AuthSessionContextProvider = ({
     [],
   );
   localStorage.setItem('clientId', clientId);
+  const [loaded, setLoaded] = useState<boolean>(false);
   const [session, setSession] = useState<Session | null>(null);
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setApiAuth(session ? session.access_token : undefined);
+      setLoaded(true);
     });
     const {
       data: { subscription },
@@ -46,7 +56,7 @@ export const AuthSessionContextProvider = ({
   }, []);
 
   return (
-    <AuthSessionContext.Provider value={{ session, clientId }}>
+    <AuthSessionContext.Provider value={{ session, clientId, loaded }}>
       {children}
     </AuthSessionContext.Provider>
   );
