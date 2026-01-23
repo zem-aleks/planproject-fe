@@ -2,6 +2,9 @@ export type UserEntity = {
   id: string;
   email: string;
   subscription: SubscriptionType;
+  subscriptionPeriodEnd: Date | null;
+  subscriptionStatus: string | null;
+  stripeCustomerId: string | null;
   phone: string | null;
   avatarUrl: string | null;
   bio: string | null;

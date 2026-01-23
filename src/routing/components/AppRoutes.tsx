@@ -17,6 +17,7 @@ import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
 import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.tsx';
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
+import { CheckoutSuccessPage } from '@/modules/subscriptions/pages/CheckoutSuccessPage';
 import { TimelinePage } from '@/modules/timeline/pages/TimelinePage';
 import { AccountPage } from '@/modules/users/pages/AccountPage';
 import { InternalElement } from '@/routing/components/InternalElement';
@@ -46,6 +47,16 @@ export const AppRoutes = () => {
             </InternalElement>
           }
         />
+
+        <Route
+          path="/checkout/session-success"
+          element={
+            <InternalElement>
+              <CheckoutSuccessPage />
+            </InternalElement>
+          }
+        />
+
         <Route
           path="/projects"
           element={

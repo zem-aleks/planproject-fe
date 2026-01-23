@@ -11,7 +11,7 @@ export const useProjectByUrlParam = (): {
   const { projectId } = useParams<{ projectId: string }>();
   const { projects, reload } = useContext(ProjectsContext);
   if (!projectId) {
-    console.error('Project ID is required');
+    // console.error('Project ID is required');
     return { project: null, reload };
   }
 

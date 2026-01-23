@@ -28,7 +28,6 @@ export function NavUser() {
   // const navigate = useNavigate();
   const { isMobile } = useSidebar();
   const { user } = useUser();
-
   if (!user) {
     return null;
   }
