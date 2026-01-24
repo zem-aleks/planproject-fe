@@ -26,7 +26,7 @@ export const AccountPage = () => {
   return (
     <PageTemplate
       header={{
-        breadcrumbs: [{ title: 'Account', href: '/account' }],
+        breadcrumbs: [],
         title: `Account`,
       }}
     >

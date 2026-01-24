@@ -83,7 +83,7 @@ export const UnlockProjectForm = ({
               </Button>
             ) : (
               <Button variant={'default'} asChild>
-                <Link to={'/account'}>Upgrade Plan</Link>
+                <Link to={'/account'}>Upgrade Subscription</Link>
               </Button>
             )}
           </div>

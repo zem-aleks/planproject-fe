@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 import { getAuditory } from '@/modules/auditory/api/getAuditory';
 import { AuditoryContent } from '@/modules/auditory/components/AuditoryContent';
@@ -7,14 +7,26 @@ import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLoadableData } from '@/utils/useLoadableData';
+import { usePollingData } from '@/utils/usePollableData';
 
 type Props = {
   project: ProjectPreviewEntity;
 };
 
 export const AuditoryLoader = ({ project }: Props): ReactNode => {
-  const { state, reload } = useLoadableData(getAuditory, project.id);
+  const { state, reload, stopPolling } = usePollingData(
+    getAuditory,
+    project.id,
+    3000,
+  );
+
+  useEffect(() => {
+    if (state.type === 'loaded' || state.type === 'reloading') {
+      if (state.data !== null) {
+        stopPolling();
+      }
+    }
+  }, [state]);
 
   switch (state.type) {
     case 'error':
@@ -33,7 +45,17 @@ export const AuditoryLoader = ({ project }: Props): ReactNode => {
         </div>
       );
 
+    case 'stopped':
+    case 'reloading':
     case 'loaded':
+      if (!state.data) {
+        return (
+          <div className={'flex flex-col gap-2'}>
+            <Skeleton className={'h-40 w-full'} />
+          </div>
+        );
+      }
+
       return <AuditoryContent project={project} auditory={state.data} />;
 
     default:

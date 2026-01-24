@@ -6,7 +6,7 @@ import { CompetitorEntity } from '@/modules/competitors/types/entity';
 export const getCompetitors = async (
   projectId: string,
   config?: AxiosRequestConfig,
-): Promise<CompetitorEntity[]> => {
+): Promise<CompetitorEntity[] | null> => {
   return api.get(`/competitors/${projectId}`, {
     signal: config?.signal,
   });

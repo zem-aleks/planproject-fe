@@ -1,12 +1,12 @@
 import { AxiosRequestConfig } from 'axios';
 
 import { api } from '@/modules/api/api';
-import { AuditoryEntity } from '@/modules/auditory/types/entity';
+import { AuditoryData } from '@/modules/auditory/types/entity';
 
 export const getAuditory = async (
   projectId: string,
   config?: AxiosRequestConfig,
-): Promise<AuditoryEntity> => {
+): Promise<AuditoryData | null> => {
   return api.get(`/auditory/${projectId}`, {
     signal: config?.signal,
   });
