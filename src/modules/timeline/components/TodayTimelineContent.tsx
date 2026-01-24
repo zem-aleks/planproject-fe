@@ -1,3 +1,4 @@
+import { useUser } from '@/modules/auth/contexts/UserContext';
 import { FocusMilestoneCard } from '@/modules/milestones/components/FocusMilestoneCard';
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
@@ -19,6 +20,7 @@ export const TodayTimelineContent = ({
   project: ProjectPreviewEntity;
   onMsg: (msg: Msg) => void;
 }) => {
+  const { user } = useUser();
   if (!milestone || milestone.status === 'completed') {
     return (
       <Card className={'flex flex-col items-center gap-6'}>
@@ -38,7 +40,9 @@ export const TodayTimelineContent = ({
 
   return (
     <div className={'flex flex-col gap-2'}>
-      <FocusComment projectId={project.id} />
+      {user?.subscription === 'business' && (
+        <FocusComment projectId={project.id} />
+      )}
       <FocusMilestoneCard
         milestone={milestone}
         onUpdated={() => onMsg({ type: 'onMilestoneCompleted' })}

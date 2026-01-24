@@ -17,9 +17,10 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
     description: 'Perfect for exploring the platform',
     details: [
       '✔ 1 project plan generation',
-      '✔ Step-by-step actionable roadmaps',
+      '✔ Step-by-step actionable plan',
       '✔ Basic AI-generated plan',
-      '✔ Limited competitor & audience analysis',
+      '✔ 1 competitor data',
+      '✔ Minimal audience analysis',
     ],
     monthly: {
       price: 0,
@@ -36,8 +37,8 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
       '✔ Everything from Basic Plan',
       '✔ Up to 5 projects',
       '✔ Advanced AI planning',
-      '✔ Full competitor & audience analysis',
-      '✔ AI refinement & iteration',
+      '✔ 5 competitors data',
+      '✔ Advanced audience analysis',
     ],
     monthly: {
       price: 19,
@@ -55,9 +56,11 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
       '✔ Everything from Pro Plan',
       '✔ Unlimited projects',
       '✔ Priority Support',
-      '✔ Market & monetization insights (coming soon)',
+      '✔ 10 competitors data',
+      '✔ Full audience analysis',
+      '✔ 🦊 AI Hero (motivator)',
+      // '✔ Market & monetization insights (coming soon)',
       '✔ Progress tracking & reminders (coming soon)',
-      '✔ Export options (coming soon)',
     ],
     monthly: {
       price: 39,

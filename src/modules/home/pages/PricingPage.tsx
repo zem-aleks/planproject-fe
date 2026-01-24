@@ -77,30 +77,29 @@ export const PricingPage = () => {
                   <tbody className="divide-y">
                     {[
                       ['Active projects', '1', 'Up to 5', 'Unlimited'],
-                      ['AI plan generation', 'Basic', 'Advanced', 'Advanced'],
-
+                      ['Step-by-step actionable plans', '✅', '✅', '✅'],
                       [
-                        'Competitor & audience analysis',
-                        'Limited',
-                        'Full',
-                        'Full',
+                        'Competitors analysis',
+                        '1 competitor',
+                        '5 competitors',
+                        '10 competitors',
                       ],
-                      ['Step-by-step actionable roadmaps', '✅', '✅', '✅'],
+                      ['Audience analysis', 'Basic', 'Advanced', 'Full'],
                       ['AI refinement & iteration', '❌', '✅', '✅'],
                       ['Priority support', '❌', '❌', '✅'],
-                      [
-                        'Market & monetization insights',
-                        '❌',
-                        '❌',
-                        '✅ (coming soon)',
-                      ],
+                      // [
+                      //   'Market & monetization insights',
+                      //   '❌',
+                      //   '❌',
+                      //   '✅ (coming soon)',
+                      // ],
+                      ['🦊 AI Hero', '❌', '❌', '✅'],
                       [
                         'Progress tracking & reminders',
                         '❌',
                         '❌',
-                        '✅ (coming soon)',
+                        '✅ (in progress)',
                       ],
-                      ['Export options', '❌', '❌', '✅ (coming soon)'],
                     ].map(([feature, basic, pro, business]) => (
                       <tr key={feature}>
                         <td className="p-4">{feature}</td>
