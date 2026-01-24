@@ -46,9 +46,7 @@ export const AccountPage = () => {
         </div>
 
         <Card className={'gap-4 p-4'}>
-          <div className={'text-xl font-semibold'}>
-            Profile Information (coming soon)
-          </div>
+          <div className={'text-xl font-semibold'}>Profile Information</div>
           {/*<Separator />*/}
           {/*<div className="flex justify-between gap-4">*/}
           {/*  <Label htmlFor="firstName" className={'shrink-0'}>*/}
