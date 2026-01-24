@@ -73,7 +73,10 @@ export const ProjectShapingForm = ({
 
           <Card className={'mt-2 w-full p-4'}>
             <div className={'w-full'}>
-              <div className={'text-lg'}>{lastAssistantMessage.content}</div>
+              <div className={'text-lg'}>
+                {lastAssistantMessage.content ||
+                  'Would you like to provide any additional information?'}
+              </div>
             </div>
             <Textarea
               id="description"
@@ -85,6 +88,7 @@ export const ProjectShapingForm = ({
               disabled={state.type === 'loading'}
               ref={textAreaRef}
               className={'w-full'}
+              maxLength={4000}
             />
 
             {state.type !== 'loading' && (

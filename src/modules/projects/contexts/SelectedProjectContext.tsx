@@ -7,16 +7,20 @@ import {
 } from 'react';
 
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext.tsx';
-import { ProjectEntity } from '@/modules/projects/types/entity.ts';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity.ts';
+import { noOperation } from '@/utils/notReachable';
 
 type SelectedProjectContextData = {
-  project: ProjectEntity | null;
-  select: (project: ProjectEntity) => void;
+  project: ProjectPreviewEntity | null;
+  select: (project: ProjectPreviewEntity) => void;
   unselect: () => void;
 };
 
-const emptyContextValue: SelectedProjectContextData =
-  {} as SelectedProjectContextData;
+const emptyContextValue: SelectedProjectContextData = {
+  project: null,
+  select: noOperation,
+  unselect: noOperation,
+};
 
 export const SelectedProjectContext =
   createContext<SelectedProjectContextData>(emptyContextValue);
@@ -31,9 +35,11 @@ export const SelectedProjectContextProvider = ({
   const selectedProject =
     projects.find((project) => project.id === selectedProjectId) || null;
 
-  const [project, setProject] = useState<ProjectEntity | null>(selectedProject);
+  const [project, setProject] = useState<ProjectPreviewEntity | null>(
+    selectedProject,
+  );
 
-  const select = useCallback((newProject: ProjectEntity) => {
+  const select = useCallback((newProject: ProjectPreviewEntity) => {
     localStorage.setItem('selectedProjectId', newProject.id);
     setProject(newProject);
   }, []);

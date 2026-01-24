@@ -2,10 +2,10 @@ import { useContext } from 'react';
 import { useParams } from 'react-router';
 
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 
 export const useProjectByUrlParam = (): {
-  project: ProjectEntity | null;
+  project: ProjectPreviewEntity | null;
   reload: () => void;
 } => {
   const { projectId } = useParams<{ projectId: string }>();

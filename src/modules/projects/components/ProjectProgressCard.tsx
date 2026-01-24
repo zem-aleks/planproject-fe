@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 
 import { getProjectProgress } from '@/modules/projects/api/getProjectProgress';
 import { getDaySince } from '@/modules/projects/helpers/getDaySince';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Card } from '@/ui/card';
 import { Progress } from '@/ui/progress';
 import { Skeleton } from '@/ui/skeleton';
@@ -12,7 +12,7 @@ import { useLoadableData } from '@/utils/useLoadableData';
 export const ProjectProgressCard = ({
   project,
 }: {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
 }) => {
   const { state } = useLoadableData(getProjectProgress, project.id);
 

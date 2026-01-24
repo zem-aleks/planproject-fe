@@ -1,6 +1,6 @@
 import { FocusMilestoneCard } from '@/modules/milestones/components/FocusMilestoneCard';
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { FocusComment } from '@/modules/timeline/components/FocusComment';
 import { StartNewMilestoneForm } from '@/modules/timeline/components/StartNewMilestoneForm';
 import { Card } from '@/ui/card';
@@ -16,7 +16,7 @@ export const TodayTimelineContent = ({
   onMsg,
 }: {
   milestone: MilestoneDetailsEntity | null;
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onMsg: (msg: Msg) => void;
 }) => {
   if (!milestone || milestone.status === 'completed') {

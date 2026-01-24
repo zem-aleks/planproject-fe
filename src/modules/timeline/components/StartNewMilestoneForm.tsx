@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { startNewMilestoneToday } from '@/modules/timeline/api/startNewMilestoneToday';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
@@ -14,7 +14,7 @@ export const StartNewMilestoneForm = ({
   project,
 }: {
   onUpdate: (milestone: MilestoneDetailsEntity | null) => void;
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
 }) => {
   const { load, state } = useLazyLoadableData(startNewMilestoneToday);
 

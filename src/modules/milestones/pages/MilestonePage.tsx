@@ -5,7 +5,7 @@ import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteM
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -30,7 +30,7 @@ const PageContent = ({
   project,
   milestoneId,
 }: {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   milestoneId: string;
 }) => {
   const { state, reload } = useLoadableData(getMilestone, milestoneId);
@@ -92,7 +92,7 @@ const LoadedContentPage = ({
   milestone,
   onChanged,
 }: {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   milestone: MilestoneDetailsEntity;
   onChanged: () => void;
 }) => {

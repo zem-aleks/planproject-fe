@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router';
 import {
   ChartGantt,
   EqualApproximately,
+  Lock,
   Map,
   PersonStanding,
   Zap,
@@ -87,7 +88,11 @@ export function NavMain() {
               <SidebarMenuButton
                 isActive={pathname === `/project/${project.id}/roadmap`}
               >
-                <Map />
+                {project.activated ? (
+                  <Map />
+                ) : (
+                  <Lock className={'font-semibold text-yellow-500'} />
+                )}
                 <span>Roadmap</span>
               </SidebarMenuButton>
             </Link>
@@ -98,7 +103,11 @@ export function NavMain() {
               <SidebarMenuButton
                 isActive={pathname === `/project/${project.id}/competitors`}
               >
-                <EqualApproximately />
+                {project.activated ? (
+                  <EqualApproximately />
+                ) : (
+                  <Lock className={'font-semibold text-yellow-500'} />
+                )}
                 <span>Competitors</span>
               </SidebarMenuButton>
             </Link>
@@ -108,7 +117,11 @@ export function NavMain() {
               <SidebarMenuButton
                 isActive={pathname === `/project/${project.id}/auditory`}
               >
-                <PersonStanding />
+                {project.activated ? (
+                  <PersonStanding />
+                ) : (
+                  <Lock className={'font-semibold text-yellow-500'} />
+                )}
                 <span>Auditory</span>
               </SidebarMenuButton>
             </Link>

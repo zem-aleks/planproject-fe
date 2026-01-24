@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 import { getAuditory } from '@/modules/auditory/api/getAuditory';
 import { AuditoryContent } from '@/modules/auditory/components/AuditoryContent';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
@@ -10,7 +10,7 @@ import { notReachable } from '@/utils/notReachable.ts';
 import { useLoadableData } from '@/utils/useLoadableData';
 
 type Props = {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
 };
 
 export const AuditoryLoader = ({ project }: Props): ReactNode => {

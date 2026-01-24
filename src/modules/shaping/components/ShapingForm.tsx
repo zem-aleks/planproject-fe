@@ -98,6 +98,7 @@ export const ShapingForm = ({
           required={true}
           disabled={state.type === 'loading'}
           ref={textAreaRef}
+          maxLength={4000}
         />
         {/*{errors.description && (*/}
         {/*  <p className="text-xs text-red-700">{errors.description.message}</p>*/}

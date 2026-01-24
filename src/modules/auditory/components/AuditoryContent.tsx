@@ -11,7 +11,7 @@ import {
   AuditoryEntity,
   AuditorySegment,
 } from '@/modules/auditory/types/entity';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/ui/chart';
@@ -22,7 +22,7 @@ import { notReachable } from '@/utils/notReachable';
 import { useLoadableData } from '@/utils/useLoadableData';
 
 type Props = {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   auditory: AuditoryEntity;
 };
 

@@ -4,7 +4,7 @@ import {
   ProjectMenuDeleteForm,
   Msg as ProjectMenuDeleteFormMsg,
 } from '@/modules/projects/components/card/ProjectMenuDeleteForm.tsx';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button.tsx';
 import {
   DropdownMenu,
@@ -17,12 +17,12 @@ import {
 import { IconCompass, IconDotsVertical } from '@tabler/icons-react';
 
 export type Msg =
-  | { type: 'onProjectSelect'; project: ProjectEntity }
-  | { type: 'onProjectEdit'; project: ProjectEntity }
+  | { type: 'onProjectSelect'; project: ProjectPreviewEntity }
+  | { type: 'onProjectEdit'; project: ProjectPreviewEntity }
   | ProjectMenuDeleteFormMsg;
 
 type Props = {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onMsg: (msg: Msg) => void;
 };
 

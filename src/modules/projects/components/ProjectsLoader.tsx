@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 import { getProjects } from '@/modules/projects/api/getProjects';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { PageLoader } from '@/modules/templates/components/PageLoader';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import { Button } from '@/ui/button.tsx';
@@ -9,7 +9,7 @@ import { notReachable } from '@/utils/notReachable.ts';
 import { useLoadableData } from '@/utils/useLoadableData';
 
 type Props = {
-  children: (chat: ProjectEntity[], reload: () => void) => ReactNode;
+  children: (projects: ProjectPreviewEntity[], reload: () => void) => ReactNode;
 };
 
 export const ProjectsLoader = ({ children }: Props): ReactNode => {

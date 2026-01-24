@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { modifyPhases } from '@/modules/phases/api/modifyPhases';
 import { PhaseEntity } from '@/modules/phases/types/entity';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button';
 import {
   Dialog,
@@ -21,7 +21,7 @@ export const ModifyPhasesForm = ({
   project,
   onModified,
 }: {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onModified: (phases: PhaseEntity[]) => void;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
@@ -58,7 +58,7 @@ const ModifyPhasesModal = ({
   onClose,
   onUpdate,
 }: {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   open: boolean;
   onClose: () => void;
   onUpdate: (phases: PhaseEntity[]) => void;

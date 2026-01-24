@@ -2,7 +2,7 @@ import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
 import { ModifyPhasesForm } from '@/modules/projects/components/forms/ModifyPhasesForm';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { notReachable } from '@/utils/notReachable';
 
 export type Msg =
@@ -13,7 +13,7 @@ export const ProjectActions = ({
   project,
   onMsg,
 }: {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onMsg: (msg: Msg) => void;
 }) => {
   switch (project.status) {

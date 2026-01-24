@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 
+import { Lock } from 'lucide-react';
+
 import { ProjectLogo } from '@/modules/projects/components/ProjectLogo';
 import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
 import { ProjectStatusBadge } from '@/modules/projects/components/ProjectStatus';
@@ -7,7 +9,7 @@ import {
   ProjectMenuActions,
   Msg as ProjectMenuActionsMsg,
 } from '@/modules/projects/components/card/ProjectMenuActions.tsx';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import {
   Card,
   CardAction,
@@ -20,7 +22,7 @@ import { notReachable } from '@/utils/notReachable';
 export type Msg = ProjectMenuActionsMsg;
 
 type Props = {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onMsg: (msg: Msg) => void;
 };
 
@@ -70,8 +72,17 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
         >
           <CardHeader>
             <div className={'flex gap-4 pr-2'}>
-              <div>
+              <div className={'relative'}>
                 <ProjectLogo url={project.logoUrl} size={'medium'} />
+                {!project.activated && (
+                  <div
+                    className={
+                      'absolute top-0 left-0 flex size-14 items-center justify-center rounded-md bg-[rgba(0,0,0,0.7)]'
+                    }
+                  >
+                    <Lock className={'size-8 text-orange-400'} />
+                  </div>
+                )}
               </div>
               <div>
                 <CardTitle className="flex items-center gap-2 text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -85,11 +96,13 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
               <ProjectMenuActions project={project} onMsg={onMsg} />
             </CardAction>
           </CardHeader>
-          <CardFooter className="w-full flex-row items-start justify-between gap-4">
-            <div className={'grow'}>
-              <ProjectProgressCard project={project} />
-            </div>
-          </CardFooter>
+          {project.status === 'active' && (
+            <CardFooter className="w-full flex-row items-start justify-between gap-4">
+              <div className={'grow'}>
+                <ProjectProgressCard project={project} />
+              </div>
+            </CardFooter>
+          )}
         </Card>
       );
 

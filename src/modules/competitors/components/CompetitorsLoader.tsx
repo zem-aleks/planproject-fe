@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { Link } from 'react-router';
 
 import { getCompetitors } from '@/modules/competitors/api/getCompetitors';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
@@ -11,7 +11,7 @@ import { notReachable } from '@/utils/notReachable.ts';
 import { useLoadableData } from '@/utils/useLoadableData';
 
 type Props = {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
 };
 
 export const CompetitorsLoader = ({ project }: Props): ReactNode => {
@@ -22,7 +22,9 @@ export const CompetitorsLoader = ({ project }: Props): ReactNode => {
       return (
         <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Competitors loading error</p>
-          <p className={'pb-2'}>{state.error.message}</p>
+          <p className={'pb-2'}>
+            {state.error.response?.data.message || state.error.message}
+          </p>
           <Button onClick={reload}>Try again</Button>
         </Card>
       );

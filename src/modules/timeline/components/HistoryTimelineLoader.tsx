@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 import dayjs from 'dayjs';
 import { Flag, Goal } from 'lucide-react';
 
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { getHistoryTimeline } from '@/modules/timeline/api/getHistoryTimeline';
 import {
   TimelineDot,
@@ -18,7 +18,7 @@ import { useLoadableData } from '@/utils/useLoadableData';
 import { IconCheck, IconCompass, IconProgress } from '@tabler/icons-react';
 
 type Props = {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
 };
 
 export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {

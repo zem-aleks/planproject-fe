@@ -1,12 +1,12 @@
 import { AxiosRequestConfig } from 'axios';
 
 import { api } from '@/modules/api/api';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 
 export const getProjects = async (
   _: void,
   config?: AxiosRequestConfig,
-): Promise<ProjectEntity[]> => {
+): Promise<ProjectPreviewEntity[]> => {
   return api.get(`/projects`, {
     signal: config?.signal,
   });

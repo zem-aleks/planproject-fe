@@ -1,5 +1,16 @@
 import { z } from 'zod';
 
+export type ProjectPreviewEntity = {
+  id: string;
+  title: string;
+  description: string | null;
+  logoUrl: string | null;
+  status: ProjectStatus;
+  daysNeeded: number | null;
+  startedAt: Date;
+  activated: boolean;
+};
+
 export type ProjectEntity = {
   id: string;
   userId: string | null;
@@ -12,6 +23,7 @@ export type ProjectEntity = {
   updatedAt: Date;
   startedAt: Date;
   status: ProjectStatus;
+  activated: boolean;
 };
 
 export type ProjectStatus =

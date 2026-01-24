@@ -2,17 +2,8 @@ import { MilestoneCard } from '@/modules/milestones/components/MilestoneCard';
 import { MilestonesLoader } from '@/modules/milestones/components/MilestonesLoader';
 import { ModifyMilestonesForm } from '@/modules/milestones/components/ModifyMilestonesForm';
 import { PhaseEntity } from '@/modules/phases/types/entity';
-import { ProjectEntity } from '@/modules/projects/types/entity';
 
-export const MilestonesBlock = ({
-  // project,
-  phase,
-  // onModified,
-}: {
-  project: ProjectEntity;
-  phase: PhaseEntity;
-  // onModified: (phase: PhaseEntity) => void;
-}) => {
+export const MilestonesBlock = ({ phase }: { phase: PhaseEntity }) => {
   return (
     <MilestonesLoader phaseId={phase.id}>
       {(milestones, reload) => (

@@ -2,83 +2,92 @@ import { useContext } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { NewProjectsChecker } from '@/modules/projects/components/NewProjectsChecker';
+import { ProjectsLoader } from '@/modules/projects/components/ProjectsLoader';
 import {
   ProjectCard,
   Msg as ProjectCardMsg,
 } from '@/modules/projects/components/card/ProjectCard.tsx';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext.tsx';
 import { SelectedProjectContext } from '@/modules/projects/contexts/SelectedProjectContext.tsx';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Button } from '@/ui/button.tsx';
+import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable.ts';
 
 export const ProjectsPage = () => {
   const navigate = useNavigate();
-  const { projects, reload } = useContext(ProjectsContext);
+  const { reload } = useContext(ProjectsContext);
   const { select } = useContext(SelectedProjectContext);
 
   return (
-    <PageTemplate
-      header={{
-        breadcrumbs: [],
-        title: 'Projects',
-        actions: (
-          // <CreateProjectAction />
-          <Button asChild size="sm" className="hidden sm:flex">
-            <Link to={'/projects/create'}>Create Project</Link>
-          </Button>
-        ),
-      }}
-    >
-      <NewProjectsChecker
-        onMsg={(msg) => {
-          switch (msg.type) {
-            case 'onNothingToConnect':
-              break;
+    <ProjectsLoader>
+      {(projects) => (
+        <PageTemplate
+          header={{
+            breadcrumbs: [],
+            title: 'Projects',
+            actions: (
+              // <CreateProjectAction />
+              <Button asChild size="sm" className="hidden sm:flex">
+                <Link to={'/projects/create'}>Create Project</Link>
+              </Button>
+            ),
+          }}
+        >
+          <NewProjectsChecker
+            onMsg={(msg) => {
+              switch (msg.type) {
+                case 'onNothingToConnect':
+                  break;
 
-            case 'onConnected': {
-              reload();
-              if (msg.project.status === 'draft') {
-                navigate(`/projects/edit/${msg.project.id}`);
-              } else {
-                navigate(`/project/${msg.project.id}?new=true`);
+                case 'onConnected': {
+                  reload();
+                  if (msg.project.status === 'draft') {
+                    navigate(`/projects/edit/${msg.project.id}`);
+                  } else if (msg.project.activated) {
+                    navigate(`/project/${msg.project.id}?new=true`);
+                  } else {
+                    navigate(`/project/${msg.project.id}`);
+                  }
+                  break;
+                }
+
+                default:
+                  notReachable(msg);
               }
-              break;
-            }
+            }}
+          />
 
-            default:
-              notReachable(msg);
-          }
-        }}
-      />
-      <ProjectsList
-        projects={projects}
-        onMsg={(msg) => {
-          switch (msg.type) {
-            case 'onProjectSelect': {
-              if (msg.project.status === 'draft') {
-                return navigate(`/projects/edit/${msg.project.id}`);
+          <ProjectsList
+            projects={projects}
+            onMsg={(msg) => {
+              switch (msg.type) {
+                case 'onProjectSelect': {
+                  if (msg.project.status === 'draft') {
+                    return navigate(`/projects/edit/${msg.project.id}`);
+                  }
+                  select(msg.project);
+                  navigate(`/project/${msg.project.id}`);
+                  break;
+                }
+
+                case 'onProjectEdit':
+                  navigate(`/projects/edit/${msg.project.id}`);
+                  break;
+
+                case 'onProjectDeleted':
+                  reload();
+                  break;
+
+                default:
+                  return notReachable(msg);
               }
-              select(msg.project);
-              navigate(`/project/${msg.project.id}`);
-              break;
-            }
-
-            case 'onProjectEdit':
-              navigate(`/projects/edit/${msg.project.id}`);
-              break;
-
-            case 'onProjectDeleted':
-              reload();
-              break;
-
-            default:
-              return notReachable(msg);
-          }
-        }}
-      />
-    </PageTemplate>
+            }}
+          />
+        </PageTemplate>
+      )}
+    </ProjectsLoader>
   );
 };
 
@@ -86,14 +95,14 @@ const ProjectsList = ({
   projects,
   onMsg,
 }: {
-  projects: ProjectEntity[];
+  projects: ProjectPreviewEntity[];
   onMsg: (msg: ProjectCardMsg) => void;
 }) => {
   if (projects.length === 0) {
     return (
-      <div className={'text-md text-muted-foreground px-4 lg:px-6'}>
+      <Card className={'text-md text-muted-foreground mx-4 p-4'}>
         No projects yet!
-      </div>
+      </Card>
     );
   }
 

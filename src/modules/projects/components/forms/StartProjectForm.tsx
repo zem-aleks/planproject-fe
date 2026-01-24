@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { startProject } from '@/modules/projects/api/startProject';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button';
 import {
   Dialog,
@@ -19,7 +19,7 @@ export const StartProjectForm = ({
   project,
   onStarted,
 }: {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onStarted: () => void;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
@@ -49,7 +49,7 @@ const StartProjectModal = ({
   onClose,
 }: {
   open: boolean;
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onStarted: () => void;
   onClose: () => void;
 }) => {

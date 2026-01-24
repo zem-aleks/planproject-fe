@@ -1,11 +1,11 @@
 import { ReactNode, createContext } from 'react';
 
 import { ProjectsLoader } from '@/modules/projects/components/ProjectsLoader';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { noOperation } from '@/utils/notReachable';
 
 type ProjectsContextData = {
-  projects: ProjectEntity[];
+  projects: ProjectPreviewEntity[];
   reload: () => void;
 };
 

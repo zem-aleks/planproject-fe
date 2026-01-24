@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import { Button } from '@/ui/button';
+import { Card } from '@/ui/card';
 
 export const ProjectNotFound = () => {
   return (
@@ -11,15 +12,15 @@ export const ProjectNotFound = () => {
         title: 'Project not found',
       }}
     >
-      <div
-        className={'flex flex-col items-center justify-center gap-1 px-8 py-2'}
+      <Card
+        className={'flex flex-col items-center justify-center gap-1 px-8 py-4'}
       >
-        <h1 className="text-2xl font-bold">No Project Found</h1>
+        <h1 className="text-2xl font-bold">No Active Project Found</h1>
         <p className="text-lg">Please select an project to continue.</p>
         <Button asChild size="sm" className="mt-2">
           <Link to="/projects">Select Project</Link>
         </Button>
-      </div>
+      </Card>
     </PageTemplate>
   );
 };

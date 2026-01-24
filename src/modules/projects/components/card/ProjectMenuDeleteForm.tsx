@@ -4,18 +4,18 @@ import { LoaderCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { deleteProject } from '@/modules/projects/api/deleteProject.ts';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { DropdownMenuItem } from '@/ui/dropdown-menu.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
 
 export type Msg = {
   type: 'onProjectDeleted';
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
 };
 
 type Props = {
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   onMsg: (msg: Msg) => void;
 };
 

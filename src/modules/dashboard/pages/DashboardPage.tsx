@@ -7,10 +7,10 @@ import { PhaseItemBuilder } from '@/modules/phases/components/PhaseItemBuilder';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
 import { PhasesTimeline } from '@/modules/phases/components/PhasesTimeline';
 import { ProjectActions } from '@/modules/projects/components/ProjectActions';
-import { ProjectLogoBuilder } from '@/modules/projects/components/ProjectLogoBuilder';
-import { ProjectStatusBadge } from '@/modules/projects/components/ProjectStatus';
+import { ProjectHeading } from '@/modules/projects/components/ProjectHeading';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
+import { ActiveProjectGuard } from '@/modules/subscriptions/guards/ActiveProjectGuard';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -26,7 +26,7 @@ export const DashboardPage = () => {
   }
 
   return (
-    <>
+    <ActiveProjectGuard>
       <WelcomeModal />
       <PageTemplate
         header={{
@@ -41,24 +41,7 @@ export const DashboardPage = () => {
               daysCount={project.daysNeeded}
             />
           )}
-          <div className={'flex flex-row gap-8'}>
-            <div className="flex grow flex-col gap-1">
-              <h1
-                className={
-                  'flex items-center justify-between gap-2 text-2xl font-semibold text-gray-100'
-                }
-              >
-                {project.title}
-                <ProjectStatusBadge status={project.status} />
-              </h1>
-              <p className={'text-gray-300'}>
-                {project.description || 'No description available'}
-              </p>
-            </div>
-            <div className={'flex flex-col gap-2'}>
-              <ProjectLogoBuilder project={project} />
-            </div>
-          </div>
+          <ProjectHeading project={project} />
 
           <ProjectActions
             project={project}
@@ -113,6 +96,6 @@ export const DashboardPage = () => {
           </PhasesLoader>
         </div>
       </PageTemplate>
-    </>
+    </ActiveProjectGuard>
   );
 };

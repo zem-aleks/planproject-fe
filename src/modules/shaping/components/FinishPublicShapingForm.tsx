@@ -17,7 +17,7 @@ import { useLoadableData } from '@/utils/useLoadableData';
 
 type Msg = { type: 'onFinish'; project: ProjectEntity };
 
-export const FinishShapingForm = ({
+export const FinishPublicShapingForm = ({
   shaping,
   onMsg,
 }: {

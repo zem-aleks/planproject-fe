@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { RefreshCcw } from 'lucide-react';
 
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { generateProjectLogo } from '@/modules/shaping/api/generateProjectLogo';
 import { getProjectLogo } from '@/modules/shaping/api/getProjectLogo';
 import { Button } from '@/ui/button';
@@ -11,7 +11,11 @@ import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { usePollingData } from '@/utils/usePollableData';
 
-export const ProjectLogoBuilder = ({ project }: { project: ProjectEntity }) => {
+export const ProjectLogoBuilder = ({
+  project,
+}: {
+  project: ProjectPreviewEntity;
+}) => {
   if (!project.logoUrl) {
     return <LogoGenerator projectId={project.id} />;
   }

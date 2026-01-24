@@ -99,6 +99,7 @@ export const ShapingPublicFormForm = ({
             disabled={state.type === 'loading'}
             ref={textAreaRef}
             className={'w-full'}
+            maxLength={4000}
           />
         </div>
         <Button

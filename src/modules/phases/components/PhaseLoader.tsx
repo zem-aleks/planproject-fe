@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import { getPhase } from '@/modules/phases/api/getPhase';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button.tsx';
+import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
 import { useReloadableData } from '@/utils/useReloadableData.ts';
@@ -25,11 +26,11 @@ export const PhaseLoader = ({ phaseId, children }: Props): ReactNode => {
 
     case 'error':
       return (
-        <div className={'flex flex-col items-center gap-2 py-4'}>
+        <Card className={'mx-4 flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Phase loading error</p>
           <p className={'text-muted-foreground pb-2'}>{state.error.message}</p>
           <Button onClick={reload}>Try again</Button>
-        </div>
+        </Card>
       );
 
     case 'reloading':

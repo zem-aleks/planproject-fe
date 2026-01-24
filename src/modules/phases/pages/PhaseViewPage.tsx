@@ -41,11 +41,7 @@ export const PhaseViewPage = () => {
               <PhaseDescription phase={phase} />
             </div>
 
-            <MilestonesBlock
-              phase={phase}
-              project={project}
-              // onModified={reload}
-            />
+            <MilestonesBlock phase={phase} />
           </div>
         )}
       </PhaseLoader>

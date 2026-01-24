@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { AnswersBlock } from '@/modules/projects/components/forms/AnswersBlock';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
-import { FinishShapingForm } from '@/modules/shaping/components/FinishShapingForm';
+import { FinishPublicShapingForm } from '@/modules/shaping/components/FinishPublicShapingForm';
 import { ShapingScore } from '@/modules/shaping/components/ShapingScore';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { supabase } from '@/modules/supabase/client';
@@ -81,7 +81,7 @@ export const ShapingChatForm = ({
         <div className={'flex flex-row items-center gap-8'}>
           <SignCard signedIn={!!session} view="sign_in" />
 
-          <FinishShapingForm
+          <FinishPublicShapingForm
             shaping={shaping}
             onMsg={(msg) => {
               switch (msg.type) {
@@ -115,7 +115,7 @@ export const ShapingChatForm = ({
         <div className={'flex flex-row items-center gap-8'}>
           <SignCard signedIn={!!session} view={'sign_up'} />
 
-          <FinishShapingForm
+          <FinishPublicShapingForm
             shaping={shaping}
             onMsg={(msg) => {
               switch (msg.type) {
@@ -171,6 +171,7 @@ export const ShapingChatForm = ({
             disabled={state.type === 'loading'}
             ref={textAreaRef}
             className={'w-full'}
+            maxLength={4000}
           />
 
           {state.type !== 'loading' && (

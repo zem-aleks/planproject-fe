@@ -6,7 +6,7 @@ import { CompletePhaseForm } from '@/modules/phases/components/CompletePhaseForm
 import { PhaseStatusBadge } from '@/modules/phases/components/PhaseStatus';
 import { StartPhaseForm } from '@/modules/phases/components/StartPhaseForm';
 import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import {
@@ -25,7 +25,7 @@ export const PhaseItemBuilder = ({
   index,
 }: {
   phase: PhaseEntityWithMilestones;
-  project: ProjectEntity;
+  project: ProjectPreviewEntity;
   index: number;
 }) => {
   const [currentPhase, setCurrentPhase] =

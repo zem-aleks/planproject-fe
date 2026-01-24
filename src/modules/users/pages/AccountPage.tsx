@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { ManageSubscriptionForm } from '@/modules/subscriptions/components/ManageSubscriptionForm';
 import { PriceCard } from '@/modules/subscriptions/components/PriceCard';
+import { SubscriptionLoader } from '@/modules/subscriptions/components/SubscriptionLoader';
 import { YearlySwitcher } from '@/modules/subscriptions/components/YearlySwitcher';
 import { SUBSCRIPTION_TITLES } from '@/modules/subscriptions/data/subscriptions';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
@@ -107,6 +108,7 @@ export const AccountPage = () => {
               You're currently using{' '}
               <strong>{SUBSCRIPTION_TITLES[user.subscription]}</strong>
             </div>
+
             {user.subscription !== 'business' && (
               <Button variant={'default'} asChild>
                 <Link to={'/pricing'} target={'_blank'}>
@@ -115,6 +117,20 @@ export const AccountPage = () => {
               </Button>
             )}
           </div>
+
+          <SubscriptionLoader>
+            {(subscription) => (
+              <>
+                <Separator />
+                <div className={'flex items-center justify-between'}>
+                  <div>
+                    Projects used <b>{subscription.usedProjects}</b> /{' '}
+                    <b>{subscription.totalAvailableProjects}</b> projects
+                  </div>
+                </div>
+              </>
+            )}
+          </SubscriptionLoader>
 
           {Boolean(user.stripeCustomerId) && (
             <>
