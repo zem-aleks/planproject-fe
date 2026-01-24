@@ -123,10 +123,16 @@ export const AccountPage = () => {
               <>
                 <Separator />
                 <div className={'flex items-center justify-between'}>
-                  <div>
-                    Projects used <b>{subscription.usedProjects}</b> /{' '}
-                    <b>{subscription.totalAvailableProjects}</b> projects
-                  </div>
+                  {subscription.type === 'business' ? (
+                    <div>
+                      <b>Unlimited</b> Projects plan
+                    </div>
+                  ) : (
+                    <div>
+                      Projects used <b>{subscription.usedProjects}</b> /{' '}
+                      <b>{subscription.totalAvailableProjects}</b> projects
+                    </div>
+                  )}
                 </div>
               </>
             )}

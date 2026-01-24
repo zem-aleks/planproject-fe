@@ -60,7 +60,8 @@ export const UnlockProjectForm = ({
             <div className={'text-center'}>
               <div className={'text-lg'}>
                 You used <b>{subscription.usedProjects}</b> /{' '}
-                <b>{subscription.totalAvailableProjects}</b> projects
+                <b>{subscription.totalAvailableProjects || 'unlimited'}</b>{' '}
+                projects
               </div>
               {subscription.canActivate ? (
                 <div className={'text-muted-foreground'}>
