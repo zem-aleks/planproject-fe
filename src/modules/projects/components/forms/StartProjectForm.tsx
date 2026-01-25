@@ -35,7 +35,10 @@ export const StartProjectForm = ({
           setOpen(false);
         }}
       />
-      <Button className={'w-full'} onClick={() => setOpen(true)}>
+      <Button
+        className={`relative w-full animate-[glow_2s_ease_infinite] shadow shadow-white`}
+        onClick={() => setOpen(true)}
+      >
         Start Project
       </Button>
     </>

@@ -1,6 +1,5 @@
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
-import { ModifyPhasesForm } from '@/modules/projects/components/forms/ModifyPhasesForm';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { notReachable } from '@/utils/notReachable';
@@ -35,21 +34,21 @@ export const ProjectActions = ({
             onStarted={() => onMsg({ type: 'onProjectStarted' })}
           />
 
-          <div className={'relative flex w-40 items-center justify-center'}>
-            <div className={'absolute w-full border-b'} />
-            <div
-              className={
-                'text-muted-foreground relative rounded bg-white px-2 text-sm'
-              }
-            >
-              or
-            </div>
-          </div>
+          {/*<div className={'relative flex w-40 items-center justify-center'}>*/}
+          {/*  <div className={'absolute w-full border-b'} />*/}
+          {/*  <div*/}
+          {/*    className={*/}
+          {/*      'text-muted-foreground relative rounded bg-white px-2 text-sm'*/}
+          {/*    }*/}
+          {/*  >*/}
+          {/*    or*/}
+          {/*  </div>*/}
+          {/*</div>*/}
 
-          <ModifyPhasesForm
-            project={project}
-            onModified={(phases) => onMsg({ type: 'onPhasesChanged', phases })}
-          />
+          {/*<ModifyPhasesForm*/}
+          {/*  project={project}*/}
+          {/*  onModified={(phases) => onMsg({ type: 'onPhasesChanged', phases })}*/}
+          {/*/>*/}
         </div>
       );
 
