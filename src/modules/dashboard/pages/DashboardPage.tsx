@@ -63,7 +63,7 @@ export const DashboardPage = () => {
           />
 
           <PhasesLoader projectId={project.id}>
-            {(phases) => (
+            {(phases, reload) => (
               <div className={'flex flex-col gap-4'}>
                 <Card className={'mt-4 flex flex-col gap-2 p-4 px-4'}>
                   <div className={'mb-4 flex flex-col gap-2'}>
@@ -83,6 +83,7 @@ export const DashboardPage = () => {
                             phase={phase}
                             project={project}
                             index={index}
+                            onChange={() => reload()}
                           />
                           <Separator />
                         </li>

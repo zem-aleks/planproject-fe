@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Link } from 'react-router';
 
-import { MilestonesBuilder } from '@/modules/milestones/components/MilestonesBuilder';
+import { Loader2Icon } from 'lucide-react';
+
 import { CompletePhaseForm } from '@/modules/phases/components/CompletePhaseForm';
 import { PhaseStatusBadge } from '@/modules/phases/components/PhaseStatus';
 import { StartPhaseForm } from '@/modules/phases/components/StartPhaseForm';
@@ -23,34 +23,30 @@ export const PhaseItemBuilder = ({
   phase,
   project,
   index,
+  onChange,
 }: {
   phase: PhaseEntityWithMilestones;
   project: ProjectPreviewEntity;
   index: number;
+  onChange: () => void;
 }) => {
-  const [currentPhase, setCurrentPhase] =
-    useState<PhaseEntityWithMilestones>(phase);
-
-  switch (currentPhase.status) {
+  switch (phase.status) {
     case 'building':
       return (
         <div className={'flex items-center justify-between'}>
           <div className={'text-sm font-medium'}>
-            {index + 1}. {currentPhase.title}
+            {index + 1}. {phase.title}
           </div>
-          <MilestonesBuilder
-            phase={currentPhase}
-            onDone={(phase) => setCurrentPhase(phase)}
-          />
+          <Loader2Icon className="animate-spin" />
         </div>
       );
 
     case 'inProgress':
       return (
         <div className={'flex items-center justify-between'}>
-          <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
+          <Link to={`/project/${project.id}/phase/${phase.id}`}>
             <Button variant={'link'} className={'px-0'}>
-              {index + 1}. {currentPhase.title}
+              {index + 1}. {phase.title}
             </Button>
           </Link>
 
@@ -64,18 +60,19 @@ export const PhaseItemBuilder = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
+                  <Link to={`/project/${project.id}/phase/${phase.id}`}>
                     Preview
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <CompletePhaseForm
-                  phase={currentPhase}
-                  onCompleted={(newPhase) =>
-                    setCurrentPhase({
-                      ...newPhase,
-                      milestones: currentPhase.milestones,
-                    })
+                  phase={phase}
+                  onCompleted={
+                    () => onChange()
+                    // setCurrentPhase({
+                    //   ...newPhase,
+                    //   milestones: phase.milestones,
+                    // })
                   }
                   variant={'menuItem'}
                 />
@@ -85,30 +82,31 @@ export const PhaseItemBuilder = ({
         </div>
       );
 
+    case 'error':
     case 'completed':
       return (
         <div className={'flex items-center justify-between'}>
-          <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
+          <Link to={`/project/${project.id}/phase/${phase.id}`}>
             <Button variant={'link'} className={'px-0'}>
-              {index + 1}. {currentPhase.title}
+              {index + 1}. {phase.title}
             </Button>
           </Link>
 
-          <PhaseStatusBadge status={currentPhase.status} />
+          <PhaseStatusBadge status={phase.status} />
         </div>
       );
 
     case 'notStarted':
       return (
         <div className={'flex items-center justify-between'}>
-          <Link to={`/project/${project.id}/phase/${currentPhase.id}`}>
+          <Link to={`/project/${project.id}/phase/${phase.id}`}>
             <Button variant={'link'} className={'px-0'}>
-              {index + 1}. {currentPhase.title}
+              {index + 1}. {phase.title}
             </Button>
           </Link>
 
           <div className="flex flex-row items-center gap-2">
-            <PhaseStatusBadge status={currentPhase.status} />
+            <PhaseStatusBadge status={phase.status} />
             {project.status === 'active' && (
               <DropdownMenu>
                 <DropdownMenuTrigger>
@@ -118,9 +116,7 @@ export const PhaseItemBuilder = ({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem asChild>
-                    <Link
-                      to={`/project/${project.id}/phase/${currentPhase.id}`}
-                    >
+                    <Link to={`/project/${project.id}/phase/${phase.id}`}>
                       Preview
                     </Link>
                   </DropdownMenuItem>
@@ -129,12 +125,13 @@ export const PhaseItemBuilder = ({
                   <StartPhaseForm
                     variant={'menuItem'}
                     phase={phase}
-                    onStarted={(newPhase) => {
-                      setCurrentPhase({
-                        ...newPhase,
-                        milestones: currentPhase.milestones,
-                      });
-                    }}
+                    onStarted={
+                      () => onChange()
+                      // setCurrentPhase({
+                      //   ...newPhase,
+                      //   milestones: phase.milestones,
+                      // });
+                    }
                   />
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -144,6 +141,6 @@ export const PhaseItemBuilder = ({
       );
 
     default:
-      return notReachable(currentPhase.status);
+      return notReachable(phase.status);
   }
 };

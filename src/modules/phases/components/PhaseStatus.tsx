@@ -34,6 +34,13 @@ export const PhaseStatusBadge = ({
         </Badge>
       );
 
+    case 'error':
+      return (
+        <Badge className={className} variant={'warning'}>
+          Error
+        </Badge>
+      );
+
     default:
       return notReachable(status);
   }

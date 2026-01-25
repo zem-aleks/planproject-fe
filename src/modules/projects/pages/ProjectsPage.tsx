@@ -14,6 +14,7 @@ import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable.ts';
+import { IconAdjustmentsStar } from '@tabler/icons-react';
 
 export const ProjectsPage = () => {
   const navigate = useNavigate();
@@ -100,8 +101,16 @@ const ProjectsList = ({
 }) => {
   if (projects.length === 0) {
     return (
-      <Card className={'text-md text-muted-foreground mx-4 p-4'}>
-        No projects yet!
+      <Card
+        className={
+          'text-md text-muted-foreground mx-4 items-center justify-center gap-4 p-8'
+        }
+      >
+        <IconAdjustmentsStar className={'size-20 text-green-600'} />
+        No projects yet! You can start by creating your first project
+        <Button asChild size="sm" className="hidden sm:flex">
+          <Link to={'/projects/create'}>Create Project</Link>
+        </Button>
       </Card>
     );
   }
