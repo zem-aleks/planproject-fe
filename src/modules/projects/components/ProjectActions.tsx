@@ -44,11 +44,6 @@ export const ProjectActions = ({
           {/*    or*/}
           {/*  </div>*/}
           {/*</div>*/}
-
-          {/*<ModifyPhasesForm*/}
-          {/*  project={project}*/}
-          {/*  onModified={(phases) => onMsg({ type: 'onPhasesChanged', phases })}*/}
-          {/*/>*/}
         </div>
       );
 

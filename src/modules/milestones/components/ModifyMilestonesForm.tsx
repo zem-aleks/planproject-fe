@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { LockIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useUser } from '@/modules/auth/contexts/UserContext';
 import { modifyMilestones } from '@/modules/milestones/api/modifyMilestones';
 import { PhaseEntity } from '@/modules/phases/types/entity';
+import { UpgradeSubscriptionModal } from '@/modules/subscriptions/components/UpgradeSubscriptionModal';
 import { Button } from '@/ui/button';
 import {
   Dialog,
@@ -15,6 +18,7 @@ import {
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { IconPencil } from '@tabler/icons-react';
 
 export const ModifyMilestonesForm = ({
   phase,
@@ -23,10 +27,23 @@ export const ModifyMilestonesForm = ({
   phase: PhaseEntity;
   onModified: (phase: PhaseEntity) => void;
 }) => {
+  const { user } = useUser();
   const [open, setOpen] = useState<boolean>(false);
 
   if (phase.status !== 'notStarted') {
     return null;
+  }
+
+  if (!['pro', 'business'].includes(user?.subscription ?? '')) {
+    return (
+      <>
+        <UpgradeSubscriptionModal open={open} onClose={() => setOpen(false)} />
+        <Button onClick={() => setOpen(true)} variant={'warning'} size={'sm'}>
+          <LockIcon />
+          Modify Milestones
+        </Button>
+      </>
+    );
   }
 
   return (
@@ -40,8 +57,8 @@ export const ModifyMilestonesForm = ({
           setOpen(false);
         }}
       />
-      <Button variant={'outline'} onClick={() => setOpen(true)}>
-        Modify Milestones
+      <Button variant={'warning'} onClick={() => setOpen(true)} size={'sm'}>
+        <IconPencil /> Modify Milestones
       </Button>
     </>
   );
@@ -97,6 +114,7 @@ const ModifyMilestonesModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className={'text-xl'}>
+            <PencilIcon className={'mb-2'} />
             Modify Milestones of "{phase.title}"
           </DialogTitle>
           <DialogDescription className={'text-muted-foreground w-full'}>
@@ -115,6 +133,7 @@ const ModifyMilestonesModal = ({
           disabled={state.type === 'loading'}
           ref={textAreaRef}
           className={'w-full'}
+          maxLength={2000}
         />
         <Button
           className={'w-full'}

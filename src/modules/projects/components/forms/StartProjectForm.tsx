@@ -14,6 +14,7 @@ import {
 } from '@/ui/dialog';
 import { notReachable } from '@/utils/notReachable';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { IconFlag } from '@tabler/icons-react';
 
 export const StartProjectForm = ({
   project,
@@ -97,6 +98,7 @@ const StartProjectModal = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className={'text-xl'}>
+            <IconFlag className={'mb-2 size-8'} />
             Start <span className={''}>{project.title}</span>
           </DialogTitle>
           <DialogDescription className={'text-muted-foreground w-full'}>

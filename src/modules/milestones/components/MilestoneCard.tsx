@@ -25,7 +25,7 @@ export const MilestoneCard = ({
 
   return (
     <Card key={currentMilestone.id} className={'justify-between gap-0 p-4'}>
-      <div className={'flex items-start justify-between'}>
+      <div className={'flex items-start justify-between gap-2'}>
         <div className={'text-lg font-semibold'}>{currentMilestone.title}</div>
         <Badge
           className={'mt-1'}

@@ -3,6 +3,7 @@ import { ReactNode, useEffect } from 'react';
 import { getPhases } from '@/modules/phases/api/getPhases';
 import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button.tsx';
+import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
 import { usePollingData } from '@/utils/usePollableData';
@@ -30,7 +31,7 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
     if (
       state.type === 'loaded' &&
       state.data.length > 0 &&
-      state.data[0].status !== 'building'
+      state.data.every((p) => p.status !== 'building')
     ) {
       stopPolling();
     }
@@ -46,11 +47,13 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
 
     case 'error':
       return (
-        <div className={'flex flex-col items-center gap-2 py-4'}>
+        <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Phases loading error</p>
-          <p className={'text-muted-foreground pb-2'}>{state.error.message}</p>
+          <p className={'text-muted-foreground pb-2'}>
+            {state.error.response?.data.message || state.error.message}
+          </p>
           <Button onClick={reload}>Try again</Button>
-        </div>
+        </Card>
       );
 
     case 'reloading':

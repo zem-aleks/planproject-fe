@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { LockIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useUser } from '@/modules/auth/contexts/UserContext';
 import { modifyPhases } from '@/modules/phases/api/modifyPhases';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import { UpgradeSubscriptionModal } from '@/modules/subscriptions/components/UpgradeSubscriptionModal';
 import { Button } from '@/ui/button';
 import {
   Dialog,
@@ -24,10 +27,25 @@ export const ModifyPhasesForm = ({
   project: ProjectPreviewEntity;
   onModified: (phases: PhaseEntity[]) => void;
 }) => {
+  const { user } = useUser();
   const [open, setOpen] = useState<boolean>(false);
+  const isActive =
+    project.status === 'analyzing' || project.status === 'active';
 
-  if (project.status !== 'analyzing') {
+  if (!isActive) {
     return null;
+  }
+
+  if (!['pro', 'business'].includes(user?.subscription ?? '')) {
+    return (
+      <>
+        <UpgradeSubscriptionModal open={open} onClose={() => setOpen(false)} />
+        <Button onClick={() => setOpen(true)} variant={'warning'} size={'sm'}>
+          <LockIcon />
+          Modify Phases
+        </Button>
+      </>
+    );
   }
 
   return (
@@ -41,11 +59,8 @@ export const ModifyPhasesForm = ({
           setOpen(false);
         }}
       />
-      <Button
-        variant={'outline'}
-        className={'w-full'}
-        onClick={() => setOpen(true)}
-      >
+      <Button onClick={() => setOpen(true)} variant={'warning'} size={'sm'}>
+        <PencilIcon />
         Modify Phases
       </Button>
     </>
@@ -101,7 +116,10 @@ const ModifyPhasesModal = ({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className={'text-xl'}>Modify Phases</DialogTitle>
+          <DialogTitle className={'text-xl'}>
+            <PencilIcon className={'mb-2'} />
+            Modify Phases
+          </DialogTitle>
           <DialogDescription className={'text-muted-foreground w-full'}>
             Please describe what would you like to change? E.g., "Add a new
             phase for user testing", "Remove the deployment phase", "Change the

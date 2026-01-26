@@ -16,9 +16,8 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
   basic: {
     description: 'Perfect for exploring the platform',
     details: [
-      '✔ 1 project plan generation',
       '✔ Step-by-step actionable plan',
-      '✔ Basic AI-generated plan',
+      '✔ 1 project plan generation',
       '✔ 1 competitor data',
       '✔ Minimal audience analysis',
     ],
@@ -36,9 +35,9 @@ export const PRICES: Record<SubscriptionType, PriceBlock> = {
     details: [
       '✔ Everything from Basic Plan',
       '✔ Up to 5 projects',
-      '✔ Advanced AI planning',
       '✔ 5 competitors data',
       '✔ Advanced audience analysis',
+      '✔ AI refinement & iteration',
     ],
     monthly: {
       price: 19,
