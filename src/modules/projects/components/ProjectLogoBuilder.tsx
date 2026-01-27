@@ -25,7 +25,7 @@ export const ProjectLogoBuilder = ({
   }
 
   return (
-    <div className={`size-[128px] shrink-0 rounded-md bg-white`}>
+    <div className={`size-16 shrink-0 rounded-md bg-white md:size-32`}>
       <img
         src={project.logoUrl}
         alt="Project Logo"
@@ -41,14 +41,14 @@ const LogoGenerator = ({ projectId }: { projectId: string }) => {
   switch (state.type) {
     case 'loading':
       return (
-        <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
+        <Skeleton className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32" />
       );
 
     case 'error':
     case 'not_requested':
       return (
         <Button
-          className="size-[128px] shrink-0 rounded-md bg-blue-100"
+          className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32"
           aria-label={'Generate logo'}
           onClick={() => load(projectId)}
         >
@@ -58,7 +58,7 @@ const LogoGenerator = ({ projectId }: { projectId: string }) => {
 
     case 'loaded':
       return (
-        <div className={`size-[128px] shrink-0 rounded-md bg-white`}>
+        <div className={`size-16 shrink-0 rounded-md bg-white md:size-32`}>
           {state.data.logoUrl && (
             <img
               src={state.data.logoUrl}
@@ -90,7 +90,7 @@ const LogoPoller = ({ projectId }: { projectId: string }) => {
   switch (state.type) {
     case 'loading':
       return (
-        <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
+        <Skeleton className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32" />
       );
 
     case 'stopped':
@@ -98,10 +98,10 @@ const LogoPoller = ({ projectId }: { projectId: string }) => {
     case 'loaded':
       if (state.data?.logoUrl === 'loading')
         return (
-          <Skeleton className="size-[128px] shrink-0 rounded-md bg-blue-100" />
+          <Skeleton className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32" />
         );
       return (
-        <div className={`size-[128px] shrink-0 rounded-md bg-white`}>
+        <div className={`size-16 shrink-0 rounded-md bg-white md:size-32`}>
           {state.data?.logoUrl && (
             <img
               src={state.data.logoUrl}

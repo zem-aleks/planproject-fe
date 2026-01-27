@@ -79,11 +79,15 @@ export const FinishPublicShapingForm = ({
                 <div className={'text-xl font-semibold'}>
                   {state.data.title}
                 </div>
-                <div className={'text-muted-foreground'}>
+                <div
+                  className={
+                    'text-muted-foreground h-12 overflow-hidden md:h-auto'
+                  }
+                >
                   {state.data.description}
                 </div>
                 {state.data.daysNeeded && (
-                  <Badge>
+                  <Badge className={'mt-1'}>
                     Initial estimation: {state.data.daysNeeded} days
                   </Badge>
                 )}

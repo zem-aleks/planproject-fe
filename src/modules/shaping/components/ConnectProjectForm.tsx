@@ -44,7 +44,11 @@ export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
   switch (state.type) {
     case 'not_requested':
       return (
-        <div className={'flex items-center justify-center text-center text-lg'}>
+        <div
+          className={
+            'flex items-center justify-center text-center text-sm italic md:text-lg'
+          }
+        >
           Your project is waiting for you...
         </div>
       );
