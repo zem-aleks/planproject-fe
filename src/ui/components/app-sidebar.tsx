@@ -4,6 +4,7 @@ import { LogoBlock } from '@/modules/home/components/LogoBlock';
 import { NavMain } from '@/ui/components/nav-main';
 import { NavSecondary } from '@/ui/components/nav-secondary';
 import { NavUser } from '@/ui/components/nav-user';
+import { Separator } from '@/ui/separator';
 import {
   Sidebar,
   SidebarContent,
@@ -118,8 +119,10 @@ export function AppSidebar() {
         {/*<NavDocuments items={data.documents} />*/}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter className={'mb-10 md:mb-0'}>
+      <SidebarFooter className={'mb-20 md:mb-0'}>
+        <Separator className={'md:hidden'} />
         <NavUser />
+        <Separator className={'md:hidden'} />
       </SidebarFooter>
     </Sidebar>
   );
