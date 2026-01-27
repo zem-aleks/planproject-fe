@@ -90,7 +90,7 @@ export const ShapingPublicFormForm = ({
           placeholder="Enter your answer"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          // rows={8}
+          rows={8}
           required={true}
           disabled={state.type === 'loading'}
           ref={textAreaRef}
