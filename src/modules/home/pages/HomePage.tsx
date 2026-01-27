@@ -13,16 +13,17 @@ export const HomePage = () => {
                   <img
                     src={'/pp_logo_white.svg'}
                     alt={'logo'}
-                    className="my-4 h-12"
+                    className="h-12"
                   />
-                  <h1 className="my-6 hidden text-4xl font-bold text-pretty text-gray-50 lg:text-6xl">
+                  <h1 className="hidden text-4xl font-bold text-pretty text-gray-50 lg:text-6xl">
                     PLAN PROJECT AI
                   </h1>
+                  <h2 className={'my-1 text-xl text-gray-100 italic'}>
+                    You don’t need another idea. You need a plan.
+                  </h2>
                   <p className="mb-8 max-w-xl text-gray-300 lg:text-xl">
-                    Platform that transforms your ideas into structured project
-                    plans. Empowering you to kickstart your projects with
-                    clarity and confidence. Frustrated with vague project ideas?
-                    Let AI help you shape them into clear, actionable plans.
+                    PlanProject.ai turns messy thoughts into clear, actionable
+                    project plans — so you can finally start
                   </p>
                   <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
                     <Button
@@ -46,10 +47,13 @@ export const HomePage = () => {
           <section className="flex items-center justify-center pb-20 md:pb-40">
             <div className="container mx-auto px-4">
               <div className="flex flex-col items-center gap-6 text-center">
-                <h2 className="my-6 text-3xl font-bold text-pretty lg:text-6xl">
+                <h3 className="mt-6 text-3xl font-bold text-pretty lg:text-6xl">
                   How It Works
-                </h2>
-                <div className="grid gap-6 lg:grid-cols-2 lg:gap-8">
+                </h3>
+                <p className={'text-xl italic underline'}>
+                  Ideas are easy. Execution needs structure.
+                </p>
+                <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-8">
                   <HomeCard
                     image={
                       'https://akmoolaxrpskmtqdymjo.supabase.co/storage/v1/object/public/assets/logo/how_it_works_11.png'
@@ -65,7 +69,7 @@ export const HomePage = () => {
                     title={
                       '2. The app will analyze your input and prepare initial plan'
                     }
-                    description={`It usually takes up to 1 minute to generate initial plan. It provides you insights about the project, its phases, milestones, timeline and more.`}
+                    description={`It usually takes up to 1 minute to generate initial plan. It provides you insights about the project, its phases, milestones, timeline and more`}
                   />
 
                   <HomeCard
@@ -73,7 +77,7 @@ export const HomePage = () => {
                       'https://akmoolaxrpskmtqdymjo.supabase.co/storage/v1/object/public/assets/logo/how_it_works_3.png'
                     }
                     title={'3. Start the project'}
-                    description={`After the review you can start your project immediately. It will activate your roadmap and tasks.`}
+                    description={`After the review you can start your project immediately. It will activate your roadmap and tasks`}
                   />
 
                   <HomeCard
@@ -81,7 +85,7 @@ export const HomePage = () => {
                       'https://akmoolaxrpskmtqdymjo.supabase.co/storage/v1/object/public/assets/logo/how_it_works_4.png'
                     }
                     title={'4. Act, iterate and bring your idea to life'}
-                    description={`Do daily tasks, track progress, provide feedback and your project will be done step by step.`}
+                    description={`Do daily tasks, track progress, provide feedback and your project will be done step by step`}
                   />
                 </div>
                 <Button
@@ -110,7 +114,10 @@ const HomeCard = ({
   image: string;
 }) => {
   return (
-    <div key={title} className="flex flex-col gap-8 text-left sm:flex-row">
+    <div
+      key={title}
+      className="flex flex-col items-center gap-8 text-left sm:flex-row sm:items-start"
+    >
       <div className="bg-muted size-40 shrink-0 overflow-clip rounded-xl">
         <img
           src={image}
@@ -118,7 +125,7 @@ const HomeCard = ({
           className="aspect-square h-full w-full object-cover object-center"
         />
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 text-center sm:text-left">
         <h3 className="text-lg font-semibold md:text-2xl">{title}</h3>
         <p className="text-muted-foreground lg:text-lg">{description}</p>
       </div>

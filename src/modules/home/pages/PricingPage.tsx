@@ -41,13 +41,12 @@ export const PricingPage = () => {
             {/* Engagement Section */}
             <section className="mx-auto max-w-5xl px-6 py-16 text-center">
               <h2 className="mb-4 text-2xl font-semibold">
-                Stay consistent. Build momentum.
+                If your idea were clear, you’d already be building it
               </h2>
               <p className="mx-auto max-w-2xl text-gray-600">
-                Your Focus Space helps you prioritize daily tasks, guiding you
-                to make steady progress on your projects. Pro users get full
-                access to all planning tools and insights to keep moving forward
-                efficiently.
+                PlanProject.ai brings clarity by turning vague concepts into
+                step-by-step project plans. With Pro and Business plans you will
+                get an access to more insights and projects.
               </p>
             </section>
 
