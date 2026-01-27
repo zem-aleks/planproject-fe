@@ -32,7 +32,9 @@ export const PageTemplate = ({ children, header }: Props) => {
           actions={header.actions}
         />
         <div className="relative flex flex-1 flex-col">
-          <div className={'absolute top-0 left-0 h-[700px] w-full opacity-80'}>
+          <div
+            className={'absolute top-0 left-0 z-0 h-[700px] w-full opacity-80'}
+          >
             <GradientBackground />
           </div>
           <div className="@container/main relative z-10 flex flex-1 flex-col gap-2">
