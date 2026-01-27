@@ -147,7 +147,7 @@ const ShapingContentInitialForm = ({
     >
       <DialogHeader
         className={
-          'relative hidden flex-col items-center justify-center gap-3 overflow-hidden rounded-l-md bg-[#803698] p-4 md:flex md:h-full md:basis-5/12 md:items-start md:p-10 md:pr-4'
+          'relative flex-col items-center justify-center gap-3 overflow-hidden rounded-l-md bg-[#803698] p-4 md:flex md:h-full md:basis-5/12 md:items-start md:p-10 md:pr-4'
         }
       >
         <DialogTitle
@@ -166,7 +166,7 @@ const ShapingContentInitialForm = ({
       </DialogHeader>
 
       <div
-        className={'flex min-h-full flex-col items-center gap-2 md:basis-7/12'}
+        className={'flex grow flex-col items-center gap-2 p-4 md:basis-7/12'}
       >
         <ShapingPublicFormForm onMsg={onMsg} />
       </div>

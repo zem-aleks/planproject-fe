@@ -71,45 +71,40 @@ export const ShapingPublicFormForm = ({
   return (
     <div
       className={
-        'flex min-h-full w-full flex-col items-center justify-center gap-2'
+        'flex min-h-full w-full flex-col items-center justify-center gap-2 md:gap-8 md:px-10'
       }
     >
       {/*<div className={'w-full px-10'}>*/}
       {/*  <img src={'/images/nightsky.jpeg'} className={'rounded-md'} />*/}
       {/*</div>*/}
-      <div
-        className={'flex w-full flex-col items-center gap-2 md:gap-8 md:px-10'}
-      >
-        <div className="flex w-full flex-col gap-2">
-          <Label htmlFor="description" className={'text-2xl'}>
-            Your Idea Description
-          </Label>
-          <p className={'text-muted-foreground mb-2 text-lg'}>
-            For example, you can describe that you wanna build an app, some
-            game, platform or you have a complex task and don't know how to
-            solve it
-          </p>
-          <Textarea
-            id="description"
-            placeholder="Enter your answer"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            rows={8}
-            required={true}
-            disabled={state.type === 'loading'}
-            ref={textAreaRef}
-            className={'w-full'}
-            maxLength={4000}
-          />
-        </div>
-        <Button
-          className={'w-full'}
-          onClick={() => load({ clientId, message })}
-          loading={state.type === 'loading'}
-        >
-          Submit
-        </Button>
+      <div className="flex w-full grow flex-col gap-2 md:grow-0">
+        <Label htmlFor="description" className={'text-2xl'}>
+          Your Idea Description
+        </Label>
+        <p className={'text-muted-foreground mb-2 text-lg'}>
+          For example, you can describe that you wanna build an app, some game,
+          platform or you have a complex task and don't know how to solve it
+        </p>
+        <Textarea
+          id="description"
+          placeholder="Enter your answer"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          // rows={8}
+          required={true}
+          disabled={state.type === 'loading'}
+          ref={textAreaRef}
+          className={'w-full grow md:grow-0'}
+          maxLength={4000}
+        />
       </div>
+      <Button
+        className={'w-full'}
+        onClick={() => load({ clientId, message })}
+        loading={state.type === 'loading'}
+      >
+        Submit
+      </Button>
     </div>
   );
 };
