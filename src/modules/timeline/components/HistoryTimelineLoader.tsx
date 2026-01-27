@@ -56,11 +56,11 @@ export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
             <div className={'flex items-end gap-8'}>
               <div
                 className={
-                  'mt-20 flex h-16 w-30 translate-y-1/3 flex-col items-center justify-center rounded-md bg-gray-50 shadow shadow-pink-900'
+                  'mt-20 flex h-16 w-16 shrink-0 translate-y-1/3 flex-col items-center justify-center rounded-md bg-gray-50 shadow shadow-pink-900 sm:w-30'
                 }
               >
                 <div className={'font-semibold'}>Day {point.projectDay}</div>
-                <div className={'text-foreground text-sm'}>
+                <div className={'text-foreground text-center text-sm'}>
                   {dayjs(point.createdAt).format('D MMM YYYY')}
                 </div>
               </div>

@@ -26,7 +26,7 @@ export const TodayTimelineContent = ({
       <Card className={'flex flex-col items-center gap-6'}>
         <div className={'flex flex-col items-center'}>
           <IconCheck className={'size-20 text-green-600'} />
-          <div className={'mb-4 px-2 text-lg'}>
+          <div className={'mb-4 px-2 text-center text-lg'}>
             Well done! All tasks are finished for today!
           </div>
           <StartNewMilestoneForm

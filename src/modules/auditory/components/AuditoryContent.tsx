@@ -176,7 +176,7 @@ const AuditoryInfoCard = ({ auditory }: { auditory: AuditoryBasicData }) => {
       )}
       <AgeCard ageSeparation={auditory.ageSeparation} />
 
-      <div className={'flex w-full flex-row gap-2'}>
+      <div className={'flex w-full flex-row flex-wrap gap-2'}>
         {auditory.tam && (
           <MarketCard
             value={auditory.tam}

@@ -81,7 +81,7 @@ export const DashboardPage = () => {
                         {/*</Button>*/}
                       </div>
                     </div>
-                    <ol className={'flex flex-col gap-2'}>
+                    <ol className={'flex flex-col gap-2 overflow-hidden'}>
                       {phases.map((phase, index) => (
                         <li key={phase.id} className={''}>
                           <PhaseItemBuilder
@@ -90,7 +90,7 @@ export const DashboardPage = () => {
                             index={index}
                             onChange={() => reload()}
                           />
-                          <Separator />
+                          <Separator className={'mt-2'} />
                         </li>
                       ))}
                     </ol>

@@ -33,7 +33,11 @@ export const PhaseItemBuilder = ({
   switch (phase.status) {
     case 'building':
       return (
-        <div className={'flex items-center justify-between'}>
+        <div
+          className={
+            'flex flex-col justify-between sm:flex-row sm:items-center sm:gap-2'
+          }
+        >
           <div className={'text-sm font-medium'}>
             {index + 1}. {phase.title}
           </div>
@@ -43,7 +47,11 @@ export const PhaseItemBuilder = ({
 
     case 'inProgress':
       return (
-        <div className={'flex items-center justify-between'}>
+        <div
+          className={
+            'flex flex-col justify-between sm:flex-row sm:items-center sm:gap-2'
+          }
+        >
           <Link to={`/project/${project.id}/phase/${phase.id}`}>
             <Button variant={'link'} className={'px-0'}>
               {index + 1}. {phase.title}
@@ -85,7 +93,11 @@ export const PhaseItemBuilder = ({
     case 'error':
     case 'completed':
       return (
-        <div className={'flex items-center justify-between'}>
+        <div
+          className={
+            'flex flex-col justify-between sm:flex-row sm:items-center sm:gap-2'
+          }
+        >
           <Link to={`/project/${project.id}/phase/${phase.id}`}>
             <Button variant={'link'} className={'px-0'}>
               {index + 1}. {phase.title}
@@ -98,7 +110,11 @@ export const PhaseItemBuilder = ({
 
     case 'notStarted':
       return (
-        <div className={'flex items-center justify-between'}>
+        <div
+          className={
+            'flex flex-col justify-between sm:flex-row sm:items-center sm:gap-2'
+          }
+        >
           <Link to={`/project/${project.id}/phase/${phase.id}`}>
             <Button variant={'link'} className={'px-0'}>
               {index + 1}. {phase.title}

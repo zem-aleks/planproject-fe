@@ -21,14 +21,23 @@ export const WelcomeModal = () => {
       onOpenChange={(open) => !open && setSearchParams({})}
       modal={true}
     >
-      <DialogContent showCloseButton={false} className={'min-w-xl'}>
+      <DialogContent
+        showCloseButton={false}
+        className="flex h-[600px] max-h-[96%] w-[94%] max-w-full flex-col items-center justify-center gap-4 rounded-md p-0 px-4 lg:w-[1200px]"
+      >
         <DialogHeader className={'flex flex-col items-center gap-4'}>
-          <Rocket className={'mt-8 mb-4 size-40 text-orange-400'} />
-          <DialogTitle className={'text-center text-3xl font-bold'}>
+          <Rocket
+            className={
+              'mt-8 mb-4 size-20 text-orange-400 sm:size-30 md:size-40'
+            }
+          />
+          <DialogTitle className={'text-center text-2xl font-bold md:text-3xl'}>
             Welcome to your new Project Plan!
           </DialogTitle>
           <DialogDescription
-            className={'text-muted-foreground w-full px-2 text-center text-xl'}
+            className={
+              'text-muted-foreground w-full px-2 text-center text-lg md:text-xl'
+            }
           >
             Please review the phases and milestones. Once you're ready, press
             the <b>Start Project</b> button to kick off the project.

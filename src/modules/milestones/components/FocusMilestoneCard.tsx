@@ -34,12 +34,16 @@ export const FocusMilestoneCard = ({
       {/*  />*/}
       {/*)}*/}
 
-      <div className={'mb-2 flex items-start justify-between'}>
+      <div className={'mb-2 flex-col items-start justify-between md:flex-row'}>
         <div>
           <div className={'text-lg font-semibold'}>
             {currentMilestone.title}
           </div>
-          <div className={'text-muted-foreground flex h-5 items-center gap-4'}>
+          <div
+            className={
+              'text-muted-foreground flex flex-col lg:h-5 lg:flex-row lg:items-center lg:gap-4'
+            }
+          >
             <span>{currentMilestone.phase.title}</span>
             <Separator orientation={'vertical'} className={'h-4'} />
             <span>Milestone {currentMilestone.orderIndex}</span>
