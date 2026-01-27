@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 
+import { AnalyticsTracker } from '@/modules/analytics/components/AnalyticsTracker';
 import { AuditoryPage } from '@/modules/auditory/pages/AuditoryPage';
 import { AuthCallbackPage } from '@/modules/auth/pages/AuthCallbackPage';
 import { LoginPage } from '@/modules/auth/pages/LoginPage';
@@ -25,6 +26,7 @@ import { InternalElement } from '@/routing/components/InternalElement';
 export const AppRoutes = () => {
   return (
     <BrowserRouter>
+      <AnalyticsTracker />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/pricing" element={<PricingPage />} />
