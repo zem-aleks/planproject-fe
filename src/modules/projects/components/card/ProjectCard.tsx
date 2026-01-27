@@ -37,7 +37,7 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
           onClick={() => onMsg({ type: 'onProjectSelect', project })}
         >
           <CardHeader>
-            <div className={'flex gap-4 pr-2'}>
+            <div className={'flex flex-col gap-4 pr-2 sm:flex-row'}>
               <ProjectLogo url={project.logoUrl} size={'medium'} />
               <div>
                 <CardTitle className="flex items-center gap-2 text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
@@ -71,7 +71,7 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
           onClick={() => onMsg({ type: 'onProjectSelect', project })}
         >
           <CardHeader>
-            <div className={'flex gap-4 pr-2'}>
+            <div className={'flex flex-col gap-4 pr-2 md:flex-row'}>
               <div className={'relative'}>
                 <ProjectLogo url={project.logoUrl} size={'medium'} />
                 {!project.activated && (
@@ -85,7 +85,7 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
                 )}
               </div>
               <div>
-                <CardTitle className="flex items-center gap-2 text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
+                <CardTitle className="mb-2 flex flex-col gap-2 text-xl font-semibold tabular-nums sm:text-2xl md:flex-row md:items-center">
                   {project.title}
                   <ProjectStatusBadge status={project.status} />
                 </CardTitle>

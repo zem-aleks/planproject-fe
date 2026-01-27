@@ -35,7 +35,7 @@ export const PageTemplate = ({ children, header }: Props) => {
           <div className={'absolute top-0 left-0 h-[700px] w-full opacity-80'}>
             <GradientBackground />
           </div>
-          <div className="@container/main relative flex flex-1 flex-col gap-2">
+          <div className="@container/main relative z-10 flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
               {children}
             </div>

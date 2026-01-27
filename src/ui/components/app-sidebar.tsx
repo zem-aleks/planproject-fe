@@ -102,13 +102,10 @@ const data = {
 export function AppSidebar() {
   return (
     <Sidebar collapsible="offcanvas" variant={'inset'}>
-      <SidebarHeader className={'rounded-lg border bg-white'}>
+      <SidebarHeader className={''}>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!px-1"
-            >
+            <SidebarMenuButton asChild className="h-10 px-4">
               <Link to={'/projects'}>
                 <LogoBlock />
               </Link>
