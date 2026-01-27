@@ -1,5 +1,6 @@
 import { PageTemplate } from '@/modules/home/components/PageTemplate';
 import { PricingCards } from '@/modules/subscriptions/components/PricingCards';
+import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 
 export const PricingPage = () => {
@@ -18,13 +19,20 @@ export const PricingPage = () => {
                 self-improvers.
               </p>
 
-              <Button
-                onClick={openOnboarding}
-                size={'lg'}
-                className={'px-20 py-6 text-lg font-semibold'}
-              >
-                Start Free — No Credit Card Required
-              </Button>
+              <div className={'flex flex-col items-center justify-center'}>
+                <Button
+                  onClick={openOnboarding}
+                  size={'lg'}
+                  className={
+                    'animate-[glow_3s_ease_infinite] px-20 py-6 text-lg font-semibold'
+                  }
+                >
+                  Start Free
+                </Button>
+                <Badge variant={'warning'} className={'mt-4'}>
+                  *No Credit Card Required
+                </Badge>
+              </div>
             </section>
 
             {/* Pricing Cards */}
