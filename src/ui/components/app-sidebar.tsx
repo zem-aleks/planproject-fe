@@ -118,7 +118,7 @@ export function AppSidebar() {
         {/*<NavDocuments items={data.documents} />*/}
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className={'mb-10 md:mb-0'}>
         <NavUser />
       </SidebarFooter>
     </Sidebar>
