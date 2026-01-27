@@ -44,7 +44,7 @@ export const PageTemplate = ({
         <div className="container mx-auto px-4">
           <div className={'flex h-16 items-center justify-between'}>
             <nav className={'flex items-center'}>
-              <Link to={'/'} className={'mr-8 mb-[-2px]'}>
+              <Link to={'/'} className={'mr-2 mb-[-2px] md:mr-8'}>
                 <LogoBlockWhite />
               </Link>
 
@@ -69,7 +69,12 @@ export const PageTemplate = ({
                 <Button asChild variant={'outline'}>
                   <Link to={'/login'}>Log In</Link>
                 </Button>
-                <Button onClick={() => setOpen(true)}>Try for Free</Button>
+                <Button
+                  className={'hidden sm:block'}
+                  onClick={() => setOpen(true)}
+                >
+                  Try for Free
+                </Button>
               </div>
             )}
           </div>
@@ -81,7 +86,7 @@ export const PageTemplate = ({
       <footer className={'bg-primary text-primary-foreground pt-16 pb-8'}>
         <div className="container mx-auto px-4">
           <div className={'flex items-center justify-between'}>
-            <div className={'flex shrink-0 flex-col gap-1'}>
+            <div className={'flex flex-col gap-1 md:shrink-0'}>
               <Link to={'/'}>
                 <LogoBlockWhite />
               </Link>

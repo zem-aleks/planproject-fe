@@ -6,11 +6,16 @@ export const HomePage = () => {
     <PageTemplate>
       {(openOnboarding) => (
         <>
-          <section className="relative z-40 flex items-center justify-center pt-56 pb-40">
+          <section className="relative z-40 flex items-center justify-center pt-28 pb-10 sm:pt-56 sm:pb-40">
             <div className="container mx-auto px-4">
               <div className="grid items-center gap-8 lg:grid-cols-2">
                 <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-                  <h1 className="my-6 text-4xl font-bold text-pretty text-gray-300 lg:text-6xl">
+                  <img
+                    src={'/pp_logo_white.svg'}
+                    alt={'logo'}
+                    className="my-4 h-12"
+                  />
+                  <h1 className="my-6 hidden text-4xl font-bold text-pretty text-gray-50 lg:text-6xl">
                     PLAN PROJECT AI
                   </h1>
                   <p className="mb-8 max-w-xl text-gray-300 lg:text-xl">
@@ -21,7 +26,7 @@ export const HomePage = () => {
                   </p>
                   <div className="flex w-full flex-col justify-center gap-2 sm:flex-row lg:justify-start">
                     <Button
-                      className="px-24"
+                      className="animate-[glow_3s_ease_infinite] px-24"
                       size={'lg'}
                       onClick={openOnboarding}
                     >
@@ -38,7 +43,7 @@ export const HomePage = () => {
             </div>
           </section>
 
-          <section className="flex items-center justify-center pb-40">
+          <section className="flex items-center justify-center pb-20 md:pb-40">
             <div className="container mx-auto px-4">
               <div className="flex flex-col items-center gap-6 text-center">
                 <h2 className="my-6 text-3xl font-bold text-pretty lg:text-6xl">
@@ -80,7 +85,7 @@ export const HomePage = () => {
                   />
                 </div>
                 <Button
-                  className="mt-10 px-24"
+                  className="mt-10 animate-[glow_3s_ease_infinite] px-24"
                   size={'lg'}
                   onClick={openOnboarding}
                 >
@@ -105,7 +110,7 @@ const HomeCard = ({
   image: string;
 }) => {
   return (
-    <div key={title} className="flex gap-8 text-left">
+    <div key={title} className="flex flex-col gap-8 text-left sm:flex-row">
       <div className="bg-muted size-40 shrink-0 overflow-clip rounded-xl">
         <img
           src={image}
