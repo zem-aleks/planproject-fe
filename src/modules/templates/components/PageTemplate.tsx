@@ -33,7 +33,9 @@ export const PageTemplate = ({ children, header }: Props) => {
         />
         <div className="relative flex flex-1 flex-col">
           <div
-            className={'absolute top-0 left-0 z-0 h-[700px] w-full opacity-80'}
+            className={
+              'pointer-events-none absolute top-0 left-0 z-10 h-[700px] w-full overflow-hidden'
+            }
           >
             <GradientBackground />
           </div>

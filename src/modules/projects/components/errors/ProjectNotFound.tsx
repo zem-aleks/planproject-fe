@@ -13,7 +13,9 @@ export const ProjectNotFound = () => {
       }}
     >
       <Card
-        className={'flex flex-col items-center justify-center gap-1 px-8 py-4'}
+        className={
+          'mx-4 flex flex-col items-center justify-center gap-1 px-8 py-4'
+        }
       >
         <h1 className="text-2xl font-bold">No Active Project Found</h1>
         <p className="text-lg">Please select an project to continue.</p>
