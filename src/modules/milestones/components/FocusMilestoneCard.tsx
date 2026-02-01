@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
+import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
 import {
   MilestoneDetailsEntity,
   MilestoneEntity,
 } from '@/modules/milestones/types/entity';
-import { Badge } from '@/ui/badge';
 import { Card } from '@/ui/card';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Separator } from '@/ui/separator';
@@ -34,7 +34,11 @@ export const FocusMilestoneCard = ({
       {/*  />*/}
       {/*)}*/}
 
-      <div className={'mb-2 flex-col items-start justify-between md:flex-row'}>
+      <div
+        className={
+          'mb-2 flex flex-col items-start justify-between gap-2 md:flex-row'
+        }
+      >
         <div>
           <div className={'text-lg font-semibold'}>
             {currentMilestone.title}
@@ -54,14 +58,7 @@ export const FocusMilestoneCard = ({
             </span>
           </div>
         </div>
-        <Badge
-          className={'mt-1'}
-          variant={
-            currentMilestone.status === 'inProgress' ? 'warning' : 'default'
-          }
-        >
-          {currentMilestone.status}
-        </Badge>
+        <MilestoneStatusBadge status={currentMilestone.status} />
       </div>
 
       <div className={'flex flex-col gap-2'}>

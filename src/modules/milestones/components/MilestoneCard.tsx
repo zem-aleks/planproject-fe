@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneActions } from '@/modules/milestones/components/MilestoneActions';
+import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { Badge } from '@/ui/badge';
@@ -27,14 +28,7 @@ export const MilestoneCard = ({
     <Card key={currentMilestone.id} className={'justify-between gap-0 p-4'}>
       <div className={'flex items-start justify-between gap-2'}>
         <div className={'text-lg font-semibold'}>{currentMilestone.title}</div>
-        <Badge
-          className={'mt-1'}
-          variant={
-            currentMilestone.status === 'inProgress' ? 'warning' : 'default'
-          }
-        >
-          {currentMilestone.status}
-        </Badge>
+        <MilestoneStatusBadge status={currentMilestone.status} />
       </div>
       <div className={'text-muted-foreground mb-2'}>
         {currentMilestone.description}
