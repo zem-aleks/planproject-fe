@@ -17,7 +17,7 @@ export const PhaseDescription = ({
         className={`flex items-center gap-2 ${variant === 'primary' ? 'text-white' : 'text-black'}`}
       >
         Expertise needed:{' '}
-        <div className={'flex-wrap gap-1'}>
+        <div className={'flex flex-wrap gap-1'}>
           {phase.expertiseNeeded.split(',').map((expertise) => (
             <Badge className={'bg-green-600 text-white'}>
               {expertise.trim()}
@@ -26,7 +26,7 @@ export const PhaseDescription = ({
         </div>
       </div>
       <div
-        className={`flex items-center gap-2 ${variant === 'primary' ? 'text-white' : 'text-black'}`}
+        className={`flex items-center gap-1 ${variant === 'primary' ? 'text-white' : 'text-black'}`}
       >
         Estimation: <Badge>Min {phase.minDaysNeeded} days</Badge>
         <Badge>Max {phase.maxDaysNeeded} days</Badge>
