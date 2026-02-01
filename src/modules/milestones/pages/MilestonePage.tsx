@@ -2,6 +2,7 @@ import { useParams } from 'react-router';
 
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
+import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
@@ -128,11 +129,7 @@ const LoadedContentPage = ({
             </h1>
           </div>
 
-          <Badge
-            variant={milestone.status === 'inProgress' ? 'warning' : 'default'}
-          >
-            {milestone.status}
-          </Badge>
+          <MilestoneStatusBadge status={milestone.status} />
         </div>
 
         <div className={'flex flex-col gap-2'}>

@@ -20,7 +20,7 @@ export const MilestoneStatusBadge = ({
     case 'inProgress':
       return (
         <Badge className={className} variant={'warning'}>
-          In Progress
+          In progress
         </Badge>
       );
 
