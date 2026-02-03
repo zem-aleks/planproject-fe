@@ -20,6 +20,8 @@ import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
+import { ShapingSummary } from './ShapingSummary';
+
 export type Msg = { type: 'onUpdate'; shaping: ShapingEntity };
 
 export const ShapingChatForm = ({
@@ -29,6 +31,7 @@ export const ShapingChatForm = ({
   shaping: ShapingEntity;
   onMsg: (msg: Msg) => void;
 }) => {
+  const [confirmed, setConfirmed] = useState<boolean>(false);
   const { session, clientId } = useAuthSession();
   const { state, load } = useLazyLoadableData(addStartShapingUserMessage);
   const [message, setMessage] = useState<string>('');
@@ -64,15 +67,35 @@ export const ShapingChatForm = ({
     }
   }, [state]);
 
-  if (shaping.score >= 100) {
+  if (confirmed) {
     return (
-      <FinishModal>
+      <FinishModal
+        title={`All data is here! Please sign up to see your results`}
+      >
         <SignCard
           signedIn={!!session}
           view={shaping.status === 'finished' ? 'sign_in' : 'sign_up'}
         />
         <FinishPublicShapingForm shaping={shaping} onMsg={noOperation} />
       </FinishModal>
+    );
+  }
+
+  if (shaping.score >= 100) {
+    return (
+      <ShapingSummary
+        shaping={shaping}
+        onMsg={(msg) => {
+          switch (msg.type) {
+            case 'onAccepted':
+              setConfirmed(true);
+              break;
+
+            default:
+              return notReachable(msg.type);
+          }
+        }}
+      />
     );
   }
 
@@ -139,7 +162,13 @@ export const ShapingChatForm = ({
   );
 };
 
-const FinishModal = ({ children }: { children: ReactNode }) => {
+const FinishModal = ({
+  title,
+  children,
+}: {
+  title: ReactNode;
+  children: ReactNode;
+}) => {
   return (
     <div className={'container overflow-y-auto'}>
       <div className="mx-auto flex flex-col items-center justify-center gap-2 px-4">
@@ -149,8 +178,7 @@ const FinishModal = ({ children }: { children: ReactNode }) => {
               'pr-12 text-left text-xl md:mb-[-20px] md:py-4 md:pr-0 md:text-center md:text-3xl'
             }
           >
-            All data is here! Please <strong>sign up</strong> to see your
-            results
+            {title}
           </DialogTitle>
         </DialogHeader>
       </div>

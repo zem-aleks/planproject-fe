@@ -8,12 +8,14 @@ import { AnswersBlock } from '@/modules/projects/components/forms/AnswersBlock';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { addShapingUserMessage } from '@/modules/shaping/api/addShapingUserMessage';
-import { FinishShapingButton } from '@/modules/shaping/components/FinishShapingButton';
+import { finishShaping } from '@/modules/shaping/api/finishShaping';
 import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
 import { ShapingScore } from '@/modules/shaping/components/ShapingScore';
+import { ShapingSummary } from '@/modules/shaping/components/ShapingSummary';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
+import { Spinner } from '@/ui/spinner';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable.ts';
 import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
@@ -31,6 +33,8 @@ export const ProjectShapingForm = ({
   const { reload } = useContext(ProjectsContext);
   const { clientId } = useAuthSession();
   const { state, load, reset } = useLazyLoadableData(addShapingUserMessage);
+  const { state: finishState, load: finish } =
+    useLazyLoadableData(finishShaping);
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const assistantMessages = shaping.messages.filter(
@@ -58,6 +62,58 @@ export const ProjectShapingForm = ({
         return notReachable(state);
     }
   }, [state, navigate]);
+
+  useEffect(() => {
+    switch (finishState.type) {
+      case 'not_requested':
+      case 'loading':
+        break;
+
+      case 'error':
+        toast.error(`Failed the shaping processing. Please try again.`);
+        break;
+
+      case 'loaded':
+        reload();
+        navigate(`/project/${project.id}?new=true`);
+        break;
+
+      default:
+        return notReachable(finishState);
+    }
+  }, [finishState]);
+
+  if (finishState.type === 'loading') {
+    return (
+      <div className={'flex w-full flex-col gap-2 p-4 py-0'}>
+        <Card className={'w-full items-center justify-center p-10'}>
+          <Spinner className={'size-20'} />
+        </Card>
+      </div>
+    );
+  }
+
+  if (shaping.score >= 100) {
+    return (
+      <div className={'flex w-full flex-col gap-2 p-4 py-0'}>
+        <Card className={'w-full px-2 py-1'}>
+          <ShapingSummary
+            shaping={shaping}
+            onMsg={(msg) => {
+              switch (msg.type) {
+                case 'onAccepted':
+                  finish(shaping.id);
+                  break;
+
+                default:
+                  return notReachable(msg.type);
+              }
+            }}
+          />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={'flex w-full flex-col gap-2 p-4 py-0'}>
@@ -113,14 +169,6 @@ export const ProjectShapingForm = ({
           </Card>
         </div>
       </div>
-
-      <FinishShapingButton
-        shaping={shaping}
-        onFinish={() => {
-          reload();
-          navigate(`/project/${project.id}?new=true`);
-        }}
-      />
     </div>
   );
 };
