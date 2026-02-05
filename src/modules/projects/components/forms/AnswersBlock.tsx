@@ -16,6 +16,7 @@ export const AnswersBlock = ({
         const included = message.includes(answer);
         return (
           <Button
+            key={answer}
             variant={'outline'}
             className={'active:bg grow cursor-pointer rounded-md p-1 px-3'}
             aria-selected={included}
