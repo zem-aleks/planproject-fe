@@ -1,4 +1,4 @@
-import { ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import { ReactNode, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
@@ -36,7 +36,6 @@ export const ProjectShapingForm = ({
   const { state: finishState, load: finish } =
     useLazyLoadableData(finishShaping);
   const [message, setMessage] = useState<string>('');
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const assistantMessages = shaping.messages.filter(
     (m) => m.role === 'assistant',
   );
@@ -142,7 +141,6 @@ export const ProjectShapingForm = ({
               rows={3}
               required={true}
               disabled={state.type === 'loading'}
-              ref={textAreaRef}
               className={'w-full'}
               maxLength={4000}
             />
