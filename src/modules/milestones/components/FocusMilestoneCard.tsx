@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
+import { MilestoneStepsList } from '@/modules/milestones/components/MilestoneStepsList';
 import {
   MilestoneDetailsEntity,
   MilestoneEntity,
@@ -75,10 +76,15 @@ export const FocusMilestoneCard = ({
           <span>{milestone.definitionOfDone}</span>
         </div>
 
-        {milestone.steps && (
+        {currentMilestone.steps.length > 0 && (
           <Card className={'w-full gap-2 p-4'}>
-            <div className={'font-semibold'}>Steps:</div>
-            <MarkdownFormat>{milestone.steps}</MarkdownFormat>
+            <MilestoneStepsList
+              milestone={currentMilestone}
+              onUpdated={(updated) => {
+                setCurrentMilestone((prev) => ({ ...prev, ...updated }));
+                onUpdated(updated);
+              }}
+            />
           </Card>
         )}
         {milestone.usefulResources && (

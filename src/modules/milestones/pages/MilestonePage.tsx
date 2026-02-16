@@ -1,9 +1,14 @@
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
-import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
+import { MilestoneStepsList } from '@/modules/milestones/components/MilestoneStepsList';
+import {
+  MilestoneDetailsEntity,
+  MilestoneEntity,
+} from '@/modules/milestones/types/entity';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
@@ -97,6 +102,16 @@ const LoadedContentPage = ({
   milestone: MilestoneDetailsEntity;
   onChanged: () => void;
 }) => {
+  const [currentMilestone, setCurrentMilestone] = useState(milestone);
+
+  useEffect(() => {
+    setCurrentMilestone(milestone);
+  }, [milestone]);
+
+  const handleStepUpdated = (updated: MilestoneEntity) => {
+    setCurrentMilestone((prev) => ({ ...prev, ...updated }));
+  };
+
   return (
     <PageTemplate
       header={{
@@ -104,18 +119,18 @@ const LoadedContentPage = ({
           { title: 'Projects', href: '/projects' },
           { title: `${project.title}`, href: `/project/${project.id}` },
           {
-            title: `${milestone.phase.title}`,
-            href: `/project/${project.id}/phase/${milestone.phase.id}`,
+            title: `${currentMilestone.phase.title}`,
+            href: `/project/${project.id}/phase/${currentMilestone.phase.id}`,
           },
         ],
-        title: milestone.title,
+        title: currentMilestone.title,
       }}
     >
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        {milestone.status === 'inProgress' && (
+        {currentMilestone.status === 'inProgress' && (
           <DaysCounter
-            startedAt={milestone.startedAt}
-            daysCount={milestone.daysNeeded}
+            startedAt={currentMilestone.startedAt}
+            daysCount={currentMilestone.daysNeeded}
           />
         )}
         <div className={'flex flex-row gap-8'}>
@@ -125,44 +140,52 @@ const LoadedContentPage = ({
                 'flex items-center justify-between gap-2 text-2xl font-semibold text-white'
               }
             >
-              {milestone.title}
+              {currentMilestone.title}
             </h1>
           </div>
 
-          <MilestoneStatusBadge status={milestone.status} />
+          <MilestoneStatusBadge status={currentMilestone.status} />
         </div>
 
         <div className={'flex flex-col gap-2'}>
-          <div className={'text-gray-200'}>{milestone.description}</div>
+          <div className={'text-gray-200'}>{currentMilestone.description}</div>
           <div className={'flex items-center gap-1 text-gray-50'}>
             <b>Estimation:</b>
-            <Badge>{milestone.daysNeeded} days</Badge>
+            <Badge>{currentMilestone.daysNeeded} days</Badge>
           </div>
           <div className={'rounded-lg bg-green-600 p-2 px-4 text-gray-200'}>
             <b className={'text-gray-50'}>Definition of done:</b>{' '}
-            <span>{milestone.definitionOfDone}</span>
+            <span>{currentMilestone.definitionOfDone}</span>
           </div>
 
           <Card className={'w-full gap-2 p-4'}>
-            <div className={'font-semibold'}>Steps:</div>
-            <MarkdownFormat>{milestone.steps}</MarkdownFormat>
+            <MilestoneStepsList
+              milestone={currentMilestone}
+              onUpdated={handleStepUpdated}
+            />
           </Card>
           <Card className={'w-full gap-2 p-4'}>
             <div className={'font-semibold'}>Useful resources:</div>
-            <MarkdownFormat>{milestone.usefulResources}</MarkdownFormat>
+            <MarkdownFormat>{currentMilestone.usefulResources}</MarkdownFormat>
           </Card>
         </div>
 
-        {milestone.status !== 'completed' && (
-          <CompleteMilestoneForm milestone={milestone} onUpdate={onChanged} />
+        {currentMilestone.status !== 'completed' && (
+          <CompleteMilestoneForm
+            milestone={currentMilestone}
+            onUpdate={onChanged}
+          />
         )}
 
-        {milestone.status === 'completed' && milestone.completeMessage && (
-          <Card className={'w-full gap-2 bg-pink-100 p-4'}>
-            <div className={'font-semibold'}>Completed with comment:</div>
-            <MarkdownFormat>{milestone.completeMessage}</MarkdownFormat>
-          </Card>
-        )}
+        {currentMilestone.status === 'completed' &&
+          currentMilestone.completeMessage && (
+            <Card className={'w-full gap-2 bg-pink-100 p-4'}>
+              <div className={'font-semibold'}>Completed with comment:</div>
+              <MarkdownFormat>
+                {currentMilestone.completeMessage}
+              </MarkdownFormat>
+            </Card>
+          )}
 
         {/*<TasksBlock milestone={milestone} />*/}
       </div>
