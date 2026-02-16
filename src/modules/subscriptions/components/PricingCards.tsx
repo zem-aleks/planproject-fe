@@ -20,6 +20,7 @@ export const PricingCards = () => {
             subscription={'pro'}
             badges={[{ text: 'Most Popular', bg: 'bg-black' }]}
             className={'border-black'}
+            temporaryFree={true}
           />
           <PriceCard
             yearly={isYearly}
@@ -29,6 +30,7 @@ export const PricingCards = () => {
               { text: 'All inclusive', bg: 'bg-green-500' },
               { text: 'Early Launch Discount', bg: 'bg-orange-400' },
             ]}
+            temporaryFree={true}
           />
         </div>
       </div>

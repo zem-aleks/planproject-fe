@@ -9,12 +9,14 @@ export const PriceCard = ({
   badges,
   className,
   showUpgradeForm,
+  temporaryFree,
 }: {
   subscription: SubscriptionType;
   yearly: boolean;
   badges: Array<{ text: string; bg: string }>;
   className?: string;
   showUpgradeForm?: boolean;
+  temporaryFree?: boolean;
 }) => {
   const priceBlock = PRICES[subscription];
   const price = yearly ? priceBlock.yearly : priceBlock.monthly;
@@ -23,6 +25,22 @@ export const PriceCard = ({
     <div
       className={`relative rounded-2xl border bg-white p-8 shadow-sm ${className} flex flex-col justify-between`}
     >
+      {temporaryFree && (
+        <div
+          className={
+            'absolute top-0 left-0 flex h-full w-full items-center justify-center rounded-2xl bg-[#ffffffaa]'
+          }
+        >
+          <div
+            className={
+              'rounded-md border-2 border-red-700 bg-white p-2 px-4 text-xl font-semibold'
+            }
+          >
+            Temporary Free
+          </div>
+        </div>
+      )}
+
       {badges.length > 0 && (
         <div className="absolute -top-3 right-6 flex items-center gap-2">
           {badges.map((badge) => (
