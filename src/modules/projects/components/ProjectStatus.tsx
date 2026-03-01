@@ -8,6 +8,11 @@ export const ProjectStatusBadge = ({ status }: { status: ProjectStatus }) => {
     case 'analyzing':
       return <Badge className={''}>Status: {status}</Badge>;
 
+    case 'soulBuilding':
+    case 'soulError':
+    case 'soulDone':
+      return null;
+
     case 'active':
       return (
         <Badge className={''} variant={'warning'}>

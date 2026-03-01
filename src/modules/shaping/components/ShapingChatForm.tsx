@@ -20,8 +20,6 @@ import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
-import { ShapingSummary } from './ShapingSummary';
-
 export type Msg = { type: 'onUpdate'; shaping: ShapingEntity };
 
 export const ShapingChatForm = ({
@@ -31,7 +29,7 @@ export const ShapingChatForm = ({
   shaping: ShapingEntity;
   onMsg: (msg: Msg) => void;
 }) => {
-  const [confirmed, setConfirmed] = useState<boolean>(false);
+  // const [confirmed, setConfirmed] = useState<boolean>(false);
   const { session, clientId } = useAuthSession();
   const { state, load } = useLazyLoadableData(addStartShapingUserMessage);
   const [message, setMessage] = useState<string>('');
@@ -67,7 +65,7 @@ export const ShapingChatForm = ({
     }
   }, [state]);
 
-  if (confirmed) {
+  if (shaping.score >= 100) {
     return (
       <FinishModal
         title={`All data is here! Please sign up to see your results`}
@@ -81,23 +79,23 @@ export const ShapingChatForm = ({
     );
   }
 
-  if (shaping.score >= 100) {
-    return (
-      <ShapingSummary
-        shaping={shaping}
-        onMsg={(msg) => {
-          switch (msg.type) {
-            case 'onAccepted':
-              setConfirmed(true);
-              break;
-
-            default:
-              return notReachable(msg.type);
-          }
-        }}
-      />
-    );
-  }
+  // if (shaping.score >= 100) {
+  //   return (
+  //     <ShapingSummary
+  //       shaping={shaping}
+  //       onMsg={(msg) => {
+  //         switch (msg.type) {
+  //           case 'onAccepted':
+  //             setConfirmed(true);
+  //             break;
+  //
+  //           default:
+  //             return notReachable(msg.type);
+  //         }
+  //       }}
+  //     />
+  //   );
+  // }
 
   return (
     <div

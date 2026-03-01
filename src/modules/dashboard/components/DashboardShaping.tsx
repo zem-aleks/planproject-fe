@@ -9,9 +9,6 @@ import { ProjectHeading } from '@/modules/projects/components/ProjectHeading';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { ModifyPhasesForm } from '@/modules/projects/components/forms/ModifyPhasesForm';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
-import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
-import { InitSoulForm } from '@/modules/soul/components/InitSoulForm';
-import { SoulBlock } from '@/modules/soul/components/SoulBlock';
 import { ActiveProjectGuard } from '@/modules/subscriptions/guards/ActiveProjectGuard';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Card } from '@/ui/card';
@@ -19,7 +16,8 @@ import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { Separator } from '@/ui/separator';
 import { notReachable } from '@/utils/notReachable';
 
-export const DashboardPage = () => {
+export const DashboardShaping = () => {
+  const navigate = useNavigate();
   const { project, reload } = useProjectByUrlParam();
   if (!project || project.status === 'draft') {
     return <ProjectNotFound />;
@@ -43,77 +41,17 @@ export const DashboardPage = () => {
           )}
           <ProjectHeading project={project} />
 
-          <DashboardContent project={project} onChanged={reload} />
-        </div>
-      </PageTemplate>
-    </ActiveProjectGuard>
-  );
-};
-
-const DashboardContent = ({
-  project,
-  onChanged,
-}: {
-  project: ProjectPreviewEntity;
-  onChanged: () => void;
-}) => {
-  const navigate = useNavigate();
-
-  switch (project.status) {
-    case 'soulBuilding':
-      // TODO: quick version of poller
-      setTimeout(onChanged, 10000);
-      return (
-        <Card className={'flex flex-row items-center gap-2 p-4'}>
-          <div className={''}>
-            <img
-              src={'/images/cat_loading.gif'}
-              width={150}
-              height={150}
-              alt={'Building'}
-              className={'-mt-5 -mb-2 -ml-5 h-37.5 w-37.5'}
-            />
-          </div>
-          <div className={'w-full'}>
-            <div className={'text-xl font-bold'}>Please wait</div>
-            <div className={'text-lg'}>
-              At this moment we're doing initialization of your project SOUL
-            </div>
-          </div>
-        </Card>
-      );
-
-    case 'shaping':
-    case 'soulError':
-      return <InitSoulForm project={project} onInitiated={onChanged} />;
-
-    // case 'analyzing':
-    // case 'active':
-    case 'soulDone':
-      return <SoulBlock project={project} />;
-
-    case 'draft':
-    case 'analyzing':
-    case 'active':
-    case 'completed':
-    case 'onHold':
-    case 'cancelled':
-      if (!project.soul) {
-        return <InitSoulForm project={project} onInitiated={onChanged} />;
-      }
-      return (
-        <>
           <ProjectActions
             project={project}
             onMsg={(msg) => {
               switch (msg.type) {
                 case 'onProjectStarted':
-                  onChanged();
+                  reload();
                   navigate(`/project/${project.id}/focus`);
                   break;
 
                 case 'onPhasesChanged':
-                  onChanged();
+                  reload();
                   break;
 
                 default:
@@ -162,10 +100,8 @@ const DashboardContent = ({
               </div>
             )}
           </PhasesLoader>
-        </>
-      );
-
-    default:
-      return notReachable(project.status);
-  }
+        </div>
+      </PageTemplate>
+    </ActiveProjectGuard>
+  );
 };

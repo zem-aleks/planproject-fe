@@ -21,6 +21,9 @@ export const ProjectActions = ({
     case 'completed':
     case 'onHold':
     case 'cancelled':
+    case 'soulBuilding':
+    case 'soulDone':
+    case 'soulError':
       return null;
 
     case 'active':
