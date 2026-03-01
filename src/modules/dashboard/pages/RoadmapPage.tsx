@@ -67,6 +67,10 @@ export const RoadmapPage = () => {
                       reload();
                       break;
 
+                    case 'onSoulChanged':
+                      reload();
+                      break;
+
                     default:
                       return notReachable(msg);
                   }

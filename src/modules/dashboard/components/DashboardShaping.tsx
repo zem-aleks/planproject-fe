@@ -54,6 +54,10 @@ export const DashboardShaping = () => {
                   reload();
                   break;
 
+                case 'onSoulChanged':
+                  reload();
+                  break;
+
                 default:
                   return notReachable(msg);
               }

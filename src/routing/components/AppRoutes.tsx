@@ -4,6 +4,8 @@ import { AnalyticsTracker } from '@/modules/analytics/components/AnalyticsTracke
 import { AuditoryPage } from '@/modules/auditory/pages/AuditoryPage';
 import { AuthCallbackPage } from '@/modules/auth/pages/AuthCallbackPage';
 import { LoginPage } from '@/modules/auth/pages/LoginPage';
+import { ChatPage } from '@/modules/chat/components/ChatPage';
+import { ChatViewPage } from '@/modules/chat/components/ChatViewPage';
 import { CompetitorsPage } from '@/modules/competitors/pages/CompetitorsPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
 import { RoadmapPage } from '@/modules/dashboard/pages/RoadmapPage';
@@ -131,6 +133,24 @@ export const AppRoutes = () => {
           element={
             <InternalElement>
               <AuditoryPage />
+            </InternalElement>
+          }
+        />
+
+        <Route
+          path="/project/:projectId/chat"
+          element={
+            <InternalElement>
+              <ChatPage />
+            </InternalElement>
+          }
+        />
+
+        <Route
+          path="/project/:projectId/chat/:chatId"
+          element={
+            <InternalElement>
+              <ChatViewPage />
             </InternalElement>
           }
         />

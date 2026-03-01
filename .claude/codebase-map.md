@@ -37,6 +37,7 @@ Each module follows the pattern: `api/`, `components/`, `pages/`, `types/`, and 
 
 | Module | Purpose | Key components |
 |---|---|---|
+| `chat/` | Project-scoped AI chat with SSE streaming | `ChatPage` (list), `ChatViewPage` (single chat), `ChatConversation`, `ChatMessageBubble`, `ChatInput`, `useChatStream` |
 | `dashboard/` | Main project dashboard | `DashboardPage`, `DashboardShaping`, `WelcomeModal`, `ChatsTable`, `RoadmapPage` |
 | `shaping/` | AI-driven project shaping conversation | `ShapingModal`, `ShapingForm`, `ShapingChatForm`, `ShapingSummary`, `SummaryReview` |
 | `soul/` | Project soul visualization | `SoulBlock` |

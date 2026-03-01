@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import {
   BookOpen,
@@ -10,26 +10,35 @@ import {
   Lightbulb,
   MessageCircle,
   Package,
-  Pencil,
   Play,
-  Plus,
   ShieldAlert,
   Target,
   Users,
   Wrench,
   X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import {
   ProjectPreviewEntity,
   ProjectSoul,
 } from '@/modules/projects/types/entity';
+import { acceptAssumption } from '@/modules/soul/api/acceptAssumption';
+import { answerOpenQuestion } from '@/modules/soul/api/answerOpenQuestion';
+import { removeAssumption } from '@/modules/soul/api/removeAssumption';
+import { removeOpenQuestion } from '@/modules/soul/api/removeOpenQuestion';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 
-export const SoulBlock = ({ project }: { project: ProjectPreviewEntity }) => {
+export const SoulBlock = ({
+  project,
+  onProjectChanged,
+}: {
+  project: ProjectPreviewEntity;
+  onProjectChanged: () => void;
+}) => {
   const soul = project.soul;
   if (!soul) return null;
 
@@ -47,9 +56,17 @@ export const SoulBlock = ({ project }: { project: ProjectPreviewEntity }) => {
         <ConstraintsSection soul={soul} />
       </div>
 
-      <OpenQuestionsSection soul={soul} />
+      <OpenQuestionsSection
+        soul={soul}
+        projectId={project.id}
+        onProjectChanged={onProjectChanged}
+      />
 
-      <AssumptionsSection soul={soul} />
+      <AssumptionsSection
+        soul={soul}
+        projectId={project.id}
+        onProjectChanged={onProjectChanged}
+      />
 
       <DecisionsSection soul={soul} />
 
@@ -103,7 +120,7 @@ const CurrentStateSection = ({ soul }: { soul: ProjectSoul }) => (
     <SectionHeader
       icon={<Gauge className="size-4" />}
       title="Current State"
-      action={<EditButton />}
+      // action={<EditButton />}
     />
     <p className="text-sm leading-relaxed">{soul.currentState.description}</p>
     {soul.currentState.keyMetrics &&
@@ -128,7 +145,7 @@ const DesiredOutcomesSection = ({ soul }: { soul: ProjectSoul }) => (
       icon={<Target className="size-4" />}
       title="Desired Outcomes"
       count={soul.desiredOutcomes.length}
-      action={<EditButton />}
+      // action={<EditButton />}
     />
     {soul.desiredOutcomes.length > 0 ? (
       <ul className="flex flex-col gap-2">
@@ -154,11 +171,11 @@ const DesiredOutcomesSection = ({ soul }: { soul: ProjectSoul }) => (
   </Card>
 );
 
-const EditButton = () => (
-  <Button variant="ghost" size="icon" className="size-7">
-    <Pencil className="size-3.5" />
-  </Button>
-);
+// const EditButton = () => (
+//   <Button variant="ghost" size="icon" className="size-7">
+//     <Pencil className="size-3.5" />
+//   </Button>
+// );
 
 const TargetUsersSection = ({
   targetUsers,
@@ -169,7 +186,7 @@ const TargetUsersSection = ({
     <SectionHeader
       icon={<Users className="size-4" />}
       title="Target Users"
-      action={<EditButton />}
+      // action={<EditButton />}
     />
     {targetUsers ? (
       <>
@@ -204,7 +221,7 @@ const WorkstreamsSection = ({ soul }: { soul: ProjectSoul }) => {
         icon={<Layers className="size-4" />}
         title="Workstreams"
         count={soul.workstreams.length}
-        action={<EditButton />}
+        // action={<EditButton />}
       />
       {sorted.length > 0 ? (
         <div className="flex flex-col gap-2">
@@ -260,13 +277,28 @@ const PriorityBadge = ({
   }
 };
 
+const ImpactBadge = ({
+  impact,
+}: {
+  impact: 'blocking' | 'important' | 'minor';
+}) => {
+  switch (impact) {
+    case 'blocking':
+      return <Badge variant="destructive">blocking</Badge>;
+    case 'important':
+      return <Badge variant="warning">important</Badge>;
+    case 'minor':
+      return <Badge variant="secondary">minor</Badge>;
+  }
+};
+
 const ResourcesSection = ({ soul }: { soul: ProjectSoul }) => (
   <Card className="flex flex-col gap-3 p-5">
     <SectionHeader
       icon={<Wrench className="size-4" />}
       title="Resources & Tools"
       count={soul.resources.length}
-      action={<EditButton />}
+      // action={<EditButton />}
     />
     {soul.resources.length > 0 ? (
       <div className="flex flex-col gap-2">
@@ -297,7 +329,7 @@ const ConstraintsSection = ({ soul }: { soul: ProjectSoul }) => (
       icon={<ShieldAlert className="size-4" />}
       title="Constraints"
       count={soul.constraints.length}
-      action={<EditButton />}
+      // action={<EditButton />}
     />
     {soul.constraints.length > 0 ? (
       <div className="flex flex-col gap-2">
@@ -324,7 +356,7 @@ const DecisionsSection = ({ soul }: { soul: ProjectSoul }) => (
       icon={<Lightbulb className="size-4" />}
       title="Decisions Made"
       count={soul.decisions.length}
-      action={<EditButton />}
+      // action={<EditButton />}
     />
     {soul.decisions.length > 0 ? (
       <div className="flex flex-col gap-2">
@@ -349,143 +381,295 @@ const DecisionsSection = ({ soul }: { soul: ProjectSoul }) => (
   </Card>
 );
 
-const OpenQuestionsSection = ({ soul }: { soul: ProjectSoul }) => (
-  <Card className="flex flex-col gap-3 p-5">
-    <SectionHeader
-      icon={<CircleHelp className="size-4" />}
-      title="Open Questions"
-      count={soul.openQuestions.length}
-      action={<EditButton />}
-    />
-    {soul.openQuestions.length > 0 ? (
-      <div className="flex flex-col gap-3">
-        {soul.openQuestions.map((q, i) => (
-          <div key={i} className="rounded-lg border p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1">
-                <div className="text-sm font-medium">{q.topic}</div>
-                {q.context && (
-                  <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-                    {q.context}
-                  </p>
+const OpenQuestionsSection = ({
+  soul,
+  projectId,
+  onProjectChanged,
+}: {
+  soul: ProjectSoul;
+  projectId: string;
+  onProjectChanged: () => void;
+}) => {
+  const [selections, setSelections] = useState<Record<number, string>>({});
+  const [answeringIndex, setAnsweringIndex] = useState<number | null>(null);
+  const [removingIndex, setRemovingIndex] = useState<number | null>(null);
+
+  const toggleSelection = (questionIndex: number, option: string) => {
+    setSelections((prev) => ({
+      ...prev,
+      [questionIndex]: prev[questionIndex] === option ? undefined! : option,
+    }));
+  };
+
+  const handleAnswer = async (questionIndex: number, topic: string) => {
+    const chosenOption = selections[questionIndex];
+    if (!chosenOption) return;
+
+    setAnsweringIndex(questionIndex);
+    try {
+      await answerOpenQuestion(projectId, { topic, chosenOption });
+      onProjectChanged();
+    } catch {
+      toast.error('Failed to submit answer');
+    } finally {
+      setAnsweringIndex(null);
+    }
+  };
+
+  const handleRemove = async (questionIndex: number, topic: string) => {
+    setRemovingIndex(questionIndex);
+    try {
+      await removeOpenQuestion(projectId, { topic });
+      onProjectChanged();
+    } catch {
+      toast.error('Failed to remove question');
+    } finally {
+      setRemovingIndex(null);
+    }
+  };
+
+  return (
+    <Card className="flex flex-col gap-3 p-5">
+      <SectionHeader
+        icon={<CircleHelp className="size-4" />}
+        title="Open Questions"
+        count={soul.openQuestions.length}
+        // action={<EditButton />}
+      />
+      {soul.openQuestions.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          {soul.openQuestions.map((q, i) => {
+            const isLoading = answeringIndex === i || removingIndex === i;
+
+            return (
+              <div key={i} className="rounded-lg border p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium">{q.topic}</div>
+                    {q.context && (
+                      <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                        {q.context}
+                      </p>
+                    )}
+                    <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                      {q.impactReason}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1">
+                    <ImpactBadge impact={q.impact} />
+                    <Badge
+                      variant={
+                        q.status === 'discussed_unresolved'
+                          ? 'warning'
+                          : 'secondary'
+                      }
+                    >
+                      {q.status === 'discussed_unresolved'
+                        ? 'unresolved'
+                        : 'not discussed'}
+                    </Badge>
+                    <Button
+                      variant="outline"
+                      className={'border-red-700'}
+                      size="sm"
+                      disabled={isLoading}
+                      loading={removingIndex === i}
+                      onClick={() => handleRemove(i, q.topic)}
+                    >
+                      <X className="size-3.5" />
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+
+                {q.suggestedOptions && q.suggestedOptions.length > 0 && (
+                  <div className="mt-3 flex flex-col gap-1.5">
+                    <p className="text-muted-foreground text-xs font-medium">
+                      Pick an answer:
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      {q.suggestedOptions.map((opt, j) => {
+                        const isSelected = selections[i] === opt;
+                        return (
+                          <button
+                            key={j}
+                            type="button"
+                            disabled={isLoading}
+                            onClick={() => toggleSelection(i, opt)}
+                            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors ${
+                              isSelected
+                                ? 'border-primary bg-primary/10 text-primary font-medium'
+                                : 'border-border hover:border-primary/40 hover:bg-muted cursor-pointer'
+                            } ${isLoading ? 'opacity-50' : ''}`}
+                          >
+                            <div
+                              className={`flex size-4 shrink-0 items-center justify-center rounded-full border ${
+                                isSelected
+                                  ? 'border-primary bg-primary'
+                                  : 'border-muted-foreground/40'
+                              }`}
+                            >
+                              {isSelected && (
+                                <Check className="size-2.5 text-white" />
+                              )}
+                            </div>
+                            {opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 )}
-              </div>
-              <div className="flex shrink-0 items-center gap-1">
-                <Badge
-                  variant={
-                    q.status === 'discussed_unresolved'
-                      ? 'warning'
-                      : 'secondary'
-                  }
-                >
-                  {q.status === 'discussed_unresolved'
-                    ? 'unresolved'
-                    : 'not discussed'}
-                </Badge>
-                <Button variant="ghost" size="sm">
-                  <X className="size-3.5" />
-                  Remove
-                </Button>
-              </div>
-            </div>
 
-            {q.suggestedOptions && q.suggestedOptions.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {q.suggestedOptions.map((opt, j) => (
-                  <Badge
-                    key={j}
-                    variant="outline"
-                    className="text-xs font-normal"
+                <Separator className="my-3" />
+
+                <div className="flex gap-2">
+                  {selections[i] && (
+                    <Button
+                      size="sm"
+                      disabled={isLoading}
+                      loading={answeringIndex === i}
+                      onClick={() => handleAnswer(i, q.topic)}
+                    >
+                      <Check className="size-3.5" />
+                      Confirm answer
+                    </Button>
+                  )}
+                  <Button variant="outline" size="sm" disabled={isLoading}>
+                    <MessageCircle className="size-3.5" />
+                    Start a chat
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-muted-foreground text-sm">No open questions yet</p>
+      )}
+      {/*<Button variant="outline" size="sm" className="self-start">*/}
+      {/*  <Plus className="size-3.5" />*/}
+      {/*  Add question*/}
+      {/*</Button>*/}
+    </Card>
+  );
+};
+
+const AssumptionsSection = ({
+  soul,
+  projectId,
+  onProjectChanged,
+}: {
+  soul: ProjectSoul;
+  projectId: string;
+  onProjectChanged: () => void;
+}) => {
+  const [acceptingIndex, setAcceptingIndex] = useState<number | null>(null);
+  const [removingIndex, setRemovingIndex] = useState<number | null>(null);
+
+  const handleAccept = async (index: number, assumption: string) => {
+    setAcceptingIndex(index);
+    try {
+      await acceptAssumption(projectId, { assumption });
+      onProjectChanged();
+    } catch {
+      toast.error('Failed to accept assumption');
+    } finally {
+      setAcceptingIndex(null);
+    }
+  };
+
+  const handleRemove = async (index: number, assumption: string) => {
+    setRemovingIndex(index);
+    try {
+      await removeAssumption(projectId, { assumption });
+      onProjectChanged();
+    } catch {
+      toast.error('Failed to remove assumption');
+    } finally {
+      setRemovingIndex(null);
+    }
+  };
+
+  return (
+    <Card className="flex flex-col gap-3 p-5">
+      <SectionHeader
+        icon={<ShieldAlert className="size-4" />}
+        title="Assumptions"
+        count={soul.assumptions.length}
+        // action={<EditButton />}
+      />
+      {soul.assumptions.length > 0 ? (
+        <div className="flex flex-col gap-3">
+          {soul.assumptions.map((a, i) => {
+            const isLoading = acceptingIndex === i || removingIndex === i;
+
+            return (
+              <div key={i} className="rounded-lg border p-4">
+                <div className="text-sm font-medium">{a.assumption}</div>
+                <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                  {a.reasoning}
+                </p>
+
+                {a.affectedAreas.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {a.affectedAreas.map((area) => (
+                      <Badge
+                        key={area}
+                        variant="secondary"
+                        className="text-[10px]"
+                      >
+                        {area}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
+                <Separator className="my-3" />
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    disabled={isLoading}
+                    loading={acceptingIndex === i}
+                    onClick={() => handleAccept(i, a.assumption)}
                   >
-                    {opt}
-                  </Badge>
-                ))}
+                    <Check className="size-3.5" />
+                    Accept
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={isLoading}
+                    loading={removingIndex === i}
+                    onClick={() => handleRemove(i, a.assumption)}
+                  >
+                    <X className="size-3.5" />
+                    Reject
+                  </Button>
+                  <Button variant="ghost" size="sm" disabled={isLoading}>
+                    <MessageCircle className="size-3.5" />
+                    Talk
+                  </Button>
+                </div>
               </div>
-            )}
-
-            <Separator className="my-3" />
-
-            <div className="flex gap-2">
-              <Button variant="default" size="sm">
-                <Lightbulb className="size-3.5" />
-                Make a decision
-              </Button>
-              <Button variant="outline" size="sm">
-                <MessageCircle className="size-3.5" />
-                Start a chat
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-    ) : (
-      <p className="text-muted-foreground text-sm">No open questions yet</p>
-    )}
-    <Button variant="outline" size="sm" className="self-start">
-      <Plus className="size-3.5" />
-      Add question
-    </Button>
-  </Card>
-);
-
-const AssumptionsSection = ({ soul }: { soul: ProjectSoul }) => (
-  <Card className="flex flex-col gap-3 p-5">
-    <SectionHeader
-      icon={<ShieldAlert className="size-4" />}
-      title="Assumptions"
-      count={soul.assumptions.length}
-      action={<EditButton />}
-    />
-    {soul.assumptions.length > 0 ? (
-      <div className="flex flex-col gap-3">
-        {soul.assumptions.map((a, i) => (
-          <div key={i} className="rounded-lg border p-4">
-            <div className="text-sm font-medium">{a.assumption}</div>
-            <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
-              {a.reasoning}
-            </p>
-
-            {a.affectedAreas.length > 0 && (
-              <div className="mt-2 flex flex-wrap gap-1.5">
-                {a.affectedAreas.map((area) => (
-                  <Badge key={area} variant="secondary" className="text-[10px]">
-                    {area}
-                  </Badge>
-                ))}
-              </div>
-            )}
-
-            <Separator className="my-3" />
-
-            <div className="flex gap-2">
-              <Button variant="default" size="sm">
-                <Check className="size-3.5" />
-                Accept
-              </Button>
-              <Button variant="outline" size="sm">
-                <X className="size-3.5" />
-                Reject
-              </Button>
-              <Button variant="ghost" size="sm">
-                <MessageCircle className="size-3.5" />
-                Talk
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
-    ) : (
-      <p className="text-muted-foreground text-sm">No assumptions yet</p>
-    )}
-  </Card>
-);
+            );
+          })}
+        </div>
+      ) : (
+        <p className="text-muted-foreground text-sm">No assumptions yet</p>
+      )}
+    </Card>
+  );
+};
 
 const DomainContextSection = ({ soul }: { soul: ProjectSoul }) => (
   <Card className="flex flex-col gap-3 p-5">
     <SectionHeader
       icon={<BookOpen className="size-4" />}
       title="Domain Context"
-      action={<EditButton />}
+      // action={<EditButton />}
     />
     {soul.domainContext.length > 0 ? (
       <ul className="flex flex-col gap-1.5">

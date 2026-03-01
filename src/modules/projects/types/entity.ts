@@ -25,6 +25,7 @@ export type ProjectEntity = {
   startedAt: Date;
   status: ProjectStatus;
   activated: boolean;
+  soul: ProjectSoul | null;
 };
 
 export type ProjectStatus =
@@ -156,6 +157,12 @@ export const PROJECT_SOUL_SCHEMA = z.object({
         topic: z.string(),
         context: z.string().optional().describe('Why this needs deciding'),
         status: z.enum(['discussed_unresolved', 'not_discussed']),
+        impact: z.enum(['blocking', 'important', 'minor']),
+        impactReason: z
+          .string()
+          .describe(
+            'One sentence: what gets stuck or degraded if this stays unresolved',
+          ),
         suggestedOptions: z
           .array(z.string())
           .optional()

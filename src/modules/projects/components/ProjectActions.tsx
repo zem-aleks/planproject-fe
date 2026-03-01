@@ -2,11 +2,13 @@ import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import { BrainstormForm } from '@/modules/soul/components/BrainstormForm';
 import { notReachable } from '@/utils/notReachable';
 
 export type Msg =
   | { type: 'onProjectStarted' }
-  | { type: 'onPhasesChanged'; phases: PhaseEntity[] };
+  | { type: 'onPhasesChanged'; phases: PhaseEntity[] }
+  | { type: 'onSoulChanged' };
 
 export const ProjectActions = ({
   project,
@@ -22,16 +24,28 @@ export const ProjectActions = ({
     case 'onHold':
     case 'cancelled':
     case 'soulBuilding':
-    case 'soulDone':
     case 'soulError':
       return null;
 
     case 'active':
-      return <ProjectProgressCard project={project} />;
+      return (
+        <>
+          <BrainstormForm
+            project={project}
+            onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
+          />
+          <ProjectProgressCard project={project} />
+        </>
+      );
 
+    case 'soulDone':
     case 'analyzing':
       return (
-        <div className={'flex flex-col items-center gap-2'}>
+        <div className="grid grid-cols-1 gap-4">
+          <BrainstormForm
+            project={project}
+            onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
+          />
           <StartProjectForm
             project={project}
             onStarted={() => onMsg({ type: 'onProjectStarted' })}

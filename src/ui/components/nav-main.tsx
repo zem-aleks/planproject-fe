@@ -5,6 +5,7 @@ import {
   EqualApproximately,
   Lock,
   Map,
+  MessageCircle,
   PersonStanding,
   Zap,
 } from 'lucide-react';
@@ -98,6 +99,16 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
 
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}/chat`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/chat`}
+              >
+                <MessageCircle />
+                <span>Chat</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <Link to={`/project/${project.id}/competitors`}>
               <SidebarMenuButton
