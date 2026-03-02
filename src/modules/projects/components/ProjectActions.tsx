@@ -1,8 +1,8 @@
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
-import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
-import { BrainstormForm } from '@/modules/soul/components/BrainstormForm';
+import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import { SoulActionButtons } from '@/modules/soul/components/SoulActionButtons';
 import { notReachable } from '@/utils/notReachable';
 
 export type Msg =
@@ -30,7 +30,7 @@ export const ProjectActions = ({
     case 'active':
       return (
         <>
-          <BrainstormForm
+          <SoulActionButtons
             project={project}
             onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
           />
@@ -42,7 +42,7 @@ export const ProjectActions = ({
     case 'analyzing':
       return (
         <div className="grid grid-cols-1 gap-4">
-          <BrainstormForm
+          <SoulActionButtons
             project={project}
             onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
           />
@@ -50,17 +50,6 @@ export const ProjectActions = ({
             project={project}
             onStarted={() => onMsg({ type: 'onProjectStarted' })}
           />
-
-          {/*<div className={'relative flex w-40 items-center justify-center'}>*/}
-          {/*  <div className={'absolute w-full border-b'} />*/}
-          {/*  <div*/}
-          {/*    className={*/}
-          {/*      'text-muted-foreground relative rounded bg-white px-2 text-sm'*/}
-          {/*    }*/}
-          {/*  >*/}
-          {/*    or*/}
-          {/*  </div>*/}
-          {/*</div>*/}
         </div>
       );
 

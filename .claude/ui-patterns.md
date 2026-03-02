@@ -11,7 +11,7 @@ Custom components in `src/ui/custom/`: DaysCounter, MarkdownFormat, InputArray, 
 ## Key Component APIs
 
 ### Button (`@/ui/button`)
-- Variants: `default | warning | destructive | outline | secondary | ghost | link`
+- Variants: `default | success | warning | destructive | outline | secondary | ghost | link`
 - Sizes: `default | sm | lg | icon`
 - Props: `loading?: boolean`, `asChild?: boolean`
 - Icons auto-size to `size-4` via `[&_svg:not([class*='size-'])]:size-4`

@@ -40,7 +40,7 @@ Each module follows the pattern: `api/`, `components/`, `pages/`, `types/`, and 
 | `chat/` | Project-scoped AI chat with SSE streaming | `ChatPage` (list), `ChatViewPage` (single chat), `ChatConversation`, `ChatMessageBubble`, `ChatInput`, `useChatStream` |
 | `dashboard/` | Main project dashboard | `DashboardPage`, `DashboardShaping`, `WelcomeModal`, `ChatsTable`, `RoadmapPage` |
 | `shaping/` | AI-driven project shaping conversation | `ShapingModal`, `ShapingForm`, `ShapingChatForm`, `ShapingSummary`, `SummaryReview` |
-| `soul/` | Project soul visualization | `SoulBlock` |
+d| `soul/` | Project soul visualization & queue | `SoulBlock`, `SoulQueueSnackbar`, `SoulActionButtons`, `WorkstreamsPage`, `DecisionsPage`, `OpenQuestionsPage`, `AssumptionsPage`, `api/addToSoulQueue`, `api/removeFromSoulQueue`, `api/applySoulQueue` |
 | `timeline/` | Daily timeline & history | `TodayTimelineLoader`, `HistoryTimelineLoader`, `Timeline`, `FocusComment`, `StartNewMilestoneForm` |
 | `subscriptions/` | Billing, pricing, Stripe | `PricingCards`, `UpgradeSubscriptionModal`, `ActiveProjectGuard`, `data/prices.ts` |
 | `home/` | Public landing pages | `HomePage`, `PricingPage`, `StaticPage` (terms/privacy) |

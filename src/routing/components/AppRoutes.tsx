@@ -20,6 +20,10 @@ import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
 import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.tsx';
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
+import { AssumptionsPage } from '@/modules/soul/pages/AssumptionsPage';
+import { DecisionsPage } from '@/modules/soul/pages/DecisionsPage';
+import { OpenQuestionsPage } from '@/modules/soul/pages/OpenQuestionsPage';
+import { WorkstreamsPage } from '@/modules/soul/pages/WorkstreamsPage';
 import { CheckoutSuccessPage } from '@/modules/subscriptions/pages/CheckoutSuccessPage';
 import { TimelinePage } from '@/modules/timeline/pages/TimelinePage';
 import { AccountPage } from '@/modules/users/pages/AccountPage';
@@ -151,6 +155,39 @@ export const AppRoutes = () => {
           element={
             <InternalElement>
               <ChatViewPage />
+            </InternalElement>
+          }
+        />
+
+        <Route
+          path="/project/:projectId/open-questions"
+          element={
+            <InternalElement>
+              <OpenQuestionsPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/assumptions"
+          element={
+            <InternalElement>
+              <AssumptionsPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/workstreams"
+          element={
+            <InternalElement>
+              <WorkstreamsPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/decisions"
+          element={
+            <InternalElement>
+              <DecisionsPage />
             </InternalElement>
           }
         />

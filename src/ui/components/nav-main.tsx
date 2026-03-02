@@ -2,11 +2,15 @@ import { Link, useLocation } from 'react-router';
 
 import {
   ChartGantt,
+  ClipboardCheck,
   EqualApproximately,
+  Layers,
+  Lightbulb,
   Lock,
   Map,
   MessageCircle,
   PersonStanding,
+  ShieldAlert,
   Zap,
 } from 'lucide-react';
 
@@ -85,6 +89,46 @@ export function NavMain() {
             </Link>
           </SidebarMenuItem>
           <SidebarMenuItem>
+            <Link to={`/project/${project.id}/open-questions`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/open-questions`}
+              >
+                <ClipboardCheck />
+                <span>Open Questions</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}/assumptions`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/assumptions`}
+              >
+                <ShieldAlert />
+                <span>Assumptions</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}/workstreams`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/workstreams`}
+              >
+                <Layers />
+                <span>Workstreams</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <Link to={`/project/${project.id}/decisions`}>
+              <SidebarMenuButton
+                isActive={pathname === `/project/${project.id}/decisions`}
+              >
+                <Lightbulb />
+                <span>Decisions</span>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <Link to={`/project/${project.id}/roadmap`}>
               <SidebarMenuButton
                 isActive={pathname === `/project/${project.id}/roadmap`}
@@ -105,7 +149,7 @@ export function NavMain() {
                 isActive={pathname === `/project/${project.id}/chat`}
               >
                 <MessageCircle />
-                <span>Chat</span>
+                <span>Chats</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>

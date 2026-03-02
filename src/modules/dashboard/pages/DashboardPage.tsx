@@ -1,91 +1,111 @@
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { WelcomeModal } from '@/modules/dashboard/components/WelcomeModal';
 import { getProject } from '@/modules/projects/api/getProject';
 import { ProjectActions } from '@/modules/projects/components/ProjectActions';
 import { ProjectHeading } from '@/modules/projects/components/ProjectHeading';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
-import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { InitSoulForm } from '@/modules/soul/components/InitSoulForm';
 import { SoulBlock } from '@/modules/soul/components/SoulBlock';
+import { SoulQueueSnackbar } from '@/modules/soul/components/SoulQueueSnackbar';
 import { ActiveProjectGuard } from '@/modules/subscriptions/guards/ActiveProjectGuard';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
+import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
+import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
 import { useReloadableData } from '@/utils/useReloadableData';
 
 export const DashboardPage = () => {
-  const { project: contextProject, reload: reloadContext } =
-    useProjectByUrlParam();
+  const { projectId } = useParams<{ projectId: string }>();
 
-  if (!contextProject || contextProject.status === 'draft') {
+  if (!projectId) {
     return <ProjectNotFound />;
   }
 
   return (
     <ActiveProjectGuard>
       <WelcomeModal />
-      <DashboardLoader
-        contextProject={contextProject}
-        reloadContext={reloadContext}
-      />
+      <DashboardLoader projectId={projectId} />
     </ActiveProjectGuard>
   );
 };
 
-const DashboardLoader = ({
-  contextProject,
-  reloadContext,
-}: {
-  contextProject: ProjectPreviewEntity;
-  reloadContext: () => void;
-}) => {
-  const { state, reload } = useReloadableData(getProject, contextProject.id);
+const DashboardLoader = ({ projectId }: { projectId: string }) => {
+  const { state, reload } = useReloadableData(getProject, projectId);
 
-  const reloadAll = () => {
-    reload();
-    reloadContext();
-  };
+  switch (state.type) {
+    case 'loading':
+      return (
+        <PageTemplate
+          header={{
+            breadcrumbs: [{ title: 'Projects', href: '/projects' }],
+            title: 'Loading…',
+          }}
+        >
+          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+            <Card className="flex items-center gap-3 p-5">
+              <Spinner className="size-5" />
+              <span className="text-muted-foreground text-sm">
+                Loading project…
+              </span>
+            </Card>
+          </div>
+        </PageTemplate>
+      );
 
-  // Use loaded data merged with context soul, or fall back to context project
-  const project: ProjectPreviewEntity = (() => {
-    switch (state.type) {
-      case 'loaded':
-      case 'reloading':
-        return {
-          ...contextProject,
-          ...state.data,
-          soul: state.data.soul ?? contextProject.soul,
-        };
-      case 'loading':
-      case 'error':
-        return contextProject;
-      default:
-        return notReachable(state);
-    }
-  })();
+    case 'error':
+      return (
+        <PageTemplate
+          header={{
+            breadcrumbs: [{ title: 'Projects', href: '/projects' }],
+            title: 'Error',
+          }}
+        >
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8">
+            <p className="text-muted-foreground text-sm">
+              Failed to load project
+            </p>
+            <Button variant="outline" size="sm" onClick={reload}>
+              Try again
+            </Button>
+          </div>
+        </PageTemplate>
+      );
 
-  return (
-    <PageTemplate
-      header={{
-        breadcrumbs: [{ title: 'Projects', href: '/projects' }],
-        title: project.title,
-      }}
-    >
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        {project.status === 'active' && (
-          <DaysCounter
-            startedAt={project.startedAt}
-            daysCount={project.daysNeeded}
-          />
-        )}
-        <ProjectHeading project={project} />
-        <DashboardContent project={project} onChanged={reloadAll} />
-      </div>
-    </PageTemplate>
-  );
+    case 'loaded':
+    case 'reloading':
+      if (state.data.status === 'draft') {
+        return <ProjectNotFound />;
+      }
+      return (
+        <>
+          <PageTemplate
+            header={{
+              breadcrumbs: [{ title: 'Projects', href: '/projects' }],
+              title: state.data.title,
+            }}
+          >
+            <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+              {state.data.status === 'active' && (
+                <DaysCounter
+                  startedAt={state.data.startedAt}
+                  daysCount={state.data.daysNeeded}
+                />
+              )}
+              <ProjectHeading project={state.data} />
+              <DashboardContent project={state.data} onChanged={reload} />
+            </div>
+          </PageTemplate>
+          <SoulQueueSnackbar project={state.data} onProjectChanged={reload} />
+        </>
+      );
+
+    default:
+      return notReachable(state);
+  }
 };
 
 const DashboardContent = ({
@@ -150,7 +170,7 @@ const DashboardContent = ({
               }
             }}
           />
-          <SoulBlock project={project} onProjectChanged={onChanged} />
+          <SoulBlock project={project} />
         </>
       );
 
@@ -188,7 +208,7 @@ const DashboardContent = ({
             }}
           />
 
-          <SoulBlock project={project} onProjectChanged={onChanged} />
+          <SoulBlock project={project} />
         </>
       );
 

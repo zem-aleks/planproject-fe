@@ -152,7 +152,7 @@ export const BrainstormForm = ({
       }}
     >
       <DialogTrigger asChild>
-        <Button className="w-full" variant="secondary">
+        <Button variant="default">
           <MessageCircle className="size-4" />
           Brainstorm Project
         </Button>

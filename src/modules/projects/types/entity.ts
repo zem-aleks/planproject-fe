@@ -10,6 +10,9 @@ export type ProjectPreviewEntity = {
   startedAt: Date;
   activated: boolean;
   soul: ProjectSoul | null;
+  soulQueue: SoulOperation[];
+  soulQueueStartedAt: Date | null;
+  soulQueueApplying: boolean;
 };
 
 export type ProjectEntity = {
@@ -26,6 +29,9 @@ export type ProjectEntity = {
   status: ProjectStatus;
   activated: boolean;
   soul: ProjectSoul | null;
+  soulQueue: SoulOperation[];
+  soulQueueStartedAt: Date | null;
+  soulQueueApplying: boolean;
 };
 
 export type ProjectStatus =
@@ -192,3 +198,18 @@ export const PROJECT_SOUL_SCHEMA = z.object({
 });
 
 export type ProjectSoul = z.infer<typeof PROJECT_SOUL_SCHEMA>;
+
+export type SoulOperation =
+  | {
+      id: string;
+      type: 'answer_open_question';
+      topic: string;
+      chosenOption: string;
+    }
+  | { id: string; type: 'remove_open_question'; topic: string }
+  | { id: string; type: 'accept_assumption'; assumption: string }
+  | { id: string; type: 'remove_assumption'; assumption: string };
+
+export type SoulOperationInput = {
+  [K in SoulOperation['type']]: Omit<Extract<SoulOperation, { type: K }>, 'id'>;
+}[SoulOperation['type']];
