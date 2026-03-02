@@ -88,6 +88,10 @@ const DashboardContent = ({
                   navigate(`/project/${project.id}/focus`);
                   break;
 
+                case 'onPlanBuilt':
+                  onChanged();
+                  break;
+
                 case 'onPhasesChanged':
                   onChanged();
                   break;
@@ -123,6 +127,10 @@ const DashboardContent = ({
                 case 'onProjectStarted':
                   onChanged();
                   navigate(`/project/${project.id}/focus`);
+                  break;
+
+                case 'onPlanBuilt':
+                  onChanged();
                   break;
 
                 case 'onPhasesChanged':

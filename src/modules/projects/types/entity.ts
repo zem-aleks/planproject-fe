@@ -215,6 +215,14 @@ export type SoulOperation =
       description: string;
       proposalId: string;
       messageId: string;
+    }
+  | {
+      id: string;
+      type: 'apply_plan_proposal';
+      description: string;
+      proposalId: string;
+      messageId: string;
+      changes: { soul?: string; plan?: string };
     };
 
 export type SoulOperationInput = {

@@ -1,5 +1,6 @@
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
+import { BuildPlanForm } from '@/modules/projects/components/forms/BuildPlanForm';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
 import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { SoulActionButtons } from '@/modules/soul/components/SoulActionButtons';
@@ -7,6 +8,7 @@ import { notReachable } from '@/utils/notReachable';
 
 export type Msg =
   | { type: 'onProjectStarted' }
+  | { type: 'onPlanBuilt' }
   | { type: 'onPhasesChanged'; phases: PhaseEntity[] }
   | { type: 'onSoulChanged' };
 
@@ -39,6 +41,19 @@ export const ProjectActions = ({
       );
 
     case 'soulDone':
+      return (
+        <div className="grid grid-cols-1 gap-4">
+          <SoulActionButtons
+            project={project}
+            onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
+          />
+          <BuildPlanForm
+            project={project}
+            onPlanBuilt={() => onMsg({ type: 'onPlanBuilt' })}
+          />
+        </div>
+      );
+
     case 'analyzing':
       return (
         <div className="grid grid-cols-1 gap-4">
@@ -49,6 +64,10 @@ export const ProjectActions = ({
           <StartProjectForm
             project={project}
             onStarted={() => onMsg({ type: 'onProjectStarted' })}
+          />
+          <BuildPlanForm
+            project={project}
+            onPlanBuilt={() => onMsg({ type: 'onPlanBuilt' })}
           />
         </div>
       );

@@ -1,7 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
-import { sendChatMessage } from '@/modules/chat/api/sendChatMessage';
+import {
+  type ProposalProgressStage,
+  sendChatMessage,
+} from '@/modules/chat/api/sendChatMessage';
 import type { ChatMessage } from '@/modules/chat/types/entity';
 
 type UseChatStreamParams = {
@@ -25,6 +28,9 @@ export const useChatStream = ({
 }: UseChatStreamParams) => {
   const { session } = useAuthSession();
   const [isStreaming, setIsStreaming] = useState(false);
+  const [toolCallName, setToolCallName] = useState<string | null>(null);
+  const [proposalStage, setProposalStage] =
+    useState<ProposalProgressStage | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
   const sendMessage = useCallback(
@@ -53,17 +59,36 @@ export const useChatStream = ({
           text,
           session.access_token,
           {
-            onChunk: onAssistantChunk,
-            onConfirm,
+            onChunk: (content) => {
+              setToolCallName(null);
+              setProposalStage(null);
+              onAssistantChunk(content);
+            },
+            onToolCall: (name) => {
+              setToolCallName(name);
+              setProposalStage(null);
+            },
+            onProposalProgress: (stage) => {
+              setProposalStage(stage);
+            },
+            onConfirm: (proposal) => {
+              setToolCallName(null);
+              setProposalStage(null);
+              onConfirm(proposal);
+            },
             onDone: (messageId, chatName) => {
               settled = true;
               setIsStreaming(false);
+              setToolCallName(null);
+              setProposalStage(null);
               controllerRef.current = null;
               onAssistantDone(messageId, chatName);
             },
             onError: () => {
               settled = true;
               setIsStreaming(false);
+              setToolCallName(null);
+              setProposalStage(null);
               controllerRef.current = null;
               onError();
             },
@@ -75,6 +100,8 @@ export const useChatStream = ({
       } finally {
         if (!settled) {
           setIsStreaming(false);
+          setToolCallName(null);
+          setProposalStage(null);
           controllerRef.current = null;
           onError();
         }
@@ -97,7 +124,9 @@ export const useChatStream = ({
     controllerRef.current?.abort();
     controllerRef.current = null;
     setIsStreaming(false);
+    setToolCallName(null);
+    setProposalStage(null);
   }, []);
 
-  return { sendMessage, isStreaming, abort };
+  return { sendMessage, isStreaming, toolCallName, proposalStage, abort };
 };

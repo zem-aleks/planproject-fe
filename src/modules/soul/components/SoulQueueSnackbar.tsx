@@ -52,6 +52,7 @@ const getOperationLabel = (op: SoulOperation): string => {
     case 'remove_assumption':
       return `Reject assumption "${op.assumption}"`;
     case 'apply_proposal':
+    case 'apply_plan_proposal':
       return `Chat proposal: ${truncate(op.description, 60)}`;
     default:
       return notReachable(op);
@@ -148,7 +149,7 @@ export const SoulQueueSnackbar = ({
       const updated = await removeFromSoulQueue(project.id, {
         operationId: op.id,
       });
-      if (op.type === 'apply_proposal') {
+      if (op.type === 'apply_proposal' || op.type === 'apply_plan_proposal') {
         onApplyProposalReverted?.(op.messageId, op.proposalId);
       }
       queryClient.setQueryData(queryKeys.projects.detail(project.id), updated);

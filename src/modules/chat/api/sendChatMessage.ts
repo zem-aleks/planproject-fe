@@ -1,7 +1,11 @@
 import { ENV } from '@/modules/config';
 
+export type ProposalProgressStage = 'analyzing' | 'generating_changes';
+
 type SSECallbacks = {
   onChunk: (content: string) => void;
+  onToolCall: (name: string) => void;
+  onProposalProgress: (stage: ProposalProgressStage) => void;
   onConfirm: (proposal: { id: string; description: string }) => void;
   onDone: (messageId: string, chatName?: string) => void;
   onError: (messageId: string | null) => void;
@@ -46,6 +50,12 @@ export const sendChatMessage = async (
       switch (data.type) {
         case 'chunk':
           callbacks.onChunk(data.content);
+          return false;
+        case 'tool_call':
+          callbacks.onToolCall(data.name);
+          return false;
+        case 'proposal_progress':
+          callbacks.onProposalProgress(data.stage);
           return false;
         case 'confirm':
           callbacks.onConfirm({

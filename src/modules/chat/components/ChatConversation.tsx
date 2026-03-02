@@ -1,11 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { AxiosError } from 'axios';
-import { Bot, MessageCircle } from 'lucide-react';
+import {
+  Bot,
+  FileSearch,
+  Flag,
+  MessageCircle,
+  Route,
+  Search,
+  Sparkles,
+  Wrench,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { queryKeys } from '@/lib/queryKeys';
 import { getChat } from '@/modules/chat/api/getChat';
+import type { ProposalProgressStage } from '@/modules/chat/api/sendChatMessage';
 import { ChatInput } from '@/modules/chat/components/ChatInput';
 import { ChatMessageBubble } from '@/modules/chat/components/ChatMessageBubble';
 import { useChatStream } from '@/modules/chat/helpers/useChatStream';
@@ -108,64 +118,65 @@ export const ChatConversation = ({
     [onProjectUpdated],
   );
 
-  const { sendMessage, isStreaming, abort } = useChatStream({
-    projectId,
-    chatId,
-    onUserMessage: (msg) => {
-      setLocalMessages((prev) => [...prev, msg]);
-      setStreamingContent('');
-      setStreamingProposals([]);
-      scrollToBottom();
-    },
-    onAssistantChunk: (content) => {
-      setStreamingContent((prev) => prev + content);
-      scrollToBottom();
-    },
-    onConfirm: (proposal) => {
-      setStreamingProposals((prev) => [
-        ...prev,
-        { ...proposal, status: 'pending' },
-      ]);
-      scrollToBottom();
-    },
-    onAssistantDone: (messageId, chatName) => {
-      setStreamingContent((prev) => {
-        setStreamingProposals((currentProposals) => {
-          const finalMessage: ChatMessage = {
-            id: messageId,
-            role: 'assistant',
-            content: prev,
-            proposals: currentProposals,
-            createdAt: new Date().toISOString(),
-          };
-          setLocalMessages((msgs) => [...msgs, finalMessage]);
-          return [];
+  const { sendMessage, isStreaming, toolCallName, proposalStage, abort } =
+    useChatStream({
+      projectId,
+      chatId,
+      onUserMessage: (msg) => {
+        setLocalMessages((prev) => [...prev, msg]);
+        setStreamingContent('');
+        setStreamingProposals([]);
+        scrollToBottom();
+      },
+      onAssistantChunk: (content) => {
+        setStreamingContent((prev) => prev + content);
+        scrollToBottom();
+      },
+      onConfirm: (proposal) => {
+        setStreamingProposals((prev) => [
+          ...prev,
+          { ...proposal, status: 'pending' },
+        ]);
+        scrollToBottom();
+      },
+      onAssistantDone: (messageId, chatName) => {
+        setStreamingContent((prev) => {
+          setStreamingProposals((currentProposals) => {
+            const finalMessage: ChatMessage = {
+              id: messageId,
+              role: 'assistant',
+              content: prev,
+              proposals: currentProposals,
+              createdAt: new Date().toISOString(),
+            };
+            setLocalMessages((msgs) => [...msgs, finalMessage]);
+            return [];
+          });
+          return '';
         });
-        return '';
-      });
-      if (chatName) {
-        onChatNameChange?.(chatName);
-      }
-      scrollToBottom();
-    },
-    onError: () => {
-      toast.error('Failed to get response');
-      setStreamingContent((prev) => {
-        if (prev) {
-          const partial: ChatMessage = {
-            id: crypto.randomUUID(),
-            role: 'assistant',
-            content: prev,
-            proposals: [],
-            createdAt: new Date().toISOString(),
-          };
-          setLocalMessages((msgs) => [...msgs, partial]);
+        if (chatName) {
+          onChatNameChange?.(chatName);
         }
-        return '';
-      });
-      setStreamingProposals([]);
-    },
-  });
+        scrollToBottom();
+      },
+      onError: () => {
+        toast.error('Failed to get response');
+        setStreamingContent((prev) => {
+          if (prev) {
+            const partial: ChatMessage = {
+              id: crypto.randomUUID(),
+              role: 'assistant',
+              content: prev,
+              proposals: [],
+              createdAt: new Date().toISOString(),
+            };
+            setLocalMessages((msgs) => [...msgs, partial]);
+          }
+          return '';
+        });
+        setStreamingProposals([]);
+      },
+    });
 
   switch (status) {
     case 'pending':
@@ -208,22 +219,38 @@ export const ChatConversation = ({
                 onProposalStatusChange={handleProposalStatusChange}
               />
             ))}
-            {isStreaming && !streamingContent && <ThinkingBubble />}
-            {isStreaming && streamingContent && (
-              <ChatMessageBubble
-                message={{
-                  id: 'streaming',
-                  role: 'assistant',
-                  content: streamingContent,
-                  proposals: [],
-                  createdAt: new Date().toISOString(),
-                }}
-                isStreaming
-                proposals={streamingProposals}
-                projectId={projectId}
-                chatId={chatId}
-                onProposalStatusChange={handleProposalStatusChange}
+            {isStreaming && !streamingContent && !toolCallName && (
+              <ThinkingBubble />
+            )}
+            {isStreaming && !streamingContent && toolCallName && (
+              <ToolCallBubble
+                name={toolCallName}
+                proposalStage={proposalStage}
               />
+            )}
+            {isStreaming && streamingContent && (
+              <>
+                <ChatMessageBubble
+                  message={{
+                    id: 'streaming',
+                    role: 'assistant',
+                    content: streamingContent,
+                    proposals: [],
+                    createdAt: new Date().toISOString(),
+                  }}
+                  isStreaming={!toolCallName}
+                  proposals={streamingProposals}
+                  projectId={projectId}
+                  chatId={chatId}
+                  onProposalStatusChange={handleProposalStatusChange}
+                />
+                {toolCallName && (
+                  <ToolCallBubble
+                    name={toolCallName}
+                    proposalStage={proposalStage}
+                  />
+                )}
+              </>
             )}
           </div>
 
@@ -252,6 +279,49 @@ const ThinkingBubble = () => (
     </div>
   </div>
 );
+
+const TOOL_CALL_CONFIG: Record<string, { label: string; icon: typeof Search }> =
+  {
+    search_chats: { label: 'Searching chats', icon: Search },
+    load_phases: { label: 'Loading phases', icon: Route },
+    load_milestones: { label: 'Loading milestones', icon: Flag },
+    propose_plan_update: { label: 'Preparing suggestion', icon: Sparkles },
+  };
+
+const PROPOSAL_STAGE_CONFIG: Record<
+  ProposalProgressStage,
+  { label: string; icon: typeof Search }
+> = {
+  analyzing: { label: 'Analyzing current plan', icon: FileSearch },
+  generating_changes: { label: 'Generating changes', icon: Wrench },
+};
+
+const ToolCallBubble = ({
+  name,
+  proposalStage,
+}: {
+  name: string;
+  proposalStage: ProposalProgressStage | null;
+}) => {
+  const stageConfig = proposalStage
+    ? PROPOSAL_STAGE_CONFIG[proposalStage]
+    : null;
+  const toolConfig = TOOL_CALL_CONFIG[name];
+  const Icon = stageConfig?.icon ?? toolConfig?.icon ?? Search;
+  const label = stageConfig?.label ?? toolConfig?.label ?? 'Thinking';
+
+  return (
+    <div className="flex gap-3">
+      <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full">
+        <Bot className="size-4" />
+      </div>
+      <div className="bg-muted text-muted-foreground flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm">
+        <Icon className="size-3.5 animate-pulse" />
+        <span>{label}&#8230;</span>
+      </div>
+    </div>
+  );
+};
 
 const SOUL_CONTEXT_LABELS: Partial<Record<ChatContext['type'], string>> = {
   open_question: 'Open Question',
