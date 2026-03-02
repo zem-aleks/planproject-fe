@@ -7,10 +7,14 @@ import { toast } from 'sonner';
 import { createChat } from '@/modules/chat/api/createChat';
 import { deleteChat } from '@/modules/chat/api/deleteChat';
 import { getChats } from '@/modules/chat/api/getChats';
-import type { ChatPreviewEntity } from '@/modules/chat/types/entity';
+import type {
+  ChatContext,
+  ChatPreviewEntity,
+} from '@/modules/chat/types/entity';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
+import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Spinner } from '@/ui/spinner';
@@ -85,6 +89,21 @@ const ChatListContent = ({ projectId }: { projectId: string }) => {
     });
   };
 
+  const contextTypeLabel = (type: ChatContext['type']): string | null => {
+    switch (type) {
+      case 'open_question':
+        return 'Open Question';
+      case 'workstream':
+        return 'Workstream';
+      case 'assumption':
+        return 'Assumption';
+      case 'decision':
+        return 'Decision';
+      default:
+        return null;
+    }
+  };
+
   const renderList = (chats: ChatPreviewEntity[]) => (
     <>
       {chats.length === 0 ? (
@@ -119,6 +138,18 @@ const ChatListContent = ({ projectId }: { projectId: string }) => {
                   <span className="text-sm font-medium">
                     {chat.name || 'New chat'}
                   </span>
+                  {chat.context && contextTypeLabel(chat.context.type) && (
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant="secondary" className="text-[10px]">
+                        {contextTypeLabel(chat.context.type)}
+                      </Badge>
+                      {chat.context.label && (
+                        <span className="text-muted-foreground truncate text-xs">
+                          {chat.context.label}
+                        </span>
+                      )}
+                    </div>
+                  )}
                   <span className="text-muted-foreground text-xs">
                     {formatDate(chat.updatedAt)}
                   </span>

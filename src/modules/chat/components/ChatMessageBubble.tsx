@@ -2,6 +2,7 @@ import { Bot, User } from 'lucide-react';
 
 import { ProposalCard } from '@/modules/chat/components/ProposalCard';
 import type { ChatMessage, ChatProposal } from '@/modules/chat/types/entity';
+import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { cn } from '@/ui/lib/utils';
 
@@ -21,6 +22,7 @@ export const ChatMessageBubble = ({
   onProposalStatusChange?: (
     proposalId: string,
     status: 'approved' | 'rejected',
+    project?: ProjectEntity,
   ) => void;
 }) => {
   const isUser = message.role === 'user';

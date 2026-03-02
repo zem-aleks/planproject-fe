@@ -1,5 +1,13 @@
 export type ChatContext = {
-  type: 'general' | 'phase' | 'milestone' | 'task';
+  type:
+    | 'general'
+    | 'phase'
+    | 'milestone'
+    | 'task'
+    | 'open_question'
+    | 'workstream'
+    | 'assumption'
+    | 'decision';
   entityId?: string;
   label?: string;
 };

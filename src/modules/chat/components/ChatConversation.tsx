@@ -1,25 +1,40 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { MessageCircle } from 'lucide-react';
+import { Bot, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { getChat } from '@/modules/chat/api/getChat';
 import { ChatInput } from '@/modules/chat/components/ChatInput';
 import { ChatMessageBubble } from '@/modules/chat/components/ChatMessageBubble';
 import { useChatStream } from '@/modules/chat/helpers/useChatStream';
-import type { ChatMessage, ChatProposal } from '@/modules/chat/types/entity';
+import type {
+  ChatContext,
+  ChatMessage,
+  ChatProposal,
+} from '@/modules/chat/types/entity';
+import type { ProjectEntity } from '@/modules/projects/types/entity';
+import { Badge } from '@/ui/badge';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
 import { useReloadableData } from '@/utils/useReloadableData';
+
+export type ProposalRevert = {
+  messageId: string;
+  proposalId: string;
+};
 
 export const ChatConversation = ({
   projectId,
   chatId,
   onChatNameChange,
+  onProjectUpdated,
+  proposalToRevert,
 }: {
   projectId: string;
   chatId: string;
   onChatNameChange?: (name: string) => void;
+  onProjectUpdated?: (project: ProjectEntity) => void;
+  proposalToRevert?: ProposalRevert | null;
 }) => {
   const { state } = useReloadableData(getChat, { projectId, chatId });
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
@@ -38,6 +53,25 @@ export const ChatConversation = ({
     }
   }, [state.type === 'loaded' && state.data.id]);
 
+  // Optimistically revert a proposal back to pending
+  useEffect(() => {
+    if (!proposalToRevert) return;
+    setLocalMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === proposalToRevert.messageId
+          ? {
+              ...msg,
+              proposals: (msg.proposals ?? []).map((p) =>
+                p.id === proposalToRevert.proposalId
+                  ? { ...p, status: 'pending' as const }
+                  : p,
+              ),
+            }
+          : msg,
+      ),
+    );
+  }, [proposalToRevert]);
+
   const scrollToBottom = useCallback(() => {
     setTimeout(() => {
       scrollRef.current?.scrollTo({
@@ -48,17 +82,24 @@ export const ChatConversation = ({
   }, []);
 
   const handleProposalStatusChange = useCallback(
-    (proposalId: string, status: 'approved' | 'rejected') => {
+    (
+      proposalId: string,
+      status: 'approved' | 'rejected',
+      project?: ProjectEntity,
+    ) => {
       setLocalMessages((prev) =>
         prev.map((msg) => ({
           ...msg,
-          proposals: msg.proposals.map((p) =>
+          proposals: (msg.proposals ?? []).map((p) =>
             p.id === proposalId ? { ...p, status } : p,
           ),
         })),
       );
+      if (project) {
+        onProjectUpdated?.(project);
+      }
     },
-    [],
+    [onProjectUpdated],
   );
 
   const { sendMessage, isStreaming, abort } = useChatStream({
@@ -139,6 +180,7 @@ export const ChatConversation = ({
     case 'loaded':
       return (
         <div className="flex flex-1 flex-col overflow-hidden">
+          <ChatContextBanner context={state.data.context} />
           <div
             ref={scrollRef}
             className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-4"
@@ -161,6 +203,7 @@ export const ChatConversation = ({
                 onProposalStatusChange={handleProposalStatusChange}
               />
             ))}
+            {isStreaming && !streamingContent && <ThinkingBubble />}
             {isStreaming && streamingContent && (
               <ChatMessageBubble
                 message={{
@@ -190,4 +233,44 @@ export const ChatConversation = ({
     default:
       return notReachable(state);
   }
+};
+
+const ThinkingBubble = () => (
+  <div className="flex gap-3">
+    <div className="bg-primary/10 text-primary flex size-8 shrink-0 items-center justify-center rounded-full">
+      <Bot className="size-4" />
+    </div>
+    <div className="bg-muted flex items-center gap-1 rounded-xl px-4 py-2.5">
+      <span className="size-1.5 animate-bounce rounded-full bg-current opacity-60 [animation-delay:0ms]" />
+      <span className="size-1.5 animate-bounce rounded-full bg-current opacity-60 [animation-delay:150ms]" />
+      <span className="size-1.5 animate-bounce rounded-full bg-current opacity-60 [animation-delay:300ms]" />
+    </div>
+  </div>
+);
+
+const SOUL_CONTEXT_LABELS: Partial<Record<ChatContext['type'], string>> = {
+  open_question: 'Open Question',
+  workstream: 'Workstream',
+  assumption: 'Assumption',
+  decision: 'Decision',
+};
+
+const ChatContextBanner = ({ context }: { context: ChatContext | null }) => {
+  if (!context) return null;
+
+  const typeLabel = SOUL_CONTEXT_LABELS[context.type];
+  if (!typeLabel) return null;
+
+  return (
+    <div className="flex items-center gap-2 border-b px-6 py-2">
+      <Badge variant="secondary" className="text-[10px]">
+        {typeLabel}
+      </Badge>
+      {context.label && (
+        <span className="text-muted-foreground truncate text-xs">
+          {context.label}
+        </span>
+      )}
+    </div>
+  );
 };

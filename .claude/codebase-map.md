@@ -28,7 +28,7 @@ Each module follows the pattern: `api/`, `components/`, `pages/`, `types/`, and 
 
 | Module | Purpose | Types | API endpoints |
 |---|---|---|---|
-| `projects/` | Project CRUD, status, forms | `types/entity.ts` — `ProjectPreviewEntity`, `ProjectEntity`, `ProjectSoul`, `ProjectStatus` | `getProjects`, `getProject`, `createProject`, `updateProject`, `deleteProject`, `startProject`, `unlockProject`, `getProjectProgress` |
+| `projects/` | Project CRUD, status, forms | `types/entity.ts` — `ProjectPreviewEntity`, `ProjectEntity`, `ProjectSoul`, `ProjectStatus`; `components/ProjectPageLoader.tsx` — reusable project loader with loading/error states, provides `{ project, reload, setProject }` | `getProjects`, `getProject`, `createProject`, `updateProject`, `deleteProject`, `startProject`, `unlockProject`, `getProjectProgress` |
 | `phases/` | Phase management within projects | `types/entity.ts` | `getPhases`, `getPhase`, `startPhase`, `completePhase`, `modifyPhases` |
 | `milestones/` | Milestone tracking within phases | `types/entity.ts` | `getMilestones`, `getMilestone`, `createMilestones`, `modifyMilestones`, `startMilestone`, `completeMilestone`, `toggleStep` |
 | `tasks/` | Daily tasks within milestones | `types/entity.ts` | `getTasks`, `getActiveTasks`, `createTasks`, `completeTask` |
@@ -40,7 +40,7 @@ Each module follows the pattern: `api/`, `components/`, `pages/`, `types/`, and 
 | `chat/` | Project-scoped AI chat with SSE streaming | `ChatPage` (list), `ChatViewPage` (single chat), `ChatConversation`, `ChatMessageBubble`, `ChatInput`, `useChatStream` |
 | `dashboard/` | Main project dashboard | `DashboardPage`, `DashboardShaping`, `WelcomeModal`, `ChatsTable`, `RoadmapPage` |
 | `shaping/` | AI-driven project shaping conversation | `ShapingModal`, `ShapingForm`, `ShapingChatForm`, `ShapingSummary`, `SummaryReview` |
-d| `soul/` | Project soul visualization & queue | `SoulBlock`, `SoulQueueSnackbar`, `SoulActionButtons`, `WorkstreamsPage`, `DecisionsPage`, `OpenQuestionsPage`, `AssumptionsPage`, `api/addToSoulQueue`, `api/removeFromSoulQueue`, `api/applySoulQueue` |
+| `soul/` | Project soul visualization & queue | `SoulBlock`, `SoulQueueSnackbar`, `SoulActionButtons`, `WorkstreamsPage`, `DecisionsPage`, `OpenQuestionsPage`, `AssumptionsPage`, `api/addToSoulQueue`, `api/removeFromSoulQueue`, `api/applySoulQueue` |
 | `timeline/` | Daily timeline & history | `TodayTimelineLoader`, `HistoryTimelineLoader`, `Timeline`, `FocusComment`, `StartNewMilestoneForm` |
 | `subscriptions/` | Billing, pricing, Stripe | `PricingCards`, `UpgradeSubscriptionModal`, `ActiveProjectGuard`, `data/prices.ts` |
 | `home/` | Public landing pages | `HomePage`, `PricingPage`, `StaticPage` (terms/privacy) |

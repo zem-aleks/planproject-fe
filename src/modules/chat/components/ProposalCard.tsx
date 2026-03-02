@@ -6,7 +6,9 @@ import { toast } from 'sonner';
 import { approveProposal } from '@/modules/chat/api/approveProposal';
 import { rejectProposal } from '@/modules/chat/api/rejectProposal';
 import type { ChatProposal } from '@/modules/chat/types/entity';
+import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button';
+import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { cn } from '@/ui/lib/utils';
 
 export const ProposalCard = ({
@@ -18,19 +20,23 @@ export const ProposalCard = ({
   proposal: ChatProposal;
   projectId: string;
   chatId: string;
-  onStatusChange: (proposalId: string, status: 'approved' | 'rejected') => void;
+  onStatusChange: (
+    proposalId: string,
+    status: 'approved' | 'rejected',
+    project?: ProjectEntity,
+  ) => void;
 }) => {
   const [loading, setLoading] = useState<'approve' | 'reject' | null>(null);
 
   const handleApprove = async () => {
     setLoading('approve');
     try {
-      await approveProposal({
+      const project = await approveProposal({
         projectId,
         chatId,
         proposalId: proposal.id,
       });
-      onStatusChange(proposal.id, 'approved');
+      onStatusChange(proposal.id, 'approved', project);
     } catch {
       toast.error('Failed to approve proposal');
     } finally {
@@ -65,7 +71,9 @@ export const ProposalCard = ({
     >
       <div className="flex items-start gap-2">
         <Lightbulb className="text-primary mt-0.5 size-4 shrink-0" />
-        <p className="text-sm font-medium">{proposal.description}</p>
+        <div className="prose-sm text-sm font-medium">
+          <MarkdownFormat>{proposal.description}</MarkdownFormat>
+        </div>
       </div>
 
       {proposal.status === 'pending' ? (

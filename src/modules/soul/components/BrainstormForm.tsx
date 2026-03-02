@@ -69,20 +69,25 @@ export const BrainstormForm = ({
   }, [open, project.id]);
 
   const handleProposalStatusChange = useCallback(
-    (proposalId: string, status: 'approved' | 'rejected') => {
+    (
+      proposalId: string,
+      status: 'approved' | 'rejected',
+      // _project?: ProjectEntity,
+    ) => {
       if (status === 'approved') {
         hadApprovalsRef.current = true;
+        onSoulChanged();
       }
       setMessages((prev) =>
         prev.map((msg) => ({
           ...msg,
-          proposals: msg.proposals.map((p) =>
+          proposals: (msg.proposals ?? []).map((p) =>
             p.id === proposalId ? { ...p, status } : p,
           ),
         })),
       );
     },
-    [],
+    [onSoulChanged],
   );
 
   const { sendMessage, isStreaming, abort } = useChatStream({

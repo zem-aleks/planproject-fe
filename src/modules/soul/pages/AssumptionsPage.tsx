@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { Check, MessageCircle, Undo2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { getProject } from '@/modules/projects/api/getProject';
+import { createChat } from '@/modules/chat/api/createChat';
+import { ProjectPageLoader } from '@/modules/projects/components/ProjectPageLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import type {
   ProjectPreviewEntity,
@@ -20,9 +21,6 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
-import { Spinner } from '@/ui/spinner';
-import { notReachable } from '@/utils/notReachable';
-import { useReloadableData } from '@/utils/useReloadableData';
 
 export const AssumptionsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -33,58 +31,13 @@ export const AssumptionsPage = () => {
 
   return (
     <ActiveProjectGuard>
-      <AssumptionsLoader projectId={projectId} />
+      <ProjectPageLoader projectId={projectId}>
+        {({ project, reload }) => (
+          <AssumptionsContent project={project} onChanged={reload} />
+        )}
+      </ProjectPageLoader>
     </ActiveProjectGuard>
   );
-};
-
-const AssumptionsLoader = ({ projectId }: { projectId: string }) => {
-  const { state, reload } = useReloadableData(getProject, projectId);
-
-  switch (state.type) {
-    case 'loading':
-      return (
-        <PageTemplate
-          header={{
-            breadcrumbs: [{ title: 'Projects', href: '/projects' }],
-            title: 'Loading…',
-          }}
-        >
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <Card className="flex items-center gap-3 p-5">
-              <Spinner className="size-5" />
-              <span className="text-muted-foreground text-sm">Loading…</span>
-            </Card>
-          </div>
-        </PageTemplate>
-      );
-
-    case 'error':
-      return (
-        <PageTemplate
-          header={{
-            breadcrumbs: [{ title: 'Projects', href: '/projects' }],
-            title: 'Error',
-          }}
-        >
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8">
-            <p className="text-muted-foreground text-sm">
-              Failed to load project
-            </p>
-            <Button variant="outline" size="sm" onClick={reload}>
-              Try again
-            </Button>
-          </div>
-        </PageTemplate>
-      );
-
-    case 'loaded':
-    case 'reloading':
-      return <AssumptionsContent project={state.data} onChanged={reload} />;
-
-    default:
-      return notReachable(state);
-  }
 };
 
 const AssumptionsContent = ({
@@ -163,9 +116,11 @@ const AssumptionsList = ({
   projectId: string;
   onProjectChanged: () => void;
 }) => {
+  const navigate = useNavigate();
   const [acceptingIndex, setAcceptingIndex] = useState<number | null>(null);
   const [removingIndex, setRemovingIndex] = useState<number | null>(null);
   const [undoingId, setUndoingId] = useState<string | null>(null);
+  const [chattingIndex, setChattingIndex] = useState<number | null>(null);
 
   const handleAccept = async (index: number, assumption: string) => {
     setAcceptingIndex(index);
@@ -206,6 +161,21 @@ const AssumptionsList = ({
       toast.error('Failed to undo');
     } finally {
       setUndoingId(null);
+    }
+  };
+
+  const handleStartChat = async (index: number, assumption: string) => {
+    setChattingIndex(index);
+    try {
+      const chat = await createChat(projectId, {
+        type: 'assumption',
+        entityId: assumption,
+        label: assumption,
+      });
+      navigate(`/project/${projectId}/chat/${chat.id}`);
+    } catch {
+      toast.error('Failed to create chat');
+      setChattingIndex(null);
     }
   };
 
@@ -304,7 +274,13 @@ const AssumptionsList = ({
                 <X className="size-3.5" />
                 Reject
               </Button>
-              <Button variant="ghost" size="sm" disabled={isLoading}>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={isLoading || chattingIndex === i}
+                loading={chattingIndex === i}
+                onClick={() => handleStartChat(i, a.assumption)}
+              >
                 <MessageCircle className="size-3.5" />
                 Talk
               </Button>

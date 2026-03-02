@@ -12,6 +12,7 @@ import {
 import { toast } from 'sonner';
 
 import type {
+  ProjectEntity,
   ProjectPreviewEntity,
   SoulOperation,
 } from '@/modules/projects/types/entity';
@@ -29,6 +30,16 @@ const formatTimeRemaining = (seconds: number): string => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 };
 
+const truncate = (text: string, max: number): string => {
+  // Strip markdown syntax and collapse whitespace
+  const plain = text
+    .replace(/[#*_`~>\\[\]()!]/g, '')
+    .replace(/\n+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return plain.length > max ? `${plain.slice(0, max)}…` : plain;
+};
+
 const getOperationLabel = (op: SoulOperation): string => {
   switch (op.type) {
     case 'answer_open_question':
@@ -39,6 +50,8 @@ const getOperationLabel = (op: SoulOperation): string => {
       return `Accept assumption "${op.assumption}"`;
     case 'remove_assumption':
       return `Reject assumption "${op.assumption}"`;
+    case 'apply_proposal':
+      return `Chat proposal: ${truncate(op.description, 60)}`;
     default:
       return notReachable(op);
   }
@@ -47,9 +60,11 @@ const getOperationLabel = (op: SoulOperation): string => {
 export const SoulQueueSnackbar = ({
   project,
   onProjectChanged,
+  onApplyProposalReverted,
 }: {
   project: ProjectPreviewEntity;
-  onProjectChanged: () => void;
+  onProjectChanged: (project?: ProjectEntity) => void;
+  onApplyProposalReverted?: (messageId: string, proposalId: string) => void;
 }) => {
   const { soulQueue, soulQueueStartedAt, soulQueueApplying } = project;
   const [expanded, setExpanded] = useState(false);
@@ -99,8 +114,8 @@ export const SoulQueueSnackbar = ({
   const handleApplyNow = async () => {
     setApplyingManually(true);
     try {
-      await applySoulQueue(project.id);
-      onProjectChanged();
+      const updated = await applySoulQueue(project.id);
+      onProjectChanged(updated);
     } catch {
       toast.error('Failed to apply queue');
     } finally {
@@ -108,11 +123,16 @@ export const SoulQueueSnackbar = ({
     }
   };
 
-  const handleRemove = async (operationId: string) => {
-    setRemovingId(operationId);
+  const handleRemove = async (op: SoulOperation) => {
+    setRemovingId(op.id);
     try {
-      await removeFromSoulQueue(project.id, { operationId });
-      onProjectChanged();
+      const updated = await removeFromSoulQueue(project.id, {
+        operationId: op.id,
+      });
+      if (op.type === 'apply_proposal') {
+        onApplyProposalReverted?.(op.messageId, op.proposalId);
+      }
+      onProjectChanged(updated);
     } catch {
       toast.error('Failed to remove item');
     } finally {
@@ -187,7 +207,7 @@ export const SoulQueueSnackbar = ({
                     className="size-6 shrink-0"
                     disabled={removingId === op.id}
                     loading={removingId === op.id}
-                    onClick={() => handleRemove(op.id)}
+                    onClick={() => handleRemove(op)}
                   >
                     <X className="size-3.5" />
                   </Button>

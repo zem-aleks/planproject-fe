@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import { Check, MessageCircle, Undo2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { getProject } from '@/modules/projects/api/getProject';
+import { createChat } from '@/modules/chat/api/createChat';
+import { ProjectPageLoader } from '@/modules/projects/components/ProjectPageLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import type {
   ProjectPreviewEntity,
@@ -20,9 +21,6 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
-import { Spinner } from '@/ui/spinner';
-import { notReachable } from '@/utils/notReachable';
-import { useReloadableData } from '@/utils/useReloadableData';
 
 export const OpenQuestionsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -33,58 +31,13 @@ export const OpenQuestionsPage = () => {
 
   return (
     <ActiveProjectGuard>
-      <OpenQuestionsLoader projectId={projectId} />
+      <ProjectPageLoader projectId={projectId}>
+        {({ project, reload }) => (
+          <OpenQuestionsContent project={project} onChanged={reload} />
+        )}
+      </ProjectPageLoader>
     </ActiveProjectGuard>
   );
-};
-
-const OpenQuestionsLoader = ({ projectId }: { projectId: string }) => {
-  const { state, reload } = useReloadableData(getProject, projectId);
-
-  switch (state.type) {
-    case 'loading':
-      return (
-        <PageTemplate
-          header={{
-            breadcrumbs: [{ title: 'Projects', href: '/projects' }],
-            title: 'Loading…',
-          }}
-        >
-          <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-            <Card className="flex items-center gap-3 p-5">
-              <Spinner className="size-5" />
-              <span className="text-muted-foreground text-sm">Loading…</span>
-            </Card>
-          </div>
-        </PageTemplate>
-      );
-
-    case 'error':
-      return (
-        <PageTemplate
-          header={{
-            breadcrumbs: [{ title: 'Projects', href: '/projects' }],
-            title: 'Error',
-          }}
-        >
-          <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8">
-            <p className="text-muted-foreground text-sm">
-              Failed to load project
-            </p>
-            <Button variant="outline" size="sm" onClick={reload}>
-              Try again
-            </Button>
-          </div>
-        </PageTemplate>
-      );
-
-    case 'loaded':
-    case 'reloading':
-      return <OpenQuestionsContent project={state.data} onChanged={reload} />;
-
-    default:
-      return notReachable(state);
-  }
 };
 
 const OpenQuestionsContent = ({
@@ -185,10 +138,12 @@ const OpenQuestionsList = ({
   projectId: string;
   onProjectChanged: () => void;
 }) => {
+  const navigate = useNavigate();
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [answeringIndex, setAnsweringIndex] = useState<number | null>(null);
   const [removingIndex, setRemovingIndex] = useState<number | null>(null);
   const [undoingId, setUndoingId] = useState<string | null>(null);
+  const [chattingIndex, setChattingIndex] = useState<number | null>(null);
 
   const toggleSelection = (questionIndex: number, option: string) => {
     setSelections((prev) => ({
@@ -240,6 +195,21 @@ const OpenQuestionsList = ({
       toast.error('Failed to undo');
     } finally {
       setUndoingId(null);
+    }
+  };
+
+  const handleStartChat = async (index: number, topic: string) => {
+    setChattingIndex(index);
+    try {
+      const chat = await createChat(projectId, {
+        type: 'open_question',
+        entityId: topic,
+        label: topic,
+      });
+      navigate(`/project/${projectId}/chat/${chat.id}`);
+    } catch {
+      toast.error('Failed to create chat');
+      setChattingIndex(null);
     }
   };
 
@@ -385,7 +355,13 @@ const OpenQuestionsList = ({
                   Confirm answer
                 </Button>
               )}
-              <Button variant="outline" size="sm" disabled={isLoading}>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isLoading || chattingIndex === i}
+                loading={chattingIndex === i}
+                onClick={() => handleStartChat(i, q.topic)}
+              >
                 <MessageCircle className="size-3.5" />
                 Start a chat
               </Button>

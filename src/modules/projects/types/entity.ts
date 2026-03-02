@@ -208,7 +208,14 @@ export type SoulOperation =
     }
   | { id: string; type: 'remove_open_question'; topic: string }
   | { id: string; type: 'accept_assumption'; assumption: string }
-  | { id: string; type: 'remove_assumption'; assumption: string };
+  | { id: string; type: 'remove_assumption'; assumption: string }
+  | {
+      id: string;
+      type: 'apply_proposal';
+      description: string;
+      proposalId: string;
+      messageId: string;
+    };
 
 export type SoulOperationInput = {
   [K in SoulOperation['type']]: Omit<Extract<SoulOperation, { type: K }>, 'id'>;
