@@ -135,13 +135,13 @@ const WorkstreamsList = ({
                   Suggested
                 </Badge>
               )}
+              <PriorityBadge priority={ws.priority} />
             </div>
             <p className="text-muted-foreground pl-6 text-xs leading-relaxed">
               {ws.description}
             </p>
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            <PriorityBadge priority={ws.priority} />
             <Button
               variant="outline"
               size="sm"

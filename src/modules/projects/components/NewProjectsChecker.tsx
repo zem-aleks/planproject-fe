@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
+import type { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 
-import { useLoadableQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { ProjectEntity } from '@/modules/projects/types/entity';
@@ -13,6 +13,7 @@ import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable';
 import { useLoadableData } from '@/utils/useLoadableData';
+import { useQuery } from '@tanstack/react-query';
 
 type Msg =
   | { type: 'onConnected'; project: ProjectEntity }
@@ -24,30 +25,30 @@ export const NewProjectsChecker = ({
   onMsg: (msg: Msg) => void;
 }) => {
   const { clientId } = useAuthSession();
-  const { state } = useLoadableQuery<ShapingEntity | null>({
+  const { data, status } = useQuery<ShapingEntity | null, AxiosError<Error>>({
     queryKey: queryKeys.shaping.start(clientId),
     queryFn: ({ signal }) => getStartShaping(clientId, { signal }),
   });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
     case 'error':
       return null;
 
-    case 'loaded':
-      if (!state.data) {
+    case 'success':
+      if (!data) {
         onMsg({ type: 'onNothingToConnect' });
         return null;
       }
       return (
         <ShapingBinder
-          shapingId={state.data.id}
+          shapingId={data.id}
           onConnected={(project) => onMsg({ type: 'onConnected', project })}
         />
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 

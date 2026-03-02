@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { invalidationMap } from '@/lib/invalidationMap';
 import { queryKeys } from '@/lib/queryKeys';
 import type {
   ProjectPreviewEntity,
@@ -123,9 +122,19 @@ export const SoulQueueSnackbar = ({
     try {
       const updated = await applySoulQueue(project.id);
       queryClient.setQueryData(queryKeys.projects.detail(project.id), updated);
-      invalidationMap
-        .applySoulQueue(project.id)
-        .forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
+      const keysToInvalidate = [
+        queryKeys.projects.detail(project.id),
+        queryKeys.projects.list(),
+        queryKeys.phases.byProject(project.id),
+        queryKeys.projects.progress(project.id),
+        queryKeys.timeline.today(project.id),
+        queryKeys.timeline.history(project.id),
+        ['milestones'],
+        ['tasks'],
+      ];
+      keysToInvalidate.forEach((key) =>
+        queryClient.invalidateQueries({ queryKey: key }),
+      );
     } catch {
       toast.error('Failed to apply queue');
     } finally {

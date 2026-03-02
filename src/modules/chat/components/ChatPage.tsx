@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 
+import type { AxiosError } from 'axios';
 import { MessageCircle, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useReloadableQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { createChat } from '@/modules/chat/api/createChat';
 import { deleteChat } from '@/modules/chat/api/deleteChat';
@@ -21,6 +21,7 @@ import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const ChatPage = () => {
   const { project } = useProjectByUrlParam();
@@ -47,8 +48,10 @@ export const ChatPage = () => {
 };
 
 const ChatListContent = ({ projectId }: { projectId: string }) => {
-  const { state, setData } = useReloadableQuery<ChatPreviewEntity[]>({
-    queryKey: queryKeys.chats.byProject(projectId),
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.chats.byProject(projectId);
+  const { data, status } = useQuery<ChatPreviewEntity[], AxiosError<Error>>({
+    queryKey,
     queryFn: ({ signal }) => getChats(projectId, { signal }),
   });
   const [creating, setCreating] = useState(false);
@@ -72,8 +75,11 @@ const ChatListContent = ({ projectId }: { projectId: string }) => {
     setDeletingId(chat.id);
     try {
       await deleteChat({ projectId, chatId: chat.id });
-      if (state.type === 'loaded' || state.type === 'reloading') {
-        setData(state.data.filter((c) => c.id !== chat.id));
+      if (status === 'success') {
+        queryClient.setQueryData(
+          queryKey,
+          data!.filter((c) => c.id !== chat.id),
+        );
       }
     } catch {
       toast.error('Failed to delete chat');
@@ -184,17 +190,16 @@ const ChatListContent = ({ projectId }: { projectId: string }) => {
       </div>
 
       {(() => {
-        switch (state.type) {
-          case 'loading':
+        switch (status) {
+          case 'pending':
             return (
               <div className="flex items-center justify-center py-12">
                 <Spinner />
               </div>
             );
 
-          case 'loaded':
-          case 'reloading':
-            return renderList(state.data);
+          case 'success':
+            return renderList(data!);
 
           case 'error':
             return (
@@ -206,7 +211,7 @@ const ChatListContent = ({ projectId }: { projectId: string }) => {
             );
 
           default:
-            return notReachable(state);
+            return notReachable(status);
         }
       })()}
     </>

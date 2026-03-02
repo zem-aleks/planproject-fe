@@ -1,7 +1,6 @@
 import { AxiosError } from 'axios';
 import { Lightbulb } from 'lucide-react';
 
-import { useReloadableQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { getStartShaping } from '@/modules/shaping/api/getStartShaping';
@@ -21,6 +20,7 @@ import {
 } from '@/ui/dialog';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 type Msg = { type: 'onClose' };
 
@@ -46,24 +46,28 @@ export const ShapingModal = ({
 
 const ShapingContent = () => {
   const { clientId } = useAuthSession();
-  const { state, reload, setData } = useReloadableQuery<ShapingEntity | null>({
-    queryKey: queryKeys.shaping.start(clientId),
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.shaping.start(clientId);
+  const { data, error, status, refetch } = useQuery<
+    ShapingEntity | null,
+    AxiosError<Error>
+  >({
+    queryKey,
     queryFn: ({ signal }) => getStartShaping(clientId, { signal }),
   });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return <LoadingContent />;
 
-    case 'loaded':
-    case 'reloading':
-      if (!state.data) {
+    case 'success':
+      if (!data) {
         return (
           <ShapingContentInitialForm
             onMsg={(msg) => {
               switch (msg.type) {
                 case 'onFinish':
-                  setData(msg.shaping);
+                  queryClient.setQueryData(queryKey, msg.shaping);
                   break;
 
                 default:
@@ -76,11 +80,11 @@ const ShapingContent = () => {
 
       return (
         <ShapingChatForm
-          shaping={state.data}
+          shaping={data}
           onMsg={(msg) => {
             switch (msg.type) {
               case 'onUpdate':
-                setData(msg.shaping);
+                queryClient.setQueryData(queryKey, msg.shaping);
                 break;
 
               default:
@@ -91,10 +95,10 @@ const ShapingContent = () => {
       );
 
     case 'error':
-      return <ErrorContent error={state.error} onRetry={reload} />;
+      return <ErrorContent error={error} onRetry={() => refetch()} />;
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 

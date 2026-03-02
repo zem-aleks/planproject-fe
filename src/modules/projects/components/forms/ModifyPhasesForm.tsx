@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { LockIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { modifyPhases } from '@/modules/phases/api/modifyPhases';
 import { PhaseEntity } from '@/modules/phases/types/entity';
@@ -19,6 +19,7 @@ import {
 } from '@/ui/dialog';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 export const ModifyPhasesForm = ({
   project,
@@ -78,7 +79,11 @@ const ModifyPhasesModal = ({
   onClose: () => void;
   onUpdate: (phases: PhaseEntity[]) => void;
 }) => {
-  const { load, state } = useLazyMutation({ mutationFn: modifyPhases });
+  const { mutate, status, data, error } = useMutation<
+    PhaseEntity[],
+    AxiosError<{ message: string }>,
+    { projectId: string; message: string }
+  >({ mutationFn: (params) => modifyPhases(params) });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState<string>('');
 
@@ -87,26 +92,26 @@ const ModifyPhasesModal = ({
   }, []);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(
-          `Failed to submit: ${state.error.response?.data.message || state.error.message}`,
+          `Failed to submit: ${error!.response?.data.message || error!.message}`,
         );
         break;
 
-      case 'loaded':
+      case 'success':
         setMessage('');
-        onUpdate(state.data);
+        onUpdate(data!);
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   return (
     <Dialog
@@ -135,14 +140,14 @@ const ModifyPhasesModal = ({
           onChange={(e) => setMessage(e.target.value)}
           rows={3}
           required={true}
-          disabled={state.type === 'loading'}
+          disabled={status === 'pending'}
           ref={textAreaRef}
           className={'w-full'}
         />
         <Button
           className={'w-full'}
-          onClick={() => load({ projectId: project.id, message })}
-          loading={state.type === 'loading'}
+          onClick={() => mutate({ projectId: project.id, message })}
+          loading={status === 'pending'}
         >
           Submit
         </Button>

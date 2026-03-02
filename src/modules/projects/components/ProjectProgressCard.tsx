@@ -1,6 +1,6 @@
+import type { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 
-import { useLoadableQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { getProjectProgress } from '@/modules/projects/api/getProjectProgress';
 import { getDaySince } from '@/modules/projects/helpers/getDaySince';
@@ -9,6 +9,7 @@ import { Card } from '@/ui/card';
 import { Progress } from '@/ui/progress';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable';
+import { useQuery } from '@tanstack/react-query';
 
 type ProjectProgress = Awaited<ReturnType<typeof getProjectProgress>>;
 
@@ -17,13 +18,13 @@ export const ProjectProgressCard = ({
 }: {
   project: ProjectPreviewEntity;
 }) => {
-  const { state } = useLoadableQuery<ProjectProgress>({
+  const { data, status } = useQuery<ProjectProgress, AxiosError<Error>>({
     queryKey: queryKeys.projects.progress(project.id),
     queryFn: ({ signal }) => getProjectProgress(project.id, { signal }),
   });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return (
         <Card className={'flex flex-col gap-2 p-4 px-4'}>
           <div className={'flex items-center justify-between gap-2'}>
@@ -33,22 +34,19 @@ export const ProjectProgressCard = ({
         </Card>
       );
 
-    case 'loaded':
+    case 'success':
       return (
         <Card className={'flex flex-col gap-2 p-4 px-4'}>
           <div className={'flex items-center justify-between gap-2'}>
             <h2 className={'text-lg font-semibold'}>
-              Project Progress ({state.data.projectProgress}%)
+              Project Progress ({data!.projectProgress}%)
             </h2>
           </div>
 
-          <Progress
-            value={state.data.projectProgress}
-            className="mb-2 h-4 w-full"
-          />
+          <Progress value={data!.projectProgress} className="mb-2 h-4 w-full" />
 
           <ul className={'list-inside list-disc'}>
-            {state.data.diffWithPlanDays >= 0 ? (
+            {data!.diffWithPlanDays >= 0 ? (
               <li>
                 Your progress is <b className={'text-green-600'}>On Track</b>
               </li>
@@ -57,32 +55,31 @@ export const ProjectProgressCard = ({
                 Your are <b className={'text-red-600'}>progressing slower</b>{' '}
                 than was initial estimation on{' '}
                 <b className={'text-green-600'}>
-                  {Math.abs(state.data.diffWithPlanDays)}
+                  {Math.abs(data!.diffWithPlanDays)}
                 </b>{' '}
                 days
               </li>
             )}
 
-            {state.data.confirmedDiffWithPlanDays > 0 && (
+            {data!.confirmedDiffWithPlanDays > 0 && (
               <li>
                 Faster on{' '}
                 <b className={'text-green-600'}>
-                  {Math.abs(state.data.confirmedDiffWithPlanDays)} days
+                  {Math.abs(data!.confirmedDiffWithPlanDays)} days
                 </b>
               </li>
             )}
 
             <li>
               <b className={'text-gray-900'}>
-                {state.data.phasesCompletedCount} / {state.data.phasesCount}{' '}
-                phases
+                {data!.phasesCompletedCount} / {data!.phasesCount} phases
               </b>{' '}
               are done
             </li>
             <li>
               <b className={'text-gray-900'}>
-                {state.data.milestonesCompletedCount} /{' '}
-                {state.data.milestonesCount} milestones
+                {data!.milestonesCompletedCount} / {data!.milestonesCount}{' '}
+                milestones
               </b>{' '}
               are done
             </li>
@@ -98,10 +95,7 @@ export const ProjectProgressCard = ({
                   You can <b>finish</b> your project till the{' '}
                   <b className={'text-green-600'}>
                     {dayjs(project.startedAt)
-                      .add(
-                        project.daysNeeded - state.data.diffWithPlanDays,
-                        'days',
-                      )
+                      .add(project.daysNeeded - data!.diffWithPlanDays, 'days')
                       .format('D MMMM YYYY')}
                   </b>
                 </li>
@@ -115,6 +109,6 @@ export const ProjectProgressCard = ({
       break;
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

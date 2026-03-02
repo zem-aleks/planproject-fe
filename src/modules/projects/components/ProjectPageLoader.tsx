@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { useReloadableQuery } from '@/lib/adapters';
+import type { AxiosError } from 'axios';
+
 import { queryKeys } from '@/lib/queryKeys';
 import { getProject } from '@/modules/projects/api/getProject';
 import type { ProjectEntity } from '@/modules/projects/types/entity';
@@ -9,6 +10,7 @@ import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export type ProjectPageLoaderProps = {
   project: ProjectEntity;
@@ -23,13 +25,15 @@ export const ProjectPageLoader = ({
   projectId: string;
   children: (props: ProjectPageLoaderProps) => ReactNode;
 }) => {
-  const { state, reload, setData } = useReloadableQuery<ProjectEntity>({
-    queryKey: queryKeys.projects.detail(projectId),
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.projects.detail(projectId);
+  const { data, status, refetch } = useQuery<ProjectEntity, AxiosError<Error>>({
+    queryKey,
     queryFn: ({ signal }) => getProject(projectId, { signal }),
   });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return (
         <PageTemplate
           header={{
@@ -58,20 +62,26 @@ export const ProjectPageLoader = ({
             <p className="text-muted-foreground text-sm">
               Failed to load project
             </p>
-            <Button variant="outline" size="sm" onClick={reload}>
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
               Try again
             </Button>
           </div>
         </PageTemplate>
       );
 
-    case 'loaded':
-    case 'reloading':
+    case 'success':
       return (
-        <>{children({ project: state.data, reload, setProject: setData })}</>
+        <>
+          {children({
+            project: data!,
+            reload: () => refetch(),
+            setProject: (project) =>
+              queryClient.setQueryData(queryKey, project),
+          })}
+        </>
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

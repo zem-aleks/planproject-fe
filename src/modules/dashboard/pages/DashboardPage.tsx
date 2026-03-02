@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { WelcomeModal } from '@/modules/dashboard/components/WelcomeModal';
@@ -69,27 +70,7 @@ const DashboardContent = ({
 
   switch (project.status) {
     case 'soulBuilding':
-      // TODO: quick version of poller
-      setTimeout(onChanged, 10000);
-      return (
-        <Card className={'flex flex-row items-center gap-2 p-4'}>
-          <div className={''}>
-            <img
-              src={'/images/cat_loading.gif'}
-              width={150}
-              height={150}
-              alt={'Building'}
-              className={'-mt-5 -mb-2 -ml-5 h-37.5 w-37.5'}
-            />
-          </div>
-          <div className={'w-full'}>
-            <div className={'text-xl font-bold'}>Please wait</div>
-            <div className={'text-lg'}>
-              At this moment we're doing initialization of your project SOUL
-            </div>
-          </div>
-        </Card>
-      );
+      return <SoulBuildingCard onChanged={onChanged} />;
 
     case 'shaping':
     case 'soulError':
@@ -165,4 +146,31 @@ const DashboardContent = ({
     default:
       return notReachable(project.status);
   }
+};
+
+const SoulBuildingCard = ({ onChanged }: { onChanged: () => void }) => {
+  useEffect(() => {
+    const id = setInterval(onChanged, 10000);
+    return () => clearInterval(id);
+  }, [onChanged]);
+
+  return (
+    <Card className="flex flex-row items-center gap-2 p-4">
+      <div>
+        <img
+          src="/images/cat_loading.gif"
+          width={150}
+          height={150}
+          alt="Building"
+          className="-mt-5 -mb-2 -ml-5 h-37.5 w-37.5"
+        />
+      </div>
+      <div className="w-full">
+        <div className="text-xl font-bold">Please wait</div>
+        <div className="text-lg">
+          At this moment we&apos;re doing initialization of your project SOUL
+        </div>
+      </div>
+    </Card>
+  );
 };

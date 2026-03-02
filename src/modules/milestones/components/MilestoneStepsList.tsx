@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { toggleStep } from '@/modules/milestones/api/toggleStep';
 import {
   MilestoneEntity,
@@ -10,6 +10,7 @@ import {
 } from '@/modules/milestones/types/entity';
 import { Checkbox } from '@/ui/checkbox';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 export const MilestoneStepsList = ({
   milestone,
@@ -18,37 +19,43 @@ export const MilestoneStepsList = ({
   milestone: MilestoneEntity;
   onUpdated: (milestone: MilestoneEntity) => void;
 }) => {
-  const { load, state, reset } = useLazyMutation({ mutationFn: toggleStep });
+  const { mutate, status, data, error, reset } = useMutation<
+    MilestoneEntity,
+    AxiosError<{ message: string }>,
+    { milestoneId: string; stepId: string }
+  >({
+    mutationFn: (params) => toggleStep(params),
+  });
   const [togglingStepId, setTogglingStepId] = useState<string | null>(null);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
-      case 'loaded':
-        onUpdated(state.data);
+      case 'success':
+        onUpdated(data!);
         setTogglingStepId(null);
         reset();
         break;
 
       case 'error':
         toast.error(
-          `Failed to toggle step: ${state.error.response?.data.message || state.error.message}`,
+          `Failed to toggle step: ${error!.response?.data.message || error!.message}`,
         );
         setTogglingStepId(null);
         reset();
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   const handleToggle = (stepId: string) => {
     setTogglingStepId(stepId);
-    load({ milestoneId: milestone.id, stepId });
+    mutate({ milestoneId: milestone.id, stepId });
   };
 
   const completedCount = milestone.steps.filter((s) => s.completed).length;

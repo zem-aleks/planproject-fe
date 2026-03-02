@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
 import { finishShaping } from '@/modules/shaping/api/finishShaping';
@@ -11,6 +10,7 @@ import { Button } from '@/ui/button';
 import { Label } from '@/ui/label';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 type Msg = { type: 'onUpdate'; shaping: ShapingEntity } | { type: 'onFinish' };
 
@@ -22,52 +22,58 @@ export const ShapingForm = ({
   shaping: ShapingEntity;
   onMsg: (msg: Msg) => void;
 }) => {
-  const { state } = useLazyMutation({ mutationFn: addStartShapingUserMessage });
-  const { state: finishState, load: finishLoad } = useLazyMutation({
-    mutationFn: finishShaping,
+  const { status, data } = useMutation({
+    mutationFn: (params: {
+      shapingId: string;
+      clientId: string;
+      message: string;
+    }) => addStartShapingUserMessage(params),
+  });
+  const { status: finishStatus, mutate: finishMutate } = useMutation({
+    mutationFn: (shapingId: string) => finishShaping(shapingId),
   });
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(`Failed to submit your message. Please try again.`);
         break;
 
-      case 'loaded':
+      case 'success':
         setMessage('');
-        onMsg({ type: 'onUpdate', shaping: state.data });
+        onMsg({ type: 'onUpdate', shaping: data! });
         textAreaRef.current?.focus();
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   useEffect(() => {
-    switch (finishState.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (finishStatus) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(`Failed to finalize the shaping. Please try again.`);
         break;
 
-      case 'loaded':
+      case 'success':
         onMsg({ type: 'onFinish' });
         break;
 
       default:
-        return notReachable(finishState);
+        return notReachable(finishStatus);
     }
-  }, [finishState]);
+  }, [finishStatus]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -97,7 +103,7 @@ export const ShapingForm = ({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           required={true}
-          disabled={state.type === 'loading'}
+          disabled={status === 'pending'}
           ref={textAreaRef}
           maxLength={4000}
         />
@@ -107,17 +113,17 @@ export const ShapingForm = ({
       </div>
 
       <Button
-        loading={state.type === 'loading'}
-        // onClick={() => load({ shapingId: shaping.id, message })}
+        loading={status === 'pending'}
+        // onClick={() => mutate({ shapingId: shaping.id, message })}
       >
         Submit
       </Button>
 
       <Button
         className={'bg-green-600'}
-        disabled={shaping.score < 70 || state.type === 'loading'}
-        loading={finishState.type === 'loading'}
-        onClick={() => finishLoad(shaping.id)}
+        disabled={shaping.score < 70 || status === 'pending'}
+        loading={finishStatus === 'pending'}
+        onClick={() => finishMutate(shaping.id)}
       >
         Finish
       </Button>

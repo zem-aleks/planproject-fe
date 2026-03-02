@@ -1,9 +1,9 @@
 import { ReactNode } from 'react';
 
+import type { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import { Flag, Goal } from 'lucide-react';
 
-import { useLoadableQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { getHistoryTimeline } from '@/modules/timeline/api/getHistoryTimeline';
@@ -17,6 +17,7 @@ import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable.ts';
 import { IconCheck, IconCompass, IconProgress } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
 
 type TimelinePoint = Awaited<ReturnType<typeof getHistoryTimeline>>;
 
@@ -25,26 +26,29 @@ type Props = {
 };
 
 export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
-  const { state, reload } = useLoadableQuery<TimelinePoint>({
+  const { data, error, status, refetch } = useQuery<
+    TimelinePoint,
+    AxiosError<Error>
+  >({
     queryKey: queryKeys.timeline.history(project.id),
     queryFn: ({ signal }) => getHistoryTimeline(project.id, { signal }),
   });
 
-  switch (state.type) {
+  switch (status) {
     case 'error':
       return (
         <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>History loading error</p>
-          <p className={'pb-2'}>{state.error.message}</p>
-          <Button onClick={reload}>Try again</Button>
+          <p className={'pb-2'}>{error.message}</p>
+          <Button onClick={() => refetch()}>Try again</Button>
         </Card>
       );
 
-    case 'loading':
+    case 'pending':
       return <Skeleton className="h-[500px] w-full rounded-xl" />;
 
-    case 'loaded': {
-      const events = state.data.filter((p) => p.events.length > 0);
+    case 'success': {
+      const events = data!.filter((p) => p.events.length > 0);
       if (events.length === 0) {
         return (
           <Card className={'flex flex-col items-center gap-2 py-4'}>
@@ -86,7 +90,7 @@ export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
     }
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 

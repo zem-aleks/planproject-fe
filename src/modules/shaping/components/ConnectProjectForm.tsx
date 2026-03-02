@@ -3,46 +3,49 @@ import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { connectProject } from '@/modules/shaping/api/connectProject';
 import { Button } from '@/ui/button';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
   const navigate = useNavigate();
   const { session, clientId } = useAuthSession();
-  const { state, load } = useLazyMutation({ mutationFn: connectProject });
+  const { status, mutate } = useMutation({
+    mutationFn: (params: { projectId: string; clientId: string }) =>
+      connectProject(params),
+  });
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(`Failed the shaping processing. Please try again.`);
         break;
 
-      case 'loaded':
+      case 'success':
         navigate(`/project/${project.id}?new=true`);
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   useEffect(() => {
-    if (session && state.type === 'not_requested') {
-      load({ projectId: project.id, clientId: clientId });
+    if (session && status === 'idle') {
+      mutate({ projectId: project.id, clientId: clientId });
     }
-  }, [session, state, project.id, clientId, load]);
+  }, [session, status, project.id, clientId, mutate]);
 
-  switch (state.type) {
-    case 'not_requested':
+  switch (status) {
+    case 'idle':
       return (
         <div
           className={
@@ -53,7 +56,7 @@ export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
         </div>
       );
 
-    case 'loading':
+    case 'pending':
       return (
         <div
           className={
@@ -64,7 +67,7 @@ export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
         </div>
       );
 
-    case 'loaded':
+    case 'success':
       return (
         <div
           className={
@@ -85,7 +88,9 @@ export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
           Something went wrong
           <Button
             className={'mt-4'}
-            onClick={() => load({ projectId: project.id, clientId: clientId })}
+            onClick={() =>
+              mutate({ projectId: project.id, clientId: clientId })
+            }
           >
             Try again
           </Button>
@@ -93,6 +98,6 @@ export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

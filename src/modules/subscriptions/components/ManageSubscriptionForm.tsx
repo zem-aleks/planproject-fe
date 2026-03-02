@@ -1,23 +1,25 @@
 import { useEffect } from 'react';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { createPortalSession } from '@/modules/subscriptions/api/createPortalSession';
 import { Button } from '@/ui/button';
+import { useMutation } from '@tanstack/react-query';
 
 export const ManageSubscriptionForm = () => {
-  const { state, load } = useLazyMutation({ mutationFn: createPortalSession });
+  const { status, data, mutate } = useMutation({
+    mutationFn: () => createPortalSession(),
+  });
 
   useEffect(() => {
-    if (state.type === 'loaded') {
-      window.location.href = state.data.url;
+    if (status === 'success') {
+      window.location.href = data!.url;
     }
-  }, [state]);
+  }, [status]);
 
   return (
     <Button
       variant={'default'}
-      onClick={() => load()}
-      loading={state.type === 'loading'}
+      onClick={() => mutate()}
+      loading={status === 'pending'}
     >
       Manage Subscription
     </Button>

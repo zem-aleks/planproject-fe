@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
-import { useLoadableQuery } from '@/lib/adapters';
+import type { AxiosError } from 'axios';
+
 import { queryKeys } from '@/lib/queryKeys';
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
@@ -22,6 +23,7 @@ import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useQuery } from '@tanstack/react-query';
 
 export const MilestonePage = () => {
   const { project } = useProjectByUrlParam();
@@ -40,12 +42,15 @@ const PageContent = ({
   project: ProjectPreviewEntity;
   milestoneId: string;
 }) => {
-  const { state, reload } = useLoadableQuery<MilestoneDetailsEntity>({
+  const { data, status, refetch } = useQuery<
+    MilestoneDetailsEntity,
+    AxiosError<Error>
+  >({
     queryKey: queryKeys.milestones.detail(milestoneId),
     queryFn: ({ signal }) => getMilestone(milestoneId, { signal }),
   });
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return (
         <PageTemplate
           header={{
@@ -63,12 +68,12 @@ const PageContent = ({
         </PageTemplate>
       );
 
-    case 'loaded':
+    case 'success':
       return (
         <LoadedContentPage
           project={project}
-          milestone={state.data}
-          onChanged={reload}
+          milestone={data!}
+          onChanged={() => refetch()}
         />
       );
 
@@ -85,7 +90,7 @@ const PageContent = ({
         >
           <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 pt-0">
             <div className={'text-xl text-white'}>Something went wrong</div>
-            <Button onClick={reload} size={'lg'}>
+            <Button onClick={() => refetch()} size={'lg'}>
               Try again
             </Button>
           </div>
@@ -93,7 +98,7 @@ const PageContent = ({
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 

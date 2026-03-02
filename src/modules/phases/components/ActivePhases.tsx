@@ -1,6 +1,6 @@
-import { useReloadableQuery } from '@/lib/adapters';
+import type { AxiosError } from 'axios';
+
 import { queryKeys } from '@/lib/queryKeys';
-import type { ReloadableData } from '@/lib/types';
 import { MilestoneCard } from '@/modules/milestones/components/MilestoneCard';
 import { MilestonesLoader } from '@/modules/milestones/components/MilestonesLoader';
 import { PhaseDescription } from '@/modules/phases/components/PhaseDescription';
@@ -11,6 +11,7 @@ import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
 import { Button } from '@/ui/button';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { notReachable } from '@/utils/notReachable';
+import { useQuery } from '@tanstack/react-query';
 
 export const ActivePhases = ({
   phases,
@@ -19,7 +20,10 @@ export const ActivePhases = ({
   phases: PhaseEntityWithMilestones[];
   project: ProjectEntity;
 }) => {
-  const { state, reload } = useReloadableQuery<TaskDetailsEntity[]>({
+  const { data, error, status, refetch } = useQuery<
+    TaskDetailsEntity[],
+    AxiosError<Error>
+  >({
     queryKey: queryKeys.tasks.active(project.id),
     queryFn: ({ signal }) => getActiveTasks(project.id, { signal }),
   });
@@ -63,7 +67,7 @@ export const ActivePhases = ({
                         phase={phase}
                         milestone={milestone}
                         key={milestone.id}
-                        onUpdated={reload}
+                        onUpdated={() => refetch()}
                       />
                     ))}
                   </div>
@@ -74,11 +78,13 @@ export const ActivePhases = ({
             <div className={'flex flex-col gap-2'}>
               <h2 className={'text-xl font-semibold'}>Ongoing Tasks</h2>
               <OngoingTasksBlock
-                state={state}
+                data={data}
+                error={error}
+                status={status}
                 onMsg={(msg) => {
                   switch (msg.type) {
                     case 'onTryAgain':
-                      reload();
+                      refetch();
                       break;
 
                     default:
@@ -97,37 +103,38 @@ export const ActivePhases = ({
 type Msg = { type: 'onTryAgain' };
 
 const OngoingTasksBlock = ({
-  state,
+  data,
+  error,
+  status,
   onMsg,
 }: {
-  state: ReloadableData<TaskDetailsEntity[], void>;
+  data: TaskDetailsEntity[] | undefined;
+  error: AxiosError<Error> | null;
+  status: 'pending' | 'error' | 'success';
   onMsg: (msg: Msg) => void;
 }) => {
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return <div>Loading...</div>;
 
     case 'error':
       return (
         <div className={'flex flex-col gap-2'}>
           Failed to load tasks:{' '}
-          {state.error.response?.data.message ||
-            state.error.message ||
-            'Unknown error'}
+          {error?.response?.data.message || error?.message || 'Unknown error'}
           <Button onClick={() => onMsg({ type: 'onTryAgain' })}>
             Try again
           </Button>
         </div>
       );
 
-    case 'reloading':
-    case 'loaded':
-      if (state.data.length === 0) {
+    case 'success':
+      if (data!.length === 0) {
         return <div>No active tasks</div>;
       }
       return (
         <ul className={'flex flex-col gap-2'}>
-          {state.data.map((task) => (
+          {data!.map((task) => (
             <li key={task.id} className={'border p-2'}>
               <div className={'font-semibold'}>{task.title}</div>
               <div className={'text-muted-foreground text-sm'}>
@@ -138,6 +145,6 @@ const OngoingTasksBlock = ({
         </ul>
       );
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

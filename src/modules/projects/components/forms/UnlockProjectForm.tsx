@@ -1,16 +1,20 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router';
 
+import type { AxiosError } from 'axios';
 import { LockOpen, ShieldQuestion } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { unlockProject } from '@/modules/projects/api/unlockProject';
-import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import {
+  ProjectEntity,
+  ProjectPreviewEntity,
+} from '@/modules/projects/types/entity';
 import { SubscriptionLoader } from '@/modules/subscriptions/components/SubscriptionLoader';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 export const UnlockProjectForm = ({
   project,
@@ -19,28 +23,32 @@ export const UnlockProjectForm = ({
   project: ProjectPreviewEntity;
   onUnlock: () => void;
 }) => {
-  const { state, load } = useLazyMutation({ mutationFn: unlockProject });
+  const { status, error, mutate } = useMutation<
+    ProjectEntity,
+    AxiosError<{ message: string }>,
+    string
+  >({ mutationFn: (projectId) => unlockProject(projectId) });
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(
-          `Failed to unlock project: ${state.error.response?.data.message || state.error.message}`,
+          `Failed to unlock project: ${error!.response?.data.message || error!.message}`,
         );
         break;
 
-      case 'loaded':
+      case 'success':
         onUnlock();
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   return (
     <Card className={'items-center justify-center gap-2 p-4 py-8'}>
@@ -76,8 +84,8 @@ export const UnlockProjectForm = ({
 
             {subscription.canActivate ? (
               <Button
-                onClick={() => load(project.id)}
-                loading={state.type === 'loading'}
+                onClick={() => mutate(project.id)}
+                loading={status === 'pending'}
               >
                 <LockOpen />
                 Unlock Project

@@ -1,9 +1,9 @@
-import { ReactNode, useEffect } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router';
 
+import type { AxiosError } from 'axios';
 import { ShieldEllipsis } from 'lucide-react';
 
-import { usePollingQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { getCompetitors } from '@/modules/competitors/api/getCompetitors';
@@ -13,6 +13,7 @@ import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable.ts';
+import { useQuery } from '@tanstack/react-query';
 
 type CompetitorData = Awaited<ReturnType<typeof getCompetitors>>;
 
@@ -22,33 +23,35 @@ type Props = {
 
 export const CompetitorsLoader = ({ project }: Props): ReactNode => {
   const { user } = useUser();
-  const { state, reload, stopPolling } = usePollingQuery<CompetitorData>({
+  const [polling, setPolling] = useState(true);
+  const { data, error, status, refetch } = useQuery<
+    CompetitorData,
+    AxiosError<Error>
+  >({
     queryKey: queryKeys.competitors.byProject(project.id),
     queryFn: ({ signal }) => getCompetitors(project.id, { signal }),
-    interval: 3000,
+    refetchInterval: polling ? 3000 : false,
   });
 
   useEffect(() => {
-    if (state.type === 'loaded' || state.type === 'reloading') {
-      if (state.data !== null) {
-        stopPolling();
-      }
+    if (status === 'success' && data !== null) {
+      setPolling(false);
     }
-  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [status, data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  switch (state.type) {
+  switch (status) {
     case 'error':
       return (
         <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Competitors loading error</p>
           <p className={'pb-2'}>
-            {state.error.response?.data.message || state.error.message}
+            {error.response?.data.message || error.message}
           </p>
-          <Button onClick={reload}>Try again</Button>
+          <Button onClick={() => refetch()}>Try again</Button>
         </Card>
       );
 
-    case 'loading':
+    case 'pending':
       return (
         <div className={'flex flex-col gap-2'}>
           <Skeleton className={'h-20 w-full'} />
@@ -60,10 +63,8 @@ export const CompetitorsLoader = ({ project }: Props): ReactNode => {
         </div>
       );
 
-    case 'stopped':
-    case 'reloading':
-    case 'loaded':
-      if (!state.data) {
+    case 'success':
+      if (!data) {
         return (
           <div className={'flex flex-col gap-2'}>
             <Skeleton className={'h-20 w-full'} />
@@ -78,7 +79,7 @@ export const CompetitorsLoader = ({ project }: Props): ReactNode => {
 
       return (
         <div className={'flex flex-col gap-2'}>
-          {state.data.map((competitor) => (
+          {data.map((competitor) => (
             <Card className={'flex justify-between gap-4 p-4 py-2'}>
               <div className={'flex gap-4'}>
                 <div
@@ -163,6 +164,6 @@ export const CompetitorsLoader = ({ project }: Props): ReactNode => {
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

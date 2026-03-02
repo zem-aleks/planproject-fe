@@ -65,19 +65,12 @@ Each module follows the pattern: `api/`, `components/`, `pages/`, `types/`, and 
 
 ## Data Layer (`src/lib/`)
 
-TanStack Query (v5) shared cache. Adapter hooks return the same discriminated union types as the old `src/utils/` hooks, so consumer components use the same `switch (state.type)` pattern.
+TanStack Query (v5) shared cache. Components use `useQuery` / `useMutation` directly from `@tanstack/react-query` with `switch (status)` pattern (`'pending'` / `'success'` / `'error'` for queries; `'idle'` / `'pending'` / `'success'` / `'error'` for mutations).
 
 | File | Purpose |
 |---|---|
 | `queryClient.ts` | `QueryClient` singleton (staleTime: 30s, gcTime: 5min, retry: 1) |
 | `queryKeys.ts` | Centralized query key factory (`queryKeys.projects.detail(id)`, etc.) |
-| `invalidationMap.ts` | Mutation → query key invalidation rules |
-| `types.ts` | Discriminated union types: `LoadableData`, `ReloadableData`, `LazyLoadableData`, `PollingData` |
-| `adapters/useLoadableQuery.ts` | Wraps `useQuery` → `LoadableData` + `reload()` |
-| `adapters/useReloadableQuery.ts` | Wraps `useQuery` → `ReloadableData` + `reload()` + `setData()` |
-| `adapters/usePollingQuery.ts` | Wraps `useQuery` with `refetchInterval` → `PollingData` + `stopPolling()`/`continuePolling()` |
-| `adapters/useLazyMutation.ts` | Wraps `useMutation` → `LazyLoadableData` + `load()` + `reset()`, accepts `invalidateKeys` |
-| `adapters/index.ts` | Barrel export |
 
 ## Utilities (`src/utils/`)
 
@@ -104,9 +97,7 @@ TanStack Query (v5) shared cache. Adapter hooks return the same discriminated un
 | Any entity type | `src/modules/<module>/types/entity.ts` |
 | Any API call | `src/modules/<module>/api/` |
 | Query keys | `src/lib/queryKeys.ts` |
-| Cache invalidation rules | `src/lib/invalidationMap.ts` |
-| Data loading types | `src/lib/types.ts` |
-| Data loading hooks | `src/lib/adapters/` |
+| Data loading | `useQuery` / `useMutation` from `@tanstack/react-query` (direct usage, no wrappers) |
 | Shared page layout | `src/modules/templates/components/PageTemplate.tsx` |
 | Theme/colors | `src/index.css` |
 | Tailwind config | `vite.config.ts` (Tailwind 4 uses Vite plugin) |

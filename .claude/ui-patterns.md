@@ -107,16 +107,14 @@ grid grid-cols-1 gap-2 sm:grid-cols-2
 
 Use `lucide-react`. Default sizing in buttons/badges is automatic. Standalone: `className="size-4"` or `size-3.5`.
 
-## Data Loading — TanStack Query Adapters (`src/lib/adapters/`)
+## Data Loading — TanStack Query v5
 
-TanStack Query v5 with a shared cache. Adapter hooks return discriminated union types (same `switch (state.type)` pattern). Import from `@/lib/adapters`.
+Direct `useQuery` / `useMutation` from `@tanstack/react-query`. Shared cache via `QueryClient` in `src/lib/queryClient.ts`.
 
-| Hook | When to use | Returns |
+| Hook | When to use | Key return fields |
 |---|---|---|
-| `useLoadableQuery({ queryKey, queryFn })` | Eager-load on mount | `{ state: LoadableData, reload }` |
-| `useReloadableQuery({ queryKey, queryFn })` | Need `reload()`, `setData()`, and shared cache | `{ state: ReloadableData, reload, setData }` |
-| `usePollingQuery({ queryKey, queryFn, interval })` | Interval-based refetching | `{ state: PollingData, reload, stopPolling, continuePolling, setData }` |
-| `useLazyMutation({ mutationFn, invalidateKeys? })` | Load on demand (user action / form submit) | `{ state: LazyLoadableData, load, reset }` |
+| `useQuery<Data, AxiosError<Error>>({ queryKey, queryFn })` | Eager-load on mount, reload, polling | `{ data, error, status, refetch }` |
+| `useMutation({ mutationFn })` | User-triggered actions (form submit, button click) | `{ status, data, error, mutate, reset }` |
 
 ### Query keys (`src/lib/queryKeys.ts`)
 
@@ -128,46 +126,67 @@ queryKeys.milestones.byPhase(phaseId)  // ['milestones', { phaseId }]
 queryKeys.tasks.active(projectId)      // ['tasks', 'active', { projectId }]
 ```
 
-### Rendering pattern
+### Query rendering pattern
 ```tsx
-import { useLoadableQuery } from '@/lib/adapters';
+import { useQuery } from '@tanstack/react-query';
+import type { AxiosError } from 'axios';
 import { queryKeys } from '@/lib/queryKeys';
 
-const { state, reload } = useLoadableQuery({
+const { data, error, status, refetch } = useQuery<ProjectEntity, AxiosError<Error>>({
   queryKey: queryKeys.projects.detail(projectId),
   queryFn: ({ signal }) => getProject(projectId, { signal }),
 });
 
-switch (state.type) {
-  case 'loading':
+switch (status) {
+  case 'pending':
     return <Spinner />;
 
-  case 'loaded':
-    return <ProjectView data={state.data} />;
+  case 'success':
+    return <ProjectView data={data!} />;
 
   case 'error':
-    return <ErrorMessage />;
+    return <ErrorMessage error={error} />;
 
   default:
-    return notReachable(state);    // exhaustive check — always include
+    return notReachable(status);    // exhaustive check — always include
 }
 ```
 
-For `useReloadableQuery`, also handle `case 'reloading':` (show existing data + loading indicator).
-For `useLazyMutation`, also handle `case 'not_requested':` (show trigger button/initial state).
-For `usePollingQuery`, also handle `case 'reloading':` and `case 'stopped':`.
+**Note:** When `status === 'success'`, destructured `data` is still `Data | undefined` (TS can't narrow across separate variables). Use `data!` in success branches — safe because TanStack guarantees `data` is defined when `status === 'success'`.
+
+### Mutation rendering pattern
+```tsx
+import { useMutation } from '@tanstack/react-query';
+
+const { status, data, error, mutate } = useMutation({ mutationFn: completeMilestone });
+
+switch (status) {
+  case 'idle':       // not yet triggered
+  case 'pending':    // in flight
+  case 'success':    // data! available
+  case 'error':      // error! available
+}
+```
+
+### Polling pattern
+```tsx
+const [polling, setPolling] = useState(true);
+const { data, status } = useQuery<Data, AxiosError<Error>>({
+  queryKey, queryFn,
+  refetchInterval: polling ? 3000 : false,
+});
+// stopPolling → setPolling(false)
+```
+
+### Optimistic updates / setData
+```tsx
+const queryClient = useQueryClient();
+queryClient.setQueryData(queryKey, newData);
+```
 
 ### Cache invalidation
 
-Use `invalidateKeys` in `useLazyMutation` for automatic invalidation after mutations:
-```tsx
-const { state, load } = useLazyMutation({
-  mutationFn: (params) => completeMilestone(params),
-  invalidateKeys: [queryKeys.milestones.byPhase(phaseId), queryKeys.tasks.active(projectId)],
-});
-```
-
-For manual invalidation, use `useQueryClient()` + `queryClient.invalidateQueries()`. See `src/lib/invalidationMap.ts` for the full mutation-to-key mapping.
+Use `useQueryClient()` + `queryClient.invalidateQueries({ queryKey })` for manual invalidation after mutations.
 
 ### Legacy hooks (`src/utils/`) — avoid for new code
 `useLoadableData`, `useReloadableData`, `useLazyLoadableData`, `usePollableData` still exist for a few mutation-on-mount components but should not be used in new code.
@@ -194,6 +213,6 @@ import { Skeleton } from '@/ui/skeleton';
 import { cn } from '@/ui/lib/utils';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { notReachable } from '@/utils/notReachable';
-import { useLoadableQuery, useReloadableQuery, useLazyMutation, usePollingQuery } from '@/lib/adapters';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/lib/queryKeys';
 ```

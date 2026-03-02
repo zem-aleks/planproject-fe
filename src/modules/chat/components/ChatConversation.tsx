@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { Bot, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useReloadableQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { getChat } from '@/modules/chat/api/getChat';
 import { ChatInput } from '@/modules/chat/components/ChatInput';
@@ -19,6 +19,7 @@ import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { Badge } from '@/ui/badge';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useQuery } from '@tanstack/react-query';
 
 export type ProposalRevert = {
   messageId: string;
@@ -38,7 +39,7 @@ export const ChatConversation = ({
   onProjectUpdated?: (project: ProjectEntity) => void;
   proposalToRevert?: ProposalRevert | null;
 }) => {
-  const { state } = useReloadableQuery<ChatEntity>({
+  const { data, status } = useQuery<ChatEntity, AxiosError<Error>>({
     queryKey: queryKeys.chats.detail(chatId),
     queryFn: ({ signal }) => getChat({ projectId, chatId }, { signal }),
   });
@@ -51,12 +52,12 @@ export const ChatConversation = ({
 
   // Reset local state when chat loads
   useEffect(() => {
-    if (state.type === 'loaded') {
-      setLocalMessages(state.data.messages);
+    if (status === 'success') {
+      setLocalMessages(data!.messages);
       setStreamingContent('');
       setStreamingProposals([]);
     }
-  }, [state.type === 'loaded' && state.data.id]);
+  }, [status === 'success' && data!.id]);
 
   // Optimistically revert a proposal back to pending
   useEffect(() => {
@@ -166,9 +167,8 @@ export const ChatConversation = ({
     },
   });
 
-  switch (state.type) {
-    case 'loading':
-    case 'reloading':
+  switch (status) {
+    case 'pending':
       return (
         <div className="flex flex-1 items-center justify-center">
           <Spinner />
@@ -182,10 +182,10 @@ export const ChatConversation = ({
         </div>
       );
 
-    case 'loaded':
+    case 'success':
       return (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <ChatContextBanner context={state.data.context} />
+          <ChatContextBanner context={data!.context} />
           <div
             ref={scrollRef}
             className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-4"
@@ -236,7 +236,7 @@ export const ChatConversation = ({
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 

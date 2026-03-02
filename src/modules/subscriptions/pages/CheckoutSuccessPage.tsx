@@ -1,34 +1,34 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 
+import type { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 
-import { usePollingQuery } from '@/lib/adapters';
 import { queryKeys } from '@/lib/queryKeys';
 import { getUser } from '@/modules/auth/api/getUser';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { UserEntity } from '@/modules/users/types/user';
 import { Card } from '@/ui/card';
+import { useQuery } from '@tanstack/react-query';
 
 export const CheckoutSuccessPage = () => {
   const { reload } = useUser();
-  const { state, stopPolling } = usePollingQuery<UserEntity>({
+  const [polling, setPolling] = useState(true);
+  const { data, status } = useQuery<UserEntity, AxiosError<Error>>({
     queryKey: [...queryKeys.user.current(), 'checkout-poll'],
     queryFn: ({ signal }) => getUser(undefined, { signal }),
-    interval: 3000,
+    refetchInterval: polling ? 3000 : false,
   });
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (state.type === 'loaded' || state.type === 'reloading') {
-      if (state.data.subscription !== 'basic') {
-        stopPolling();
-        reload();
-        navigate('/projects');
-      }
+    if (status === 'success' && data!.subscription !== 'basic') {
+      setPolling(false);
+      reload();
+      navigate('/projects');
     }
-  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [status, data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <PageTemplate

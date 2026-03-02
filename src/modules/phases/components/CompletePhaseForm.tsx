@@ -2,13 +2,13 @@ import { useEffect } from 'react';
 
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { completePhase } from '@/modules/phases/api/completePhase';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button';
 import { DropdownMenuItem } from '@/ui/dropdown-menu';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 export const CompletePhaseForm = ({
   phase,
@@ -19,28 +19,30 @@ export const CompletePhaseForm = ({
   onCompleted: (phase: PhaseEntity) => void;
   variant: 'menuItem' | 'button';
 }) => {
-  const { state, load } = useLazyMutation({ mutationFn: completePhase });
+  const { status, data, error, mutate } = useMutation({
+    mutationFn: (phaseId: string) => completePhase(phaseId),
+  });
 
   useEffect(() => {
-    switch (state.type) {
-      case 'loaded':
-        console.log(state.data);
-        onCompleted(state.data);
+    switch (status) {
+      case 'success':
+        console.log(data);
+        onCompleted(data!);
         toast.success(`Phase ${phase.title} completed!`);
         break;
 
       case 'error':
-        toast.error(`Failed to complete the phase: ${state.error.message}`);
+        toast.error(`Failed to complete the phase: ${error!.message}`);
         break;
 
-      case 'not_requested':
-      case 'loading':
+      case 'idle':
+      case 'pending':
         break;
 
       default:
-        notReachable(state);
+        notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   if (variant === 'button') {
     return (
@@ -48,9 +50,9 @@ export const CompletePhaseForm = ({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          load(phase.id);
+          mutate(phase.id);
         }}
-        loading={state.type === 'loading'}
+        loading={status === 'pending'}
         size={'sm'}
       >
         Complete
@@ -63,11 +65,11 @@ export const CompletePhaseForm = ({
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        load(phase.id);
+        mutate(phase.id);
       }}
-      disabled={state.type === 'loading'}
+      disabled={status === 'pending'}
     >
-      {state.type === 'loading' && <Spinner />}
+      {status === 'pending' && <Spinner />}
       Complete
     </DropdownMenuItem>
   );

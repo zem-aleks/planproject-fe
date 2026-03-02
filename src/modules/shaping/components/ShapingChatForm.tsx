@@ -1,9 +1,9 @@
 import { ReactNode, useEffect, useRef, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { AnswersBlock } from '@/modules/projects/components/forms/AnswersBlock';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
@@ -19,6 +19,7 @@ import { Textarea } from '@/ui/textarea';
 import { noOperation, notReachable } from '@/utils/notReachable';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { useMutation } from '@tanstack/react-query';
 
 export type Msg = { type: 'onUpdate'; shaping: ShapingEntity };
 
@@ -31,8 +32,12 @@ export const ShapingChatForm = ({
 }) => {
   // const [confirmed, setConfirmed] = useState<boolean>(false);
   const { session, clientId } = useAuthSession();
-  const { state, load } = useLazyMutation({
-    mutationFn: addStartShapingUserMessage,
+  const { status, data, error, mutate } = useMutation<
+    ShapingEntity,
+    AxiosError<{ message: string }>,
+    { shapingId: string; clientId: string; message: string }
+  >({
+    mutationFn: (params) => addStartShapingUserMessage(params),
   });
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
@@ -46,26 +51,26 @@ export const ShapingChatForm = ({
   }, []);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(
-          `Failed to submit: ${state.error.response?.data.message || state.error.message}`,
+          `Failed to submit: ${error!.response?.data.message || error!.message}`,
         );
         break;
 
-      case 'loaded':
+      case 'success':
         setMessage('');
-        onMsg({ type: 'onUpdate', shaping: state.data });
+        onMsg({ type: 'onUpdate', shaping: data! });
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   if (shaping.score >= 100) {
     return (
@@ -135,13 +140,13 @@ export const ShapingChatForm = ({
             onChange={(e) => setMessage(e.target.value)}
             rows={8}
             required={true}
-            disabled={state.type === 'loading'}
+            disabled={status === 'pending'}
             ref={textAreaRef}
             className={'w-full grow md:grow-0'}
             maxLength={4000}
           />
 
-          {state.type !== 'loading' && (
+          {status !== 'pending' && (
             <AnswersBlock
               answers={lastAssistantMessage.answers}
               message={message}
@@ -151,8 +156,8 @@ export const ShapingChatForm = ({
 
           <Button
             className={'w-full'}
-            onClick={() => load({ shapingId: shaping.id, message, clientId })}
-            loading={state.type === 'loading'}
+            onClick={() => mutate({ shapingId: shaping.id, message, clientId })}
+            loading={status === 'pending'}
           >
             Submit
           </Button>

@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 
 import { AlertCircle, Sparkles } from 'lucide-react';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { initSoul } from '@/modules/soul/api/initSoul';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 type Reason = 'no_soul' | 'error';
 
@@ -24,26 +24,28 @@ export const InitSoulForm = ({
   onInitiated: () => void;
 }) => {
   const reason = getReasonFromProject(project);
-  const { state, load } = useLazyMutation({ mutationFn: initSoul });
+  const { status, mutate } = useMutation({
+    mutationFn: (projectId: string) => initSoul(projectId),
+  });
 
   useEffect(() => {
-    if (state.type === 'loaded') {
+    if (status === 'success') {
       onInitiated();
     }
-  }, [state.type, onInitiated]);
+  }, [status, onInitiated]);
 
   const handleInit = () => {
-    load(project.id);
+    mutate(project.id);
   };
 
-  switch (state.type) {
-    case 'not_requested':
+  switch (status) {
+    case 'idle':
     case 'error':
       return (
         <Card className="flex flex-col gap-3 p-4">
           <ReasonBanner reason={reason} />
 
-          {state.type === 'error' && (
+          {status === 'error' && (
             <p className="text-destructive text-sm">
               Failed to initialize. Please try again.
             </p>
@@ -58,7 +60,7 @@ export const InitSoulForm = ({
         </Card>
       );
 
-    case 'loading':
+    case 'pending':
       return (
         <Card className="flex flex-col gap-3 p-4">
           <ReasonBanner reason={reason} />
@@ -70,11 +72,11 @@ export const InitSoulForm = ({
         </Card>
       );
 
-    case 'loaded':
+    case 'success':
       return null;
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 

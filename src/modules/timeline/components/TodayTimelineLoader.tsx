@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 
-import { useReloadableQuery } from '@/lib/adapters';
+import type { AxiosError } from 'axios';
+
 import { queryKeys } from '@/lib/queryKeys';
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { getTodayTimeline } from '@/modules/timeline/api/getTodayTimeline';
@@ -8,6 +9,7 @@ import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
+import { useQuery } from '@tanstack/react-query';
 
 type Props = {
   projectId: string;
@@ -21,13 +23,16 @@ export const TodayTimelineLoader = ({
   projectId,
   children,
 }: Props): ReactNode => {
-  const { state, reload } = useReloadableQuery<MilestoneDetailsEntity | null>({
+  const { data, error, status, refetch } = useQuery<
+    MilestoneDetailsEntity | null,
+    AxiosError<Error>
+  >({
     queryKey: queryKeys.timeline.today(projectId),
     queryFn: ({ signal }) => getTodayTimeline(projectId, { signal }),
   });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return (
         <div className="flex flex-1 flex-col gap-4">
           <Skeleton className="aspect-video rounded-xl" />
@@ -39,16 +44,15 @@ export const TodayTimelineLoader = ({
       return (
         <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Timeline loading error</p>
-          <p className={'pb-2'}>{state.error.message}</p>
-          <Button onClick={reload}>Try again</Button>
+          <p className={'pb-2'}>{error.message}</p>
+          <Button onClick={() => refetch()}>Try again</Button>
         </Card>
       );
 
-    case 'reloading':
-    case 'loaded':
-      return <>{children(state.data, reload)}</>;
+    case 'success':
+      return <>{children(data!, () => refetch())}</>;
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

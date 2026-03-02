@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { createShaping } from '@/modules/shaping/api/createShaping';
@@ -11,35 +10,39 @@ import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
+import { useMutation } from '@tanstack/react-query';
 
 export const ProjectCreateForm = (): ReactNode => {
   const { reload } = useContext(ProjectsContext);
   const navigate = useNavigate();
   const { clientId } = useAuthSession();
-  const { state, load } = useLazyMutation({ mutationFn: createShaping });
+  const { status, data, error, mutate } = useMutation({
+    mutationFn: (params: { message: string; clientId: string }) =>
+      createShaping(params),
+  });
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
-      case 'loaded':
+      case 'success':
         reload();
         toast.success(`Project draft created successfully!`);
-        navigate(`/projects/edit/${state.data.projectId}`);
+        navigate(`/projects/edit/${data!.projectId}`);
         break;
 
       case 'error':
-        toast.error(`Failed to create project: ${state.error.message}`);
+        toast.error(`Failed to create project: ${error!.message}`);
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state, navigate]);
+  }, [status, navigate]);
 
   return (
     <div
@@ -63,14 +66,14 @@ export const ProjectCreateForm = (): ReactNode => {
           onChange={(e) => setMessage(e.target.value)}
           rows={3}
           required={true}
-          disabled={state.type === 'loading'}
+          disabled={status === 'pending'}
           ref={textAreaRef}
           className={'w-full'}
         />
         <Button
           className={'w-full'}
-          onClick={() => load({ clientId, message })}
-          loading={state.type === 'loading'}
+          onClick={() => mutate({ clientId, message })}
+          loading={status === 'pending'}
         >
           Submit
         </Button>

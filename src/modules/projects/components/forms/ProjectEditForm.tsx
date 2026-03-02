@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
-import { useLazyMutation } from '@/lib/adapters';
 import { updateProject } from '@/modules/projects/api/updateProject';
 import { ProjectForm } from '@/modules/projects/components/forms/ProjectForm.tsx';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext.tsx';
-import { ProjectEntity } from '@/modules/projects/types/entity';
+import {
+  ProjectCreateData,
+  ProjectEntity,
+} from '@/modules/projects/types/entity';
 import { notReachable } from '@/utils/notReachable.ts';
+import { useMutation } from '@tanstack/react-query';
 
 export const ProjectEditForm = ({
   project,
@@ -17,34 +20,37 @@ export const ProjectEditForm = ({
 }): ReactNode => {
   const { reload } = useContext(ProjectsContext);
   const navigate = useNavigate();
-  const { state, load, reset } = useLazyMutation({ mutationFn: updateProject });
+  const { status, data, error, mutate, reset } = useMutation({
+    mutationFn: (params: ProjectCreateData & { id: string }) =>
+      updateProject(params),
+  });
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
-      case 'loaded':
+      case 'success':
         reset();
         reload();
-        toast.success(`Project "${state.data.title}" updated successfully!`);
+        toast.success(`Project "${data!.title}" updated successfully!`);
         navigate('/projects');
         break;
 
       case 'error':
-        toast.error(`Failed to create project: ${state.error.message}`);
+        toast.error(`Failed to create project: ${error!.message}`);
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state, reset, navigate, reload]);
+  }, [status, reset, navigate, reload]);
 
   return (
     <ProjectForm
       defaultValues={project}
-      onSubmit={(data) => load({ ...data, id: project.id })}
+      onSubmit={(data) => mutate({ ...data, id: project.id })}
     />
   );
 };
