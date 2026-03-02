@@ -1,14 +1,16 @@
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
+import type { ReloadableData } from '@/lib/types';
 import { MilestoneCard } from '@/modules/milestones/components/MilestoneCard';
 import { MilestonesLoader } from '@/modules/milestones/components/MilestonesLoader';
 import { PhaseDescription } from '@/modules/phases/components/PhaseDescription';
 import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { getActiveTasks } from '@/modules/tasks/api/getActiveTasks';
-import { TaskEntity } from '@/modules/tasks/types/entity';
+import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
 import { Button } from '@/ui/button';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { notReachable } from '@/utils/notReachable';
-import { ReloadableData, useReloadableData } from '@/utils/useReloadableData';
 
 export const ActivePhases = ({
   phases,
@@ -17,7 +19,10 @@ export const ActivePhases = ({
   phases: PhaseEntityWithMilestones[];
   project: ProjectEntity;
 }) => {
-  const { state, reload } = useReloadableData(getActiveTasks, project.id);
+  const { state, reload } = useReloadableQuery<TaskDetailsEntity[]>({
+    queryKey: queryKeys.tasks.active(project.id),
+    queryFn: ({ signal }) => getActiveTasks(project.id, { signal }),
+  });
   const activePhases = phases.filter((phase) => phase.status === 'inProgress');
   if (activePhases.length === 0) {
     return (
@@ -95,7 +100,7 @@ const OngoingTasksBlock = ({
   state,
   onMsg,
 }: {
-  state: ReloadableData<TaskEntity[], string>;
+  state: ReloadableData<TaskDetailsEntity[], void>;
   onMsg: (msg: Msg) => void;
 }) => {
   switch (state.type) {

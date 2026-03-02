@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getProject } from '@/modules/projects/api/getProject.ts';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLoadableData } from '@/utils/useLoadableData.ts';
 
 type Props = {
   projectId: string;
@@ -13,7 +14,10 @@ type Props = {
 };
 
 export const ProjectLoader = ({ children, projectId }: Props): ReactNode => {
-  const { state, reload } = useLoadableData(getProject, projectId);
+  const { state, reload } = useLoadableQuery<ProjectEntity>({
+    queryKey: queryKeys.projects.detail(projectId),
+    queryFn: ({ signal }) => getProject(projectId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

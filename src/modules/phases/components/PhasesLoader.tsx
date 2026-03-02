@@ -1,12 +1,13 @@
 import { ReactNode, useEffect } from 'react';
 
+import { usePollingQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getPhases } from '@/modules/phases/api/getPhases';
 import { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { usePollingData } from '@/utils/usePollableData';
 
 type Props = {
   projectId: string;
@@ -18,14 +19,13 @@ type Props = {
 };
 
 export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
-  // const { reload: reloadProjects } = useContext(ProjectsContext);
-  // const { state, reload, setData } = useReloadableData(getPhases, projectId);
-
-  const { state, reload, setData, stopPolling } = usePollingData(
-    getPhases,
-    projectId,
-    3000,
-  );
+  const { state, reload, setData, stopPolling } = usePollingQuery<
+    PhaseEntityWithMilestones[]
+  >({
+    queryKey: queryKeys.phases.byProject(projectId),
+    queryFn: ({ signal }) => getPhases(projectId, { signal }),
+    interval: 3000,
+  });
 
   useEffect(() => {
     if (
@@ -35,7 +35,7 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
     ) {
       stopPolling();
     }
-  }, [state]);
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   switch (state.type) {
     case 'loading':

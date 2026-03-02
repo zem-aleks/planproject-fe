@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LockIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { modifyMilestones } from '@/modules/milestones/api/modifyMilestones';
 import { PhaseEntity } from '@/modules/phases/types/entity';
@@ -17,7 +18,6 @@ import {
 } from '@/ui/dialog';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { IconPencil } from '@tabler/icons-react';
 
 export const ModifyMilestonesForm = ({
@@ -75,7 +75,7 @@ const ModifyMilestonesModal = ({
   onClose: () => void;
   onUpdate: (phase: PhaseEntity) => void;
 }) => {
-  const { load, state } = useLazyLoadableData(modifyMilestones);
+  const { load, state } = useLazyMutation({ mutationFn: modifyMilestones });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState<string>('');
 

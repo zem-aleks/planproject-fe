@@ -2,10 +2,13 @@ import { useEffect } from 'react';
 
 import { LoaderCircle } from 'lucide-react';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { bindShaping } from '@/modules/shaping/api/bindShaping';
 import { getStartShaping } from '@/modules/shaping/api/getStartShaping';
+import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable';
@@ -21,7 +24,10 @@ export const NewProjectsChecker = ({
   onMsg: (msg: Msg) => void;
 }) => {
   const { clientId } = useAuthSession();
-  const { state } = useLoadableData(getStartShaping, clientId);
+  const { state } = useLoadableQuery<ShapingEntity | null>({
+    queryKey: queryKeys.shaping.start(clientId),
+    queryFn: ({ signal }) => getStartShaping(clientId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

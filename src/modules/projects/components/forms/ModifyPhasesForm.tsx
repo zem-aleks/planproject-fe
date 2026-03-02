@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { LockIcon, PencilIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { modifyPhases } from '@/modules/phases/api/modifyPhases';
 import { PhaseEntity } from '@/modules/phases/types/entity';
@@ -18,7 +19,6 @@ import {
 } from '@/ui/dialog';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const ModifyPhasesForm = ({
   project,
@@ -78,7 +78,7 @@ const ModifyPhasesModal = ({
   onClose: () => void;
   onUpdate: (phases: PhaseEntity[]) => void;
 }) => {
-  const { load, state } = useLazyLoadableData(modifyPhases);
+  const { load, state } = useLazyMutation({ mutationFn: modifyPhases });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState<string>('');
 

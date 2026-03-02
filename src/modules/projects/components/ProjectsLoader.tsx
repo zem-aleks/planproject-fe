@@ -1,19 +1,23 @@
 import { ReactNode } from 'react';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getProjects } from '@/modules/projects/api/getProjects';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { PageLoader } from '@/modules/templates/components/PageLoader';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import { Button } from '@/ui/button.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLoadableData } from '@/utils/useLoadableData';
 
 type Props = {
   children: (projects: ProjectPreviewEntity[], reload: () => void) => ReactNode;
 };
 
 export const ProjectsLoader = ({ children }: Props): ReactNode => {
-  const { state, reload } = useLoadableData(getProjects, undefined);
+  const { state, reload } = useLoadableQuery<ProjectPreviewEntity[]>({
+    queryKey: queryKeys.projects.list(),
+    queryFn: ({ signal }) => getProjects(undefined, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

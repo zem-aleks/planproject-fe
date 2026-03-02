@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { createPortalSession } from '@/modules/subscriptions/api/createPortalSession';
 import { Button } from '@/ui/button';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const ManageSubscriptionForm = () => {
-  const { state, load } = useLazyLoadableData(createPortalSession);
+  const { state, load } = useLazyMutation({ mutationFn: createPortalSession });
 
   useEffect(() => {
     if (state.type === 'loaded') {

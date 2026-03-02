@@ -1,12 +1,13 @@
 import { ReactNode } from 'react';
 
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { getTodayTimeline } from '@/modules/timeline/api/getTodayTimeline';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData.ts';
 
 type Props = {
   projectId: string;
@@ -20,7 +21,10 @@ export const TodayTimelineLoader = ({
   projectId,
   children,
 }: Props): ReactNode => {
-  const { state, reload } = useReloadableData(getTodayTimeline, projectId);
+  const { state, reload } = useReloadableQuery<MilestoneDetailsEntity | null>({
+    queryKey: queryKeys.timeline.today(projectId),
+    queryFn: ({ signal }) => getTodayTimeline(projectId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

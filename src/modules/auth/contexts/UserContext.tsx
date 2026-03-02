@@ -1,10 +1,11 @@
 import { ReactNode, createContext, useContext } from 'react';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getUser } from '@/modules/auth/api/getUser';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { UserEntity } from '@/modules/users/types/user';
 import { noOperation, notReachable } from '@/utils/notReachable';
-import { useLoadableData } from '@/utils/useLoadableData';
 
 type UserContextData = { user: UserEntity | null; reload: () => void };
 
@@ -14,7 +15,11 @@ export const UserContext = createContext<UserContextData>(emptyContextValue);
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const { session } = useAuthSession();
-  const { state, reload } = useLoadableData(getUser, undefined);
+  const { state, reload } = useLoadableQuery<UserEntity>({
+    queryKey: queryKeys.user.current(),
+    queryFn: ({ signal }) => getUser(undefined, { signal }),
+    enabled: !!session,
+  });
 
   if (!session)
     return (

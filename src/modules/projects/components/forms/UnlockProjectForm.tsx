@@ -4,13 +4,13 @@ import { Link } from 'react-router';
 import { LockOpen, ShieldQuestion } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { unlockProject } from '@/modules/projects/api/unlockProject';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { SubscriptionLoader } from '@/modules/subscriptions/components/SubscriptionLoader';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const UnlockProjectForm = ({
   project,
@@ -19,7 +19,7 @@ export const UnlockProjectForm = ({
   project: ProjectPreviewEntity;
   onUnlock: () => void;
 }) => {
-  const { state, load } = useLazyLoadableData(unlockProject);
+  const { state, load } = useLazyMutation({ mutationFn: unlockProject });
 
   useEffect(() => {
     switch (state.type) {

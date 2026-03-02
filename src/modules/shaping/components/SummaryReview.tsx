@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
@@ -10,7 +11,6 @@ import { Card } from '@/ui/card';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export type Msg =
   | { type: 'onAccepted'; shaping: ShapingEntity }
@@ -100,7 +100,9 @@ export const ModifySummary = ({
   onMsg: (msg: ModifySummaryMsg) => void;
 }) => {
   const { clientId } = useAuthSession();
-  const { state, load } = useLazyLoadableData(addStartShapingUserMessage);
+  const { state, load } = useLazyMutation({
+    mutationFn: addStartShapingUserMessage,
+  });
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {

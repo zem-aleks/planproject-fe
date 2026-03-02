@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { AnswersBlock } from '@/modules/projects/components/forms/AnswersBlock';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
@@ -16,7 +17,6 @@ import { Label } from '@/ui/label';
 import { Separator } from '@/ui/separator';
 import { Textarea } from '@/ui/textarea';
 import { noOperation, notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
@@ -31,7 +31,9 @@ export const ShapingChatForm = ({
 }) => {
   // const [confirmed, setConfirmed] = useState<boolean>(false);
   const { session, clientId } = useAuthSession();
-  const { state, load } = useLazyLoadableData(addStartShapingUserMessage);
+  const { state, load } = useLazyMutation({
+    mutationFn: addStartShapingUserMessage,
+  });
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const assistantMessages = shaping.messages.filter(

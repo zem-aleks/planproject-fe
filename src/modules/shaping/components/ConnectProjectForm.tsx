@@ -3,18 +3,18 @@ import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { connectProject } from '@/modules/shaping/api/connectProject';
 import { Button } from '@/ui/button';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const ConnectProjectForm = ({ project }: { project: ProjectEntity }) => {
   const navigate = useNavigate();
   const { session, clientId } = useAuthSession();
-  const { state, load } = useLazyLoadableData(connectProject);
+  const { state, load } = useLazyMutation({ mutationFn: connectProject });
 
   useEffect(() => {
     switch (state.type) {

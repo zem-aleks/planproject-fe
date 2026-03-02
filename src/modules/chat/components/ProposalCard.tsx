@@ -69,9 +69,9 @@ export const ProposalCard = ({
         proposal.status === 'pending' && 'border-primary/20 bg-primary/5',
       )}
     >
-      <div className="flex items-start gap-2">
+      <div className="flex min-w-0 items-start gap-2">
         <Lightbulb className="text-primary mt-0.5 size-4 shrink-0" />
-        <div className="prose-sm text-sm font-medium">
+        <div className="prose-sm min-w-0 overflow-hidden text-sm font-medium break-words">
           <MarkdownFormat>{proposal.description}</MarkdownFormat>
         </div>
       </div>

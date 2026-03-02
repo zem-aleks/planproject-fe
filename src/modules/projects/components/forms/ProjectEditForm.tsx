@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { updateProject } from '@/modules/projects/api/updateProject';
 import { ProjectForm } from '@/modules/projects/components/forms/ProjectForm.tsx';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext.tsx';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
 
 export const ProjectEditForm = ({
   project,
@@ -17,7 +17,7 @@ export const ProjectEditForm = ({
 }): ReactNode => {
   const { reload } = useContext(ProjectsContext);
   const navigate = useNavigate();
-  const { state, load, reset } = useLazyLoadableData(updateProject);
+  const { state, load, reset } = useLazyMutation({ mutationFn: updateProject });
 
   useEffect(() => {
     switch (state.type) {

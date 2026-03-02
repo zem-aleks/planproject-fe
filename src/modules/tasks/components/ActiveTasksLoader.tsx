@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
 
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getActiveTasks } from '@/modules/tasks/api/getActiveTasks';
 import { TaskDetailsEntity } from '@/modules/tasks/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData.ts';
 
 type Props = {
   projectId: string;
@@ -20,10 +21,10 @@ export const ActiveTasksLoader = ({
   projectId,
   children,
 }: Props): ReactNode => {
-  const { state, reload, setData } = useReloadableData(
-    getActiveTasks,
-    projectId,
-  );
+  const { state, reload, setData } = useReloadableQuery<TaskDetailsEntity[]>({
+    queryKey: queryKeys.tasks.active(projectId),
+    queryFn: ({ signal }) => getActiveTasks(projectId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

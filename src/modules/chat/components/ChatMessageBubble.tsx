@@ -41,14 +41,14 @@ export const ChatMessageBubble = ({
       </div>
       <div
         className={cn(
-          'max-w-[80%] rounded-xl px-4 py-2.5 text-sm leading-relaxed',
+          'max-w-[80%] min-w-0 overflow-hidden rounded-xl px-4 py-2.5 text-sm leading-relaxed',
           isUser ? 'bg-primary text-primary-foreground' : 'bg-muted',
         )}
       >
         {isUser ? (
-          message.content
+          <p className="break-words whitespace-pre-wrap">{message.content}</p>
         ) : (
-          <div className="prose-sm">
+          <div className="prose-sm max-w-none overflow-hidden break-words">
             <MarkdownFormat>{message.content}</MarkdownFormat>
             {proposals?.map((proposal) => (
               <ProposalCard

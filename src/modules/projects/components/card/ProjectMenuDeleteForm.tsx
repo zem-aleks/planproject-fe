@@ -3,11 +3,11 @@ import { useEffect } from 'react';
 import { LoaderCircle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { deleteProject } from '@/modules/projects/api/deleteProject.ts';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { DropdownMenuItem } from '@/ui/dropdown-menu.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
 
 export type Msg = {
   type: 'onProjectDeleted';
@@ -20,7 +20,7 @@ type Props = {
 };
 
 export const ProjectMenuDeleteForm = ({ project, onMsg }: Props) => {
-  const { state, load } = useLazyLoadableData(deleteProject);
+  const { state, load } = useLazyMutation({ mutationFn: deleteProject });
 
   useEffect(() => {
     switch (state.type) {

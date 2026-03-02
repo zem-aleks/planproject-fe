@@ -2,14 +2,14 @@ import { useEffect } from 'react';
 
 import { RefreshCcw } from 'lucide-react';
 
+import { useLazyMutation, usePollingQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { generateProjectLogo } from '@/modules/shaping/api/generateProjectLogo';
 import { getProjectLogo } from '@/modules/shaping/api/getProjectLogo';
 import { Button } from '@/ui/button';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
-import { usePollingData } from '@/utils/usePollableData';
 
 export const ProjectLogoBuilder = ({
   project,
@@ -36,7 +36,7 @@ export const ProjectLogoBuilder = ({
 };
 
 const LogoGenerator = ({ projectId }: { projectId: string }) => {
-  const { state, load } = useLazyLoadableData(generateProjectLogo);
+  const { state, load } = useLazyMutation({ mutationFn: generateProjectLogo });
 
   switch (state.type) {
     case 'loading':
@@ -74,18 +74,20 @@ const LogoGenerator = ({ projectId }: { projectId: string }) => {
   }
 };
 
+type LogoData = Awaited<ReturnType<typeof getProjectLogo>>;
+
 const LogoPoller = ({ projectId }: { projectId: string }) => {
-  const { state, stopPolling } = usePollingData(
-    getProjectLogo,
-    projectId,
-    5000,
-  );
+  const { state, stopPolling } = usePollingQuery<LogoData>({
+    queryKey: queryKeys.projectLogo.byProject(projectId),
+    queryFn: ({ signal }) => getProjectLogo(projectId, { signal }),
+    interval: 5000,
+  });
 
   useEffect(() => {
     if (state.type === 'loaded' && state.data?.logoUrl !== 'loading') {
       stopPolling();
     }
-  }, [state]);
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   switch (state.type) {
     case 'loading':

@@ -2,13 +2,13 @@ import { useEffect } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { completePhase } from '@/modules/phases/api/completePhase';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button';
 import { DropdownMenuItem } from '@/ui/dropdown-menu';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const CompletePhaseForm = ({
   phase,
@@ -19,7 +19,7 @@ export const CompletePhaseForm = ({
   onCompleted: (phase: PhaseEntity) => void;
   variant: 'menuItem' | 'button';
 }) => {
-  const { state, load } = useLazyLoadableData(completePhase);
+  const { state, load } = useLazyMutation({ mutationFn: completePhase });
 
   useEffect(() => {
     switch (state.type) {

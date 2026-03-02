@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { queryKeys } from '@/lib/queryKeys';
 import {
   ChatConversation,
   type ProposalRevert,
@@ -10,6 +11,7 @@ import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNot
 import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { SoulQueueSnackbar } from '@/modules/soul/components/SoulQueueSnackbar';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const ChatViewPage = () => {
   const { projectId, chatId } = useParams<{
@@ -32,7 +34,6 @@ export const ChatViewPage = () => {
 
 const ChatViewContent = ({
   project,
-  reload,
   setProject,
   chatId,
 }: {
@@ -41,6 +42,7 @@ const ChatViewContent = ({
   setProject: (project: ProjectEntity) => void;
   chatId: string;
 }) => {
+  const queryClient = useQueryClient();
   const [proposalToRevert, setProposalToRevert] =
     useState<ProposalRevert | null>(null);
 
@@ -49,10 +51,12 @@ const ChatViewContent = ({
       if (updated) {
         setProject(updated);
       } else {
-        reload();
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.projects.detail(project.id),
+        });
       }
     },
-    [setProject, reload],
+    [setProject, queryClient, project.id],
   );
 
   const handleApplyProposalReverted = useCallback(
@@ -75,7 +79,7 @@ const ChatViewContent = ({
         }}
       >
         <div className="flex flex-1 p-4 pt-0">
-          <div className="flex min-h-[calc(100vh-12rem)] w-full overflow-hidden rounded-xl border bg-white shadow-sm">
+          <div className="bg-card flex min-h-[calc(100vh-12rem)] w-full overflow-hidden rounded-xl border shadow-sm">
             <ChatConversation
               projectId={project.id}
               chatId={chatId}
@@ -87,7 +91,6 @@ const ChatViewContent = ({
       </PageTemplate>
       <SoulQueueSnackbar
         project={project}
-        onProjectChanged={handleProjectChanged}
         onApplyProposalReverted={handleApplyProposalReverted}
       />
     </>

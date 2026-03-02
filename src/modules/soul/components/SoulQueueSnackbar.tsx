@@ -11,8 +11,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { invalidationMap } from '@/lib/invalidationMap';
+import { queryKeys } from '@/lib/queryKeys';
 import type {
-  ProjectEntity,
   ProjectPreviewEntity,
   SoulOperation,
 } from '@/modules/projects/types/entity';
@@ -21,6 +22,7 @@ import { removeFromSoulQueue } from '@/modules/soul/api/removeFromSoulQueue';
 import { Button } from '@/ui/button';
 import { Progress } from '@/ui/progress';
 import { notReachable } from '@/utils/notReachable';
+import { useQueryClient } from '@tanstack/react-query';
 
 const QUEUE_DURATION_S = 300; // 5 minutes
 
@@ -59,13 +61,12 @@ const getOperationLabel = (op: SoulOperation): string => {
 
 export const SoulQueueSnackbar = ({
   project,
-  onProjectChanged,
   onApplyProposalReverted,
 }: {
   project: ProjectPreviewEntity;
-  onProjectChanged: (project?: ProjectEntity) => void;
   onApplyProposalReverted?: (messageId: string, proposalId: string) => void;
 }) => {
+  const queryClient = useQueryClient();
   const { soulQueue, soulQueueStartedAt, soulQueueApplying } = project;
   const [expanded, setExpanded] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -75,16 +76,22 @@ export const SoulQueueSnackbar = ({
 
   const isApplying = soulQueueApplying || applyingManually;
 
+  const invalidateProject = () => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.projects.detail(project.id),
+    });
+  };
+
   // Poll while backend is applying until it finishes
   useEffect(() => {
     if (!soulQueueApplying) return;
 
     const interval = setInterval(() => {
-      onProjectChanged();
+      invalidateProject();
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [soulQueueApplying, onProjectChanged]);
+  }, [soulQueueApplying]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!soulQueueStartedAt || soulQueue.length === 0 || isApplying) return;
@@ -100,14 +107,14 @@ export const SoulQueueSnackbar = ({
       setRemainingSeconds(Math.ceil(remaining));
 
       if (remaining <= 0) {
-        onProjectChanged();
+        invalidateProject();
       }
     };
 
     tick();
     const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [soulQueueStartedAt, soulQueue.length, onProjectChanged, isApplying]);
+  }, [soulQueueStartedAt, soulQueue.length, isApplying]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (soulQueue.length === 0 && !isApplying) return null;
 
@@ -115,7 +122,10 @@ export const SoulQueueSnackbar = ({
     setApplyingManually(true);
     try {
       const updated = await applySoulQueue(project.id);
-      onProjectChanged(updated);
+      queryClient.setQueryData(queryKeys.projects.detail(project.id), updated);
+      invalidationMap
+        .applySoulQueue(project.id)
+        .forEach((key) => queryClient.invalidateQueries({ queryKey: key }));
     } catch {
       toast.error('Failed to apply queue');
     } finally {
@@ -132,7 +142,7 @@ export const SoulQueueSnackbar = ({
       if (op.type === 'apply_proposal') {
         onApplyProposalReverted?.(op.messageId, op.proposalId);
       }
-      onProjectChanged(updated);
+      queryClient.setQueryData(queryKeys.projects.detail(project.id), updated);
     } catch {
       toast.error('Failed to remove item');
     } finally {

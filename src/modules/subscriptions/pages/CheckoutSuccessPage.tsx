@@ -3,15 +3,21 @@ import { useNavigate } from 'react-router';
 
 import { LoaderCircle } from 'lucide-react';
 
+import { usePollingQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getUser } from '@/modules/auth/api/getUser';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
+import { UserEntity } from '@/modules/users/types/user';
 import { Card } from '@/ui/card';
-import { usePollingData } from '@/utils/usePollableData';
 
 export const CheckoutSuccessPage = () => {
   const { reload } = useUser();
-  const { state, stopPolling } = usePollingData(getUser, undefined, 3000);
+  const { state, stopPolling } = usePollingQuery<UserEntity>({
+    queryKey: [...queryKeys.user.current(), 'checkout-poll'],
+    queryFn: ({ signal }) => getUser(undefined, { signal }),
+    interval: 3000,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,7 +28,7 @@ export const CheckoutSuccessPage = () => {
         navigate('/projects');
       }
     }
-  }, [state]);
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <PageTemplate

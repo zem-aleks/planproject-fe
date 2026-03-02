@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { startNewMilestoneToday } from '@/modules/timeline/api/startNewMilestoneToday';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const StartNewMilestoneForm = ({
   onUpdate,
@@ -16,7 +16,9 @@ export const StartNewMilestoneForm = ({
   onUpdate: (milestone: MilestoneDetailsEntity | null) => void;
   project: ProjectPreviewEntity;
 }) => {
-  const { load, state } = useLazyLoadableData(startNewMilestoneToday);
+  const { load, state } = useLazyMutation({
+    mutationFn: startNewMilestoneToday,
+  });
 
   useEffect(() => {
     switch (state.type) {

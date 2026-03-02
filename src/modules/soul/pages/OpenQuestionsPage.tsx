@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Check, MessageCircle, Undo2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { queryKeys } from '@/lib/queryKeys';
 import { createChat } from '@/modules/chat/api/createChat';
 import { ProjectPageLoader } from '@/modules/projects/components/ProjectPageLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
@@ -21,6 +22,7 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const OpenQuestionsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -32,9 +34,7 @@ export const OpenQuestionsPage = () => {
   return (
     <ActiveProjectGuard>
       <ProjectPageLoader projectId={projectId}>
-        {({ project, reload }) => (
-          <OpenQuestionsContent project={project} onChanged={reload} />
-        )}
+        {({ project }) => <OpenQuestionsContent project={project} />}
       </ProjectPageLoader>
     </ActiveProjectGuard>
   );
@@ -42,10 +42,8 @@ export const OpenQuestionsPage = () => {
 
 const OpenQuestionsContent = ({
   project,
-  onChanged,
 }: {
   project: ProjectPreviewEntity;
-  onChanged: () => void;
 }) => {
   const soul = project.soul;
 
@@ -75,7 +73,6 @@ const OpenQuestionsContent = ({
               soul={soul}
               soulQueue={project.soulQueue}
               projectId={project.id}
-              onProjectChanged={onChanged}
             />
           ) : (
             <Card className="p-5">
@@ -84,7 +81,7 @@ const OpenQuestionsContent = ({
           )}
         </div>
       </PageTemplate>
-      <SoulQueueSnackbar project={project} onProjectChanged={onChanged} />
+      <SoulQueueSnackbar project={project} />
     </>
   );
 };
@@ -131,19 +128,24 @@ const OpenQuestionsList = ({
   soul,
   soulQueue,
   projectId,
-  onProjectChanged,
 }: {
   soul: ProjectSoul;
   soulQueue: SoulOperation[];
   projectId: string;
-  onProjectChanged: () => void;
 }) => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [selections, setSelections] = useState<Record<number, string>>({});
   const [answeringIndex, setAnsweringIndex] = useState<number | null>(null);
   const [removingIndex, setRemovingIndex] = useState<number | null>(null);
   const [undoingId, setUndoingId] = useState<string | null>(null);
   const [chattingIndex, setChattingIndex] = useState<number | null>(null);
+
+  const invalidateProject = () => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.projects.detail(projectId),
+    });
+  };
 
   const toggleSelection = (questionIndex: number, option: string) => {
     setSelections((prev) => ({
@@ -163,7 +165,7 @@ const OpenQuestionsList = ({
         topic,
         chosenOption,
       });
-      onProjectChanged();
+      invalidateProject();
     } catch {
       toast.error('Failed to submit answer');
     } finally {
@@ -178,7 +180,7 @@ const OpenQuestionsList = ({
         type: 'remove_open_question',
         topic,
       });
-      onProjectChanged();
+      invalidateProject();
     } catch {
       toast.error('Failed to remove question');
     } finally {
@@ -190,7 +192,7 @@ const OpenQuestionsList = ({
     setUndoingId(operationId);
     try {
       await removeFromSoulQueue(projectId, { operationId });
-      onProjectChanged();
+      invalidateProject();
     } catch {
       toast.error('Failed to undo');
     } finally {

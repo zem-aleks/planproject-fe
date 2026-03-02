@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
 import { createShaping } from '@/modules/shaping/api/createShaping';
@@ -10,13 +11,12 @@ import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
 
 export const ProjectCreateForm = (): ReactNode => {
   const { reload } = useContext(ProjectsContext);
   const navigate = useNavigate();
   const { clientId } = useAuthSession();
-  const { state, load } = useLazyLoadableData(createShaping);
+  const { state, load } = useLazyMutation({ mutationFn: createShaping });
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 

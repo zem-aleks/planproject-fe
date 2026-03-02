@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getProject } from '@/modules/projects/api/getProject';
 import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
@@ -7,7 +9,6 @@ import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useReloadableData } from '@/utils/useReloadableData';
 
 export type ProjectPageLoaderProps = {
   project: ProjectEntity;
@@ -22,7 +23,10 @@ export const ProjectPageLoader = ({
   projectId: string;
   children: (props: ProjectPageLoaderProps) => ReactNode;
 }) => {
-  const { state, reload, setData } = useReloadableData(getProject, projectId);
+  const { state, reload, setData } = useReloadableQuery<ProjectEntity>({
+    queryKey: queryKeys.projects.detail(projectId),
+    queryFn: ({ signal }) => getProject(projectId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

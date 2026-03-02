@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Check, MessageCircle, Undo2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { queryKeys } from '@/lib/queryKeys';
 import { createChat } from '@/modules/chat/api/createChat';
 import { ProjectPageLoader } from '@/modules/projects/components/ProjectPageLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
@@ -21,6 +22,7 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const AssumptionsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -32,21 +34,13 @@ export const AssumptionsPage = () => {
   return (
     <ActiveProjectGuard>
       <ProjectPageLoader projectId={projectId}>
-        {({ project, reload }) => (
-          <AssumptionsContent project={project} onChanged={reload} />
-        )}
+        {({ project }) => <AssumptionsContent project={project} />}
       </ProjectPageLoader>
     </ActiveProjectGuard>
   );
 };
 
-const AssumptionsContent = ({
-  project,
-  onChanged,
-}: {
-  project: ProjectPreviewEntity;
-  onChanged: () => void;
-}) => {
+const AssumptionsContent = ({ project }: { project: ProjectPreviewEntity }) => {
   const soul = project.soul;
 
   return (
@@ -73,7 +67,6 @@ const AssumptionsContent = ({
               soul={soul}
               soulQueue={project.soulQueue}
               projectId={project.id}
-              onProjectChanged={onChanged}
             />
           ) : (
             <Card className="p-5">
@@ -82,7 +75,7 @@ const AssumptionsContent = ({
           )}
         </div>
       </PageTemplate>
-      <SoulQueueSnackbar project={project} onProjectChanged={onChanged} />
+      <SoulQueueSnackbar project={project} />
     </>
   );
 };
@@ -109,18 +102,23 @@ const AssumptionsList = ({
   soul,
   soulQueue,
   projectId,
-  onProjectChanged,
 }: {
   soul: ProjectSoul;
   soulQueue: SoulOperation[];
   projectId: string;
-  onProjectChanged: () => void;
 }) => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [acceptingIndex, setAcceptingIndex] = useState<number | null>(null);
   const [removingIndex, setRemovingIndex] = useState<number | null>(null);
   const [undoingId, setUndoingId] = useState<string | null>(null);
   const [chattingIndex, setChattingIndex] = useState<number | null>(null);
+
+  const invalidateProject = () => {
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.projects.detail(projectId),
+    });
+  };
 
   const handleAccept = async (index: number, assumption: string) => {
     setAcceptingIndex(index);
@@ -129,7 +127,7 @@ const AssumptionsList = ({
         type: 'accept_assumption',
         assumption,
       });
-      onProjectChanged();
+      invalidateProject();
     } catch {
       toast.error('Failed to accept assumption');
     } finally {
@@ -144,7 +142,7 @@ const AssumptionsList = ({
         type: 'remove_assumption',
         assumption,
       });
-      onProjectChanged();
+      invalidateProject();
     } catch {
       toast.error('Failed to remove assumption');
     } finally {
@@ -156,7 +154,7 @@ const AssumptionsList = ({
     setUndoingId(operationId);
     try {
       await removeFromSoulQueue(projectId, { operationId });
-      onProjectChanged();
+      invalidateProject();
     } catch {
       toast.error('Failed to undo');
     } finally {

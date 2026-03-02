@@ -107,29 +107,43 @@ grid grid-cols-1 gap-2 sm:grid-cols-2
 
 Use `lucide-react`. Default sizing in buttons/badges is automatic. Standalone: `className="size-4"` or `size-3.5`.
 
-## Data Loading Hooks (`src/utils/`)
+## Data Loading — TanStack Query Adapters (`src/lib/adapters/`)
 
-No global state manager. Use these custom hooks for async data:
+TanStack Query v5 with a shared cache. Adapter hooks return discriminated union types (same `switch (state.type)` pattern). Import from `@/lib/adapters`.
 
-| Hook | When to use | States |
+| Hook | When to use | Returns |
 |---|---|---|
-| `useLoadableData(apiFn, params)` | Eager-load on mount | `loading → loaded \| error` |
-| `useReloadableData(apiFn, params)` | Need `reload()` and `setData()` | `loading → loaded \| reloading \| error` |
-| `useLazyLoadableData(apiFn)` | Load on demand (user action) | `not_requested → loading → loaded \| error` |
-| `usePollableData(apiFn, interval)` | Interval-based refetching | same as loadable |
+| `useLoadableQuery({ queryKey, queryFn })` | Eager-load on mount | `{ state: LoadableData, reload }` |
+| `useReloadableQuery({ queryKey, queryFn })` | Need `reload()`, `setData()`, and shared cache | `{ state: ReloadableData, reload, setData }` |
+| `usePollingQuery({ queryKey, queryFn, interval })` | Interval-based refetching | `{ state: PollingData, reload, stopPolling, continuePolling, setData }` |
+| `useLazyMutation({ mutationFn, invalidateKeys? })` | Load on demand (user action / form submit) | `{ state: LazyLoadableData, load, reset }` |
 
-All hooks return `{ state, ... }` where `state.type` is a discriminated union. Always handle with `switch (state.type)` + `default: notReachable(state)`.
+### Query keys (`src/lib/queryKeys.ts`)
 
-### Rendering pattern for loadable data
+Always use the centralized factory:
 ```tsx
-const { state, reload } = useLoadableData(getItems, params);
+import { queryKeys } from '@/lib/queryKeys';
+queryKeys.projects.detail(projectId)   // ['projects', projectId]
+queryKeys.milestones.byPhase(phaseId)  // ['milestones', { phaseId }]
+queryKeys.tasks.active(projectId)      // ['tasks', 'active', { projectId }]
+```
+
+### Rendering pattern
+```tsx
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
+
+const { state, reload } = useLoadableQuery({
+  queryKey: queryKeys.projects.detail(projectId),
+  queryFn: ({ signal }) => getProject(projectId, { signal }),
+});
 
 switch (state.type) {
   case 'loading':
-    return <Spinner />;            // or Skeleton
+    return <Spinner />;
 
   case 'loaded':
-    return <ItemsList data={state.data} />;
+    return <ProjectView data={state.data} />;
 
   case 'error':
     return <ErrorMessage />;
@@ -139,8 +153,24 @@ switch (state.type) {
 }
 ```
 
-For `useReloadableData`, also handle `case 'reloading':` (show existing data + loading indicator).
-For `useLazyLoadableData`, also handle `case 'not_requested':` (show trigger button/initial state).
+For `useReloadableQuery`, also handle `case 'reloading':` (show existing data + loading indicator).
+For `useLazyMutation`, also handle `case 'not_requested':` (show trigger button/initial state).
+For `usePollingQuery`, also handle `case 'reloading':` and `case 'stopped':`.
+
+### Cache invalidation
+
+Use `invalidateKeys` in `useLazyMutation` for automatic invalidation after mutations:
+```tsx
+const { state, load } = useLazyMutation({
+  mutationFn: (params) => completeMilestone(params),
+  invalidateKeys: [queryKeys.milestones.byPhase(phaseId), queryKeys.tasks.active(projectId)],
+});
+```
+
+For manual invalidation, use `useQueryClient()` + `queryClient.invalidateQueries()`. See `src/lib/invalidationMap.ts` for the full mutation-to-key mapping.
+
+### Legacy hooks (`src/utils/`) — avoid for new code
+`useLoadableData`, `useReloadableData`, `useLazyLoadableData`, `usePollableData` still exist for a few mutation-on-mount components but should not be used in new code.
 
 ## Code Conventions
 
@@ -164,7 +194,6 @@ import { Skeleton } from '@/ui/skeleton';
 import { cn } from '@/ui/lib/utils';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { notReachable } from '@/utils/notReachable';
-import { useLoadableData } from '@/utils/useLoadableData';
-import { useReloadableData } from '@/utils/useReloadableData';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useLoadableQuery, useReloadableQuery, useLazyMutation, usePollingQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 ```

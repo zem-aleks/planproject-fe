@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { finishShaping } from '@/modules/shaping/api/finishShaping';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const FinishShapingButton = ({
   shaping,
@@ -16,7 +16,7 @@ export const FinishShapingButton = ({
   shaping: ShapingEntity;
   onFinish: (project: ProjectEntity) => void;
 }) => {
-  const { state, load } = useLazyLoadableData(finishShaping);
+  const { state, load } = useLazyMutation({ mutationFn: finishShaping });
 
   useEffect(() => {
     switch (state.type) {

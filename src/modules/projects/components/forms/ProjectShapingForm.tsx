@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { AnswersBlock } from '@/modules/projects/components/forms/AnswersBlock';
 import { ProjectsContext } from '@/modules/projects/contexts/ProjectsContext';
@@ -18,7 +19,6 @@ import { Card } from '@/ui/card';
 import { Spinner } from '@/ui/spinner';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
 
 export const ProjectShapingForm = ({
   project,
@@ -32,9 +32,12 @@ export const ProjectShapingForm = ({
   const navigate = useNavigate();
   const { reload } = useContext(ProjectsContext);
   const { clientId } = useAuthSession();
-  const { state, load, reset } = useLazyLoadableData(addShapingUserMessage);
-  const { state: finishState, load: finish } =
-    useLazyLoadableData(finishShaping);
+  const { state, load, reset } = useLazyMutation({
+    mutationFn: addShapingUserMessage,
+  });
+  const { state: finishState, load: finish } = useLazyMutation({
+    mutationFn: finishShaping,
+  });
   const [message, setMessage] = useState<string>('');
   const assistantMessages = shaping.messages.filter(
     (m) => m.role === 'assistant',

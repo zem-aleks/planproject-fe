@@ -3,6 +3,8 @@ import { ReactNode } from 'react';
 import dayjs from 'dayjs';
 import { Flag, Goal } from 'lucide-react';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { getHistoryTimeline } from '@/modules/timeline/api/getHistoryTimeline';
 import {
@@ -14,15 +16,19 @@ import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLoadableData } from '@/utils/useLoadableData';
 import { IconCheck, IconCompass, IconProgress } from '@tabler/icons-react';
+
+type TimelinePoint = Awaited<ReturnType<typeof getHistoryTimeline>>;
 
 type Props = {
   project: ProjectPreviewEntity;
 };
 
 export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
-  const { state, reload } = useLoadableData(getHistoryTimeline, project.id);
+  const { state, reload } = useLoadableQuery<TimelinePoint>({
+    queryKey: queryKeys.timeline.history(project.id),
+    queryFn: ({ signal }) => getHistoryTimeline(project.id, { signal }),
+  });
 
   switch (state.type) {
     case 'error':

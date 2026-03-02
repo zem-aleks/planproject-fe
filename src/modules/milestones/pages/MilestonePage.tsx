@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
@@ -20,7 +22,6 @@ import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useLoadableData } from '@/utils/useLoadableData';
 
 export const MilestonePage = () => {
   const { project } = useProjectByUrlParam();
@@ -39,7 +40,10 @@ const PageContent = ({
   project: ProjectPreviewEntity;
   milestoneId: string;
 }) => {
-  const { state, reload } = useLoadableData(getMilestone, milestoneId);
+  const { state, reload } = useLoadableQuery<MilestoneDetailsEntity>({
+    queryKey: queryKeys.milestones.detail(milestoneId),
+    queryFn: ({ signal }) => getMilestone(milestoneId, { signal }),
+  });
   switch (state.type) {
     case 'loading':
       return (

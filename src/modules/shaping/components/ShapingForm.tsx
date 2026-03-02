@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { ProjectEntity } from '@/modules/projects/types/entity';
 import { addStartShapingUserMessage } from '@/modules/shaping/api/addStartShapingUserMessage';
 import { finishShaping } from '@/modules/shaping/api/finishShaping';
@@ -10,7 +11,6 @@ import { Button } from '@/ui/button';
 import { Label } from '@/ui/label';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 type Msg = { type: 'onUpdate'; shaping: ShapingEntity } | { type: 'onFinish' };
 
@@ -22,9 +22,10 @@ export const ShapingForm = ({
   shaping: ShapingEntity;
   onMsg: (msg: Msg) => void;
 }) => {
-  const { state } = useLazyLoadableData(addStartShapingUserMessage);
-  const { state: finishState, load: finishLoad } =
-    useLazyLoadableData(finishShaping);
+  const { state } = useLazyMutation({ mutationFn: addStartShapingUserMessage });
+  const { state: finishState, load: finishLoad } = useLazyMutation({
+    mutationFn: finishShaping,
+  });
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 

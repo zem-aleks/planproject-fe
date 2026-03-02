@@ -49,7 +49,7 @@ export const DashboardPage = () => {
                   <DashboardContent project={project} onChanged={reload} />
                 </div>
               </PageTemplate>
-              <SoulQueueSnackbar project={project} onProjectChanged={reload} />
+              <SoulQueueSnackbar project={project} />
             </>
           );
         }}

@@ -3,12 +3,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Bot, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getChat } from '@/modules/chat/api/getChat';
 import { ChatInput } from '@/modules/chat/components/ChatInput';
 import { ChatMessageBubble } from '@/modules/chat/components/ChatMessageBubble';
 import { useChatStream } from '@/modules/chat/helpers/useChatStream';
 import type {
   ChatContext,
+  ChatEntity,
   ChatMessage,
   ChatProposal,
 } from '@/modules/chat/types/entity';
@@ -16,7 +19,6 @@ import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { Badge } from '@/ui/badge';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useReloadableData } from '@/utils/useReloadableData';
 
 export type ProposalRevert = {
   messageId: string;
@@ -36,7 +38,10 @@ export const ChatConversation = ({
   onProjectUpdated?: (project: ProjectEntity) => void;
   proposalToRevert?: ProposalRevert | null;
 }) => {
-  const { state } = useReloadableData(getChat, { projectId, chatId });
+  const { state } = useReloadableQuery<ChatEntity>({
+    queryKey: queryKeys.chats.detail(chatId),
+    queryFn: ({ signal }) => getChat({ projectId, chatId }, { signal }),
+  });
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const [streamingContent, setStreamingContent] = useState('');
   const [streamingProposals, setStreamingProposals] = useState<ChatProposal[]>(
@@ -179,11 +184,11 @@ export const ChatConversation = ({
 
     case 'loaded':
       return (
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <ChatContextBanner context={state.data.context} />
           <div
             ref={scrollRef}
-            className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-4"
+            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-6 py-4"
           >
             {localMessages.length === 0 && !isStreaming && (
               <div className="text-muted-foreground flex flex-1 flex-col items-center justify-center gap-2">

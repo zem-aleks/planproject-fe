@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 
 import { ShieldEllipsis } from 'lucide-react';
 
+import { usePollingQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { useUser } from '@/modules/auth/contexts/UserContext';
 import { getCompetitors } from '@/modules/competitors/api/getCompetitors';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
@@ -11,7 +13,8 @@ import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable.ts';
-import { usePollingData } from '@/utils/usePollableData';
+
+type CompetitorData = Awaited<ReturnType<typeof getCompetitors>>;
 
 type Props = {
   project: ProjectPreviewEntity;
@@ -19,11 +22,11 @@ type Props = {
 
 export const CompetitorsLoader = ({ project }: Props): ReactNode => {
   const { user } = useUser();
-  const { state, reload, stopPolling } = usePollingData(
-    getCompetitors,
-    project.id,
-    3000,
-  );
+  const { state, reload, stopPolling } = usePollingQuery<CompetitorData>({
+    queryKey: queryKeys.competitors.byProject(project.id),
+    queryFn: ({ signal }) => getCompetitors(project.id, { signal }),
+    interval: 3000,
+  });
 
   useEffect(() => {
     if (state.type === 'loaded' || state.type === 'reloading') {
@@ -31,7 +34,7 @@ export const CompetitorsLoader = ({ project }: Props): ReactNode => {
         stopPolling();
       }
     }
-  }, [state]);
+  }, [state]); // eslint-disable-line react-hooks/exhaustive-deps
 
   switch (state.type) {
     case 'error':

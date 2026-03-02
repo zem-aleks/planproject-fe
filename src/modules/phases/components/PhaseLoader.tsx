@@ -1,12 +1,13 @@
 import { ReactNode } from 'react';
 
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getPhase } from '@/modules/phases/api/getPhase';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData.ts';
 
 type Props = {
   phaseId: string;
@@ -14,7 +15,10 @@ type Props = {
 };
 
 export const PhaseLoader = ({ phaseId, children }: Props): ReactNode => {
-  const { state, reload } = useReloadableData(getPhase, phaseId);
+  const { state, reload } = useReloadableQuery<PhaseEntity>({
+    queryKey: queryKeys.phases.detail(phaseId),
+    queryFn: ({ signal }) => getPhase(phaseId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

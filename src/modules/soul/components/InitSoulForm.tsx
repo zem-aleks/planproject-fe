@@ -2,12 +2,12 @@ import { useEffect } from 'react';
 
 import { AlertCircle, Sparkles } from 'lucide-react';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { initSoul } from '@/modules/soul/api/initSoul';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 type Reason = 'no_soul' | 'error';
 
@@ -24,7 +24,7 @@ export const InitSoulForm = ({
   onInitiated: () => void;
 }) => {
   const reason = getReasonFromProject(project);
-  const { state, load } = useLazyLoadableData(initSoul);
+  const { state, load } = useLazyMutation({ mutationFn: initSoul });
 
   useEffect(() => {
     if (state.type === 'loaded') {

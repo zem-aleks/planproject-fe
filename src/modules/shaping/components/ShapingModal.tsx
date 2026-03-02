@@ -1,6 +1,8 @@
 import { AxiosError } from 'axios';
 import { Lightbulb } from 'lucide-react';
 
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { getStartShaping } from '@/modules/shaping/api/getStartShaping';
 import { ShapingChatForm } from '@/modules/shaping/components/ShapingChatForm';
@@ -8,6 +10,7 @@ import {
   ShapingPublicFormForm,
   Msg as ShapingPublicFormFormMsg,
 } from '@/modules/shaping/components/ShapingCreationForm';
+import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
 import {
   Dialog,
@@ -18,7 +21,6 @@ import {
 } from '@/ui/dialog';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useReloadableData } from '@/utils/useReloadableData';
 
 type Msg = { type: 'onClose' };
 
@@ -44,10 +46,10 @@ export const ShapingModal = ({
 
 const ShapingContent = () => {
   const { clientId } = useAuthSession();
-  const { state, reload, setData } = useReloadableData(
-    getStartShaping,
-    clientId,
-  );
+  const { state, reload, setData } = useReloadableQuery<ShapingEntity | null>({
+    queryKey: queryKeys.shaping.start(clientId),
+    queryFn: ({ signal }) => getStartShaping(clientId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

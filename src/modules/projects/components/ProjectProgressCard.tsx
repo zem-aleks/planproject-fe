@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getProjectProgress } from '@/modules/projects/api/getProjectProgress';
 import { getDaySince } from '@/modules/projects/helpers/getDaySince';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
@@ -7,14 +9,18 @@ import { Card } from '@/ui/card';
 import { Progress } from '@/ui/progress';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable';
-import { useLoadableData } from '@/utils/useLoadableData';
+
+type ProjectProgress = Awaited<ReturnType<typeof getProjectProgress>>;
 
 export const ProjectProgressCard = ({
   project,
 }: {
   project: ProjectPreviewEntity;
 }) => {
-  const { state } = useLoadableData(getProjectProgress, project.id);
+  const { state } = useLoadableQuery<ProjectProgress>({
+    queryKey: queryKeys.projects.progress(project.id),
+    queryFn: ({ signal }) => getProjectProgress(project.id, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

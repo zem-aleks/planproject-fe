@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { toggleStep } from '@/modules/milestones/api/toggleStep';
 import {
   MilestoneEntity,
@@ -9,7 +10,6 @@ import {
 } from '@/modules/milestones/types/entity';
 import { Checkbox } from '@/ui/checkbox';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const MilestoneStepsList = ({
   milestone,
@@ -18,7 +18,7 @@ export const MilestoneStepsList = ({
   milestone: MilestoneEntity;
   onUpdated: (milestone: MilestoneEntity) => void;
 }) => {
-  const { load, state, reset } = useLazyLoadableData(toggleStep);
+  const { load, state, reset } = useLazyMutation({ mutationFn: toggleStep });
   const [togglingStepId, setTogglingStepId] = useState<string | null>(null);
 
   useEffect(() => {

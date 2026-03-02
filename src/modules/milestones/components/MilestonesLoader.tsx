@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
 
+import { useReloadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getMilestones } from '@/modules/milestones/api/getMilestones';
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData.ts';
 
 type Props = {
   phaseId: string;
@@ -13,7 +14,10 @@ type Props = {
 };
 
 export const MilestonesLoader = ({ phaseId, children }: Props): ReactNode => {
-  const { state, reload } = useReloadableData(getMilestones, phaseId);
+  const { state, reload } = useReloadableQuery<MilestoneEntity[]>({
+    queryKey: queryKeys.milestones.byPhase(phaseId),
+    queryFn: ({ signal }) => getMilestones(phaseId, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':

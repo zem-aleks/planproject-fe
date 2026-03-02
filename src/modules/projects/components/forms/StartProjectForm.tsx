@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { startProject } from '@/modules/projects/api/startProject';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { Button } from '@/ui/button';
@@ -13,7 +14,6 @@ import {
   DialogTitle,
 } from '@/ui/dialog';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 import { IconFlag } from '@tabler/icons-react';
 
 export const StartProjectForm = ({
@@ -57,7 +57,7 @@ const StartProjectModal = ({
   onStarted: () => void;
   onClose: () => void;
 }) => {
-  const { state, load } = useLazyLoadableData(startProject);
+  const { state, load } = useLazyMutation({ mutationFn: startProject });
 
   useEffect(() => {
     switch (state.type) {

@@ -63,16 +63,32 @@ Each module follows the pattern: `api/`, `components/`, `pages/`, `types/`, and 
 | `src/ui/hooks/` | `use-mobile.ts` |
 | `src/ui/lib/utils.ts` | `cn()` helper (clsx + tailwind-merge) |
 
+## Data Layer (`src/lib/`)
+
+TanStack Query (v5) shared cache. Adapter hooks return the same discriminated union types as the old `src/utils/` hooks, so consumer components use the same `switch (state.type)` pattern.
+
+| File | Purpose |
+|---|---|
+| `queryClient.ts` | `QueryClient` singleton (staleTime: 30s, gcTime: 5min, retry: 1) |
+| `queryKeys.ts` | Centralized query key factory (`queryKeys.projects.detail(id)`, etc.) |
+| `invalidationMap.ts` | Mutation → query key invalidation rules |
+| `types.ts` | Discriminated union types: `LoadableData`, `ReloadableData`, `LazyLoadableData`, `PollingData` |
+| `adapters/useLoadableQuery.ts` | Wraps `useQuery` → `LoadableData` + `reload()` |
+| `adapters/useReloadableQuery.ts` | Wraps `useQuery` → `ReloadableData` + `reload()` + `setData()` |
+| `adapters/usePollingQuery.ts` | Wraps `useQuery` with `refetchInterval` → `PollingData` + `stopPolling()`/`continuePolling()` |
+| `adapters/useLazyMutation.ts` | Wraps `useMutation` → `LazyLoadableData` + `load()` + `reset()`, accepts `invalidateKeys` |
+| `adapters/index.ts` | Barrel export |
+
 ## Utilities (`src/utils/`)
 
 | File | Purpose |
 |---|---|
 | `notReachable.ts` | Exhaustive switch/if-else helper |
-| `useLoadableData.ts` | Eager-load hook (loading → loaded \| error) |
-| `useReloadableData.ts` | Reloadable hook (+ reloading state, setData) |
-| `useLazyLoadableData.ts` | On-demand load hook (not_requested → loading → ...) |
-| `usePollableData.ts` | Interval-based refetch hook |
-| `cancelable.ts` | AbortController wrapper for async ops |
+| `useLoadableData.ts` | **Legacy** — still used by mutation-on-mount components (`MilestonesBuilder`, `TasksBuilder`, etc.) |
+| `useReloadableData.ts` | **Legacy** — replaced by `useReloadableQuery` from `@/lib/adapters` |
+| `useLazyLoadableData.ts` | **Legacy** — replaced by `useLazyMutation` from `@/lib/adapters` |
+| `usePollableData.ts` | **Legacy** — replaced by `usePollingQuery` from `@/lib/adapters` |
+| `cancelable.ts` | **Legacy** — TanStack Query handles abort via `signal` parameter |
 | `replaceUnicode.ts` | Unicode character replacement |
 | `formatPrice.ts` | Price formatting |
 
@@ -87,6 +103,10 @@ Each module follows the pattern: `api/`, `components/`, `pages/`, `types/`, and 
 | Project types/schemas | `src/modules/projects/types/entity.ts` |
 | Any entity type | `src/modules/<module>/types/entity.ts` |
 | Any API call | `src/modules/<module>/api/` |
+| Query keys | `src/lib/queryKeys.ts` |
+| Cache invalidation rules | `src/lib/invalidationMap.ts` |
+| Data loading types | `src/lib/types.ts` |
+| Data loading hooks | `src/lib/adapters/` |
 | Shared page layout | `src/modules/templates/components/PageTemplate.tsx` |
 | Theme/colors | `src/index.css` |
 | Tailwind config | `vite.config.ts` (Tailwind 4 uses Vite plugin) |

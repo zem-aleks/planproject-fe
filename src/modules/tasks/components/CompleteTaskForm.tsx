@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { completeTask } from '@/modules/tasks/api/completeTask';
 import { TaskDetailsEntity, TaskEntity } from '@/modules/tasks/types/entity';
 import { Button } from '@/ui/button';
@@ -14,7 +15,6 @@ import {
 } from '@/ui/dialog';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const CompleteTaskForm = ({
   task,
@@ -51,7 +51,7 @@ const CompleteTaskModal = ({
   onClose: () => void;
   onUpdate: (task: TaskEntity) => void;
 }) => {
-  const { load, state } = useLazyLoadableData(completeTask);
+  const { load, state } = useLazyMutation({ mutationFn: completeTask });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState<string>('');
 

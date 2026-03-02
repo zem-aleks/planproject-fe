@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { toast } from 'sonner';
 
+import { useLazyMutation } from '@/lib/adapters';
 import { completeMilestone } from '@/modules/milestones/api/completeMilestone';
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { Button } from '@/ui/button';
@@ -14,7 +15,6 @@ import {
 } from '@/ui/dialog';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
 
 export const CompleteMilestoneForm = ({
   milestone,
@@ -51,7 +51,7 @@ const CompleteMilestoneModal = ({
   onClose: () => void;
   onUpdate: (milestone: MilestoneEntity) => void;
 }) => {
-  const { load, state } = useLazyLoadableData(completeMilestone);
+  const { load, state } = useLazyMutation({ mutationFn: completeMilestone });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState<string>('');
 

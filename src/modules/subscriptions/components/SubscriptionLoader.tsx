@@ -1,18 +1,22 @@
 import { ReactNode } from 'react';
 
+import { useLoadableQuery } from '@/lib/adapters';
+import { queryKeys } from '@/lib/queryKeys';
 import { getSubscription } from '@/modules/subscriptions/api/getSubscription';
 import { SubscriptionEntity } from '@/modules/subscriptions/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLoadableData } from '@/utils/useLoadableData';
 
 type Props = {
   children: (subscription: SubscriptionEntity, reload: () => void) => ReactNode;
 };
 
 export const SubscriptionLoader = ({ children }: Props): ReactNode => {
-  const { state, reload } = useLoadableData(getSubscription, undefined);
+  const { state, reload } = useLoadableQuery<SubscriptionEntity>({
+    queryKey: queryKeys.subscription.current(),
+    queryFn: ({ signal }) => getSubscription(undefined, { signal }),
+  });
 
   switch (state.type) {
     case 'loading':
