@@ -109,6 +109,16 @@ const ChatListContent = ({ projectId }: { projectId: string }) => {
         return 'Assumption';
       case 'decision':
         return 'Decision';
+      case 'desired_outcome':
+        return 'Desired Outcome';
+      case 'constraint':
+        return 'Constraint';
+      case 'resource':
+        return 'Resource';
+      case 'target_user':
+        return 'Target User';
+      case 'project_context':
+        return 'Project Context';
       default:
         return null;
     }

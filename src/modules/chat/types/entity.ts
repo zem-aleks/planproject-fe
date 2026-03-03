@@ -7,7 +7,12 @@ export type ChatContext = {
     | 'open_question'
     | 'workstream'
     | 'assumption'
-    | 'decision';
+    | 'decision'
+    | 'desired_outcome'
+    | 'constraint'
+    | 'resource'
+    | 'target_user'
+    | 'project_context';
   entityId?: string;
   label?: string;
 };

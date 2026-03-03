@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 
 import { queryKeys } from '@/lib/queryKeys';
 import {
@@ -18,6 +18,8 @@ export const ChatViewPage = () => {
     projectId: string;
     chatId: string;
   }>();
+  const [searchParams] = useSearchParams();
+  const initialMessage = searchParams.get('message');
 
   if (!projectId) {
     return <ProjectNotFound />;
@@ -27,7 +29,13 @@ export const ChatViewPage = () => {
 
   return (
     <ProjectPageLoader projectId={projectId}>
-      {(props) => <ChatViewContent {...props} chatId={chatId} />}
+      {(props) => (
+        <ChatViewContent
+          {...props}
+          chatId={chatId}
+          initialMessage={initialMessage}
+        />
+      )}
     </ProjectPageLoader>
   );
 };
@@ -36,11 +44,13 @@ const ChatViewContent = ({
   project,
   setProject,
   chatId,
+  initialMessage,
 }: {
   project: ProjectEntity;
   reload: () => void;
   setProject: (project: ProjectEntity) => void;
   chatId: string;
+  initialMessage?: string | null;
 }) => {
   const queryClient = useQueryClient();
   const [proposalToRevert, setProposalToRevert] =
@@ -83,6 +93,7 @@ const ChatViewContent = ({
             <ChatConversation
               projectId={project.id}
               chatId={chatId}
+              initialMessage={initialMessage}
               onProjectUpdated={handleProjectChanged}
               proposalToRevert={proposalToRevert}
             />

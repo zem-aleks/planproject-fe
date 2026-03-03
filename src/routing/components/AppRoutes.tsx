@@ -21,8 +21,13 @@ import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.ts
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
 import { AssumptionsPage } from '@/modules/soul/pages/AssumptionsPage';
+import { ConstraintsPage } from '@/modules/soul/pages/ConstraintsPage';
 import { DecisionsPage } from '@/modules/soul/pages/DecisionsPage';
+import { DesiredOutcomesPage } from '@/modules/soul/pages/DesiredOutcomesPage';
 import { OpenQuestionsPage } from '@/modules/soul/pages/OpenQuestionsPage';
+import { ProjectContextPage } from '@/modules/soul/pages/ProjectContextPage';
+import { ResourcesPage } from '@/modules/soul/pages/ResourcesPage';
+import { TargetUsersPage } from '@/modules/soul/pages/TargetUsersPage';
 import { WorkstreamsPage } from '@/modules/soul/pages/WorkstreamsPage';
 import { CheckoutSuccessPage } from '@/modules/subscriptions/pages/CheckoutSuccessPage';
 import { TimelinePage } from '@/modules/timeline/pages/TimelinePage';
@@ -188,6 +193,46 @@ export const AppRoutes = () => {
           element={
             <InternalElement>
               <DecisionsPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/desired-outcomes"
+          element={
+            <InternalElement>
+              <DesiredOutcomesPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/constraints"
+          element={
+            <InternalElement>
+              <ConstraintsPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/resources"
+          element={
+            <InternalElement>
+              <ResourcesPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/target-users"
+          element={
+            <InternalElement>
+              <TargetUsersPage />
+            </InternalElement>
+          }
+        />
+        <Route
+          path="/project/:projectId/context"
+          element={
+            <InternalElement>
+              <ProjectContextPage />
             </InternalElement>
           }
         />

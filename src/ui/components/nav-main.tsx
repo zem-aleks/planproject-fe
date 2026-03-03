@@ -6,6 +6,7 @@ import {
   ChartGantt,
   ChevronRight,
   ClipboardCheck,
+  Compass,
   EqualApproximately,
   Layers,
   Lightbulb,
@@ -13,6 +14,10 @@ import {
   MessageCircle,
   PersonStanding,
   ShieldAlert,
+  ShieldBan,
+  Target,
+  Users,
+  Wrench,
   Zap,
 } from 'lucide-react';
 
@@ -186,31 +191,58 @@ export function NavMain() {
   );
 }
 
-const KNOWLEDGE_BASE_ITEMS = [
+type KnowledgeBaseItem = {
+  path: string;
+  label: string;
+  icon: typeof ClipboardCheck;
+  getCount?: (soul: ProjectSoul) => number;
+};
+
+const KNOWLEDGE_BASE_ITEMS: KnowledgeBaseItem[] = [
   {
     path: 'open-questions',
     label: 'Open Questions',
     icon: ClipboardCheck,
-    countKey: 'openQuestions' as const,
+    getCount: (soul) => soul.openQuestions.length,
   },
   {
     path: 'assumptions',
     label: 'Assumptions',
     icon: ShieldAlert,
-    countKey: 'assumptions' as const,
+    getCount: (soul) => soul.assumptions.length,
   },
   {
     path: 'workstreams',
     label: 'Workstreams',
     icon: Layers,
-    countKey: 'workstreams' as const,
+    getCount: (soul) => soul.workstreams.length,
   },
   {
     path: 'decisions',
     label: 'Decisions',
     icon: Lightbulb,
-    countKey: 'decisions' as const,
+    getCount: (soul) => soul.decisions.length,
   },
+  {
+    path: 'desired-outcomes',
+    label: 'Desired Outcomes',
+    icon: Target,
+    getCount: (soul) => soul.desiredOutcomes.length,
+  },
+  {
+    path: 'constraints',
+    label: 'Constraints',
+    icon: ShieldBan,
+    getCount: (soul) => soul.constraints.length,
+  },
+  {
+    path: 'resources',
+    label: 'Resources & Tools',
+    icon: Wrench,
+    getCount: (soul) => soul.resources.length,
+  },
+  { path: 'target-users', label: 'Target Users', icon: Users },
+  { path: 'context', label: 'Project Context', icon: Compass },
 ];
 
 const KnowledgeBaseMenu = ({
@@ -249,7 +281,7 @@ const KnowledgeBaseMenu = ({
                 >
                   <item.icon className="size-3.5" />
                   <span>{item.label}</span>
-                  <NavCount count={soul[item.countKey].length} />
+                  {item.getCount && <NavCount count={item.getCount(soul)} />}
                 </SidebarMenuSubButton>
               </Link>
             </SidebarMenuSubItem>

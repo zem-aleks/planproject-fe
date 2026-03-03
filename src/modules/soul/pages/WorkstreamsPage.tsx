@@ -11,6 +11,7 @@ import type {
   ProjectPreviewEntity,
   ProjectSoul,
 } from '@/modules/projects/types/entity';
+import { DiscoverButton } from '@/modules/soul/components/DiscoverButton';
 import { ActiveProjectGuard } from '@/modules/subscriptions/guards/ActiveProjectGuard';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import { Badge } from '@/ui/badge';
@@ -62,11 +63,14 @@ const WorkstreamsContent = ({
       }}
     >
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <div className="flex flex-col gap-0">
-          <h1 className="text-2xl font-semibold text-white">Workstreams</h1>
-          <div className="text-gray-200">
-            Review and manage your project workstreams
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-0">
+            <h1 className="text-2xl font-semibold text-white">Workstreams</h1>
+            <div className="text-gray-200">
+              Review and manage your project workstreams
+            </div>
           </div>
+          <DiscoverButton projectId={projectId} contextType="workstream" />
         </div>
 
         {sorted.length > 0 ? (
@@ -150,7 +154,7 @@ const WorkstreamsList = ({
               onClick={() => handleStartChat(i, ws.name)}
             >
               <MessageCircle className="size-3.5" />
-              Discuss
+              Discover
             </Button>
           </div>
         </Card>
