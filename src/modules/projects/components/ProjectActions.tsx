@@ -36,6 +36,10 @@ export const ProjectActions = ({
             project={project}
             onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
           />
+          <BuildPlanForm
+            project={project}
+            onPlanBuilt={() => onMsg({ type: 'onPlanBuilt' })}
+          />
           <ProjectProgressCard project={project} />
         </>
       );

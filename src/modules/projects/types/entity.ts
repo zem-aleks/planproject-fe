@@ -13,6 +13,7 @@ export type ProjectPreviewEntity = {
   soulQueue: SoulOperation[];
   soulQueueStartedAt: Date | null;
   soulQueueApplying: boolean;
+  soulQueueError: string | null;
 };
 
 export type ProjectEntity = {
@@ -32,6 +33,7 @@ export type ProjectEntity = {
   soulQueue: SoulOperation[];
   soulQueueStartedAt: Date | null;
   soulQueueApplying: boolean;
+  soulQueueError: string | null;
 };
 
 export type ProjectStatus =

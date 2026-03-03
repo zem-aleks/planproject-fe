@@ -6,6 +6,10 @@ import { toast } from 'sonner';
 import { createChat } from '@/modules/chat/api/createChat';
 import { ChatInput } from '@/modules/chat/components/ChatInput';
 import { ChatMessageBubble } from '@/modules/chat/components/ChatMessageBubble';
+import {
+  ThinkingBubble,
+  ToolCallBubble,
+} from '@/modules/chat/components/ChatStreamingIndicators';
 import { useChatStream } from '@/modules/chat/helpers/useChatStream';
 import type { ChatMessage, ChatProposal } from '@/modules/chat/types/entity';
 import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
@@ -90,61 +94,62 @@ export const BrainstormForm = ({
     [onSoulChanged],
   );
 
-  const { sendMessage, isStreaming, abort } = useChatStream({
-    projectId: project.id,
-    chatId: chatId ?? '',
-    onUserMessage: (msg) => {
-      setMessages((prev) => [...prev, msg]);
-      setStreamingContent('');
-      setStreamingProposals([]);
-      scrollToBottom();
-    },
-    onAssistantChunk: (content) => {
-      setStreamingContent((prev) => prev + content);
-      scrollToBottom();
-    },
-    onConfirm: (proposal) => {
-      setStreamingProposals((prev) => [
-        ...prev,
-        { ...proposal, status: 'pending' },
-      ]);
-      scrollToBottom();
-    },
-    onAssistantDone: (messageId) => {
-      setStreamingContent((prev) => {
-        setStreamingProposals((currentProposals) => {
-          const finalMessage: ChatMessage = {
-            id: messageId,
-            role: 'assistant',
-            content: prev,
-            proposals: currentProposals,
-            createdAt: new Date().toISOString(),
-          };
-          setMessages((msgs) => [...msgs, finalMessage]);
-          return [];
+  const { sendMessage, isStreaming, abort, toolCallName, proposalStage } =
+    useChatStream({
+      projectId: project.id,
+      chatId: chatId ?? '',
+      onUserMessage: (msg) => {
+        setMessages((prev) => [...prev, msg]);
+        setStreamingContent('');
+        setStreamingProposals([]);
+        scrollToBottom();
+      },
+      onAssistantChunk: (content) => {
+        setStreamingContent((prev) => prev + content);
+        scrollToBottom();
+      },
+      onConfirm: (proposal) => {
+        setStreamingProposals((prev) => [
+          ...prev,
+          { ...proposal, status: 'pending' },
+        ]);
+        scrollToBottom();
+      },
+      onAssistantDone: (messageId) => {
+        setStreamingContent((prev) => {
+          setStreamingProposals((currentProposals) => {
+            const finalMessage: ChatMessage = {
+              id: messageId,
+              role: 'assistant',
+              content: prev,
+              proposals: currentProposals,
+              createdAt: new Date().toISOString(),
+            };
+            setMessages((msgs) => [...msgs, finalMessage]);
+            return [];
+          });
+          return '';
         });
-        return '';
-      });
-      scrollToBottom();
-    },
-    onError: () => {
-      toast.error('Failed to get response');
-      setStreamingContent((prev) => {
-        if (prev) {
-          const partial: ChatMessage = {
-            id: crypto.randomUUID(),
-            role: 'assistant',
-            content: prev,
-            proposals: [],
-            createdAt: new Date().toISOString(),
-          };
-          setMessages((msgs) => [...msgs, partial]);
-        }
-        return '';
-      });
-      setStreamingProposals([]);
-    },
-  });
+        scrollToBottom();
+      },
+      onError: () => {
+        toast.error('Failed to get response');
+        setStreamingContent((prev) => {
+          if (prev) {
+            const partial: ChatMessage = {
+              id: crypto.randomUUID(),
+              role: 'assistant',
+              content: prev,
+              proposals: [],
+              createdAt: new Date().toISOString(),
+            };
+            setMessages((msgs) => [...msgs, partial]);
+          }
+          return '';
+        });
+        setStreamingProposals([]);
+      },
+    });
 
   return (
     <Dialog
@@ -201,21 +206,41 @@ export const BrainstormForm = ({
                   onProposalStatusChange={handleProposalStatusChange}
                 />
               ))}
+              {isStreaming &&
+                !streamingContent &&
+                !toolCallName &&
+                !proposalStage && <ThinkingBubble />}
+              {isStreaming &&
+                !streamingContent &&
+                (toolCallName || proposalStage) && (
+                  <ToolCallBubble
+                    name={toolCallName}
+                    proposalStage={proposalStage}
+                  />
+                )}
               {isStreaming && streamingContent && (
-                <ChatMessageBubble
-                  message={{
-                    id: 'streaming',
-                    role: 'assistant',
-                    content: streamingContent,
-                    proposals: [],
-                    createdAt: new Date().toISOString(),
-                  }}
-                  isStreaming
-                  proposals={streamingProposals}
-                  projectId={project.id}
-                  chatId={chatId!}
-                  onProposalStatusChange={handleProposalStatusChange}
-                />
+                <>
+                  <ChatMessageBubble
+                    message={{
+                      id: 'streaming',
+                      role: 'assistant',
+                      content: streamingContent,
+                      proposals: [],
+                      createdAt: new Date().toISOString(),
+                    }}
+                    isStreaming={!toolCallName && !proposalStage}
+                    proposals={streamingProposals}
+                    projectId={project.id}
+                    chatId={chatId!}
+                    onProposalStatusChange={handleProposalStatusChange}
+                  />
+                  {(toolCallName || proposalStage) && (
+                    <ToolCallBubble
+                      name={toolCallName}
+                      proposalStage={proposalStage}
+                    />
+                  )}
+                </>
               )}
             </div>
 

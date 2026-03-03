@@ -10,7 +10,7 @@ import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 
 export const MilestoneCard = ({
-  phase,
+  // phase,
   milestone,
   onUpdated,
 }: {
@@ -44,21 +44,19 @@ export const MilestoneCard = ({
         <p>{currentMilestone.definitionOfDone}</p>
       </div>
 
-      {phase.status === 'inProgress' && (
-        <div className={'flex flex-col gap-2'}>
-          <MilestoneActions
-            milestone={currentMilestone}
-            onUpdated={(milestone) => {
-              setCurrentMilestone(milestone);
-              onUpdated(milestone);
-            }}
-          />
+      <div className={'flex flex-col gap-2'}>
+        <MilestoneActions
+          milestone={currentMilestone}
+          onUpdated={(milestone) => {
+            setCurrentMilestone(milestone);
+            onUpdated(milestone);
+          }}
+        />
 
-          {milestone.status !== 'completed' && (
-            <CompleteMilestoneForm milestone={milestone} onUpdate={onUpdated} />
-          )}
-        </div>
-      )}
+        {milestone.status !== 'completed' && (
+          <CompleteMilestoneForm milestone={milestone} onUpdate={onUpdated} />
+        )}
+      </div>
 
       {/*<TasksBlock milestone={milestone} />*/}
     </Card>

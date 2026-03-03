@@ -29,7 +29,8 @@ export const BuildPlanForm = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
 
-  const isRegenerate = project.status === 'analyzing';
+  const isRegenerate =
+    project.status === 'analyzing' || project.status === 'active';
 
   return (
     <>

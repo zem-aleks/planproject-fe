@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
+  AlertCircle,
+  Check,
   ChevronDown,
   ChevronUp,
   Clock,
@@ -17,8 +19,10 @@ import type {
   SoulOperation,
 } from '@/modules/projects/types/entity';
 import { applySoulQueue } from '@/modules/soul/api/applySoulQueue';
+import { cancelSoulQueue } from '@/modules/soul/api/cancelSoulQueue';
 import { removeFromSoulQueue } from '@/modules/soul/api/removeFromSoulQueue';
 import { Button } from '@/ui/button';
+import { cn } from '@/ui/lib/utils';
 import { Progress } from '@/ui/progress';
 import { notReachable } from '@/utils/notReachable';
 import { useQueryClient } from '@tanstack/react-query';
@@ -67,12 +71,17 @@ export const SoulQueueSnackbar = ({
   onApplyProposalReverted?: (messageId: string, proposalId: string) => void;
 }) => {
   const queryClient = useQueryClient();
-  const { soulQueue, soulQueueStartedAt, soulQueueApplying } = project;
+  const { soulQueue, soulQueueStartedAt, soulQueueApplying, soulQueueError } =
+    project;
   const [expanded, setExpanded] = useState(false);
   const [progress, setProgress] = useState(0);
   const [remainingSeconds, setRemainingSeconds] = useState(QUEUE_DURATION_S);
   const [applyingManually, setApplyingManually] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+  const [applied, setApplied] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+  const prevIsApplyingRef = useRef(false);
 
   const isApplying = soulQueueApplying || applyingManually;
 
@@ -94,31 +103,91 @@ export const SoulQueueSnackbar = ({
   }, [soulQueueApplying]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!soulQueueStartedAt || soulQueue.length === 0 || isApplying) return;
+    if (
+      !soulQueueStartedAt ||
+      soulQueue.length === 0 ||
+      isApplying ||
+      applied ||
+      soulQueueError ||
+      dismissed
+    )
+      return;
 
     const startTime = new Date(soulQueueStartedAt).getTime();
+    const initialElapsed = (Date.now() - startTime) / 1000;
 
-    const tick = () => {
+    // Timer already expired — fire once, don't start interval
+    if (initialElapsed >= QUEUE_DURATION_S) {
+      setProgress(100);
+      setRemainingSeconds(0);
+      invalidateProject();
+      return;
+    }
+
+    setProgress(Math.min((initialElapsed / QUEUE_DURATION_S) * 100, 100));
+    setRemainingSeconds(
+      Math.ceil(Math.max(0, QUEUE_DURATION_S - initialElapsed)),
+    );
+
+    const interval = setInterval(() => {
       const elapsed = (Date.now() - startTime) / 1000;
       const remaining = Math.max(0, QUEUE_DURATION_S - elapsed);
-      const pct = Math.min((elapsed / QUEUE_DURATION_S) * 100, 100);
 
-      setProgress(pct);
+      setProgress(Math.min((elapsed / QUEUE_DURATION_S) * 100, 100));
       setRemainingSeconds(Math.ceil(remaining));
 
       if (remaining <= 0) {
+        clearInterval(interval);
         invalidateProject();
       }
-    };
+    }, 1000);
 
-    tick();
-    const interval = setInterval(tick, 1000);
     return () => clearInterval(interval);
-  }, [soulQueueStartedAt, soulQueue.length, isApplying]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [
+    soulQueueStartedAt,
+    soulQueue.length,
+    isApplying,
+    applied,
+    soulQueueError,
+    dismissed,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (soulQueue.length === 0 && !isApplying) return null;
+  // Transition detection: isApplying true → false (success only)
+  useEffect(() => {
+    if (prevIsApplyingRef.current && !isApplying) {
+      if (soulQueue.length === 0 && !soulQueueError) {
+        setApplied(true);
+      }
+    }
+    prevIsApplyingRef.current = isApplying;
+  }, [isApplying, soulQueue.length, soulQueueError]);
+
+  // Auto-dismiss success after 3s
+  useEffect(() => {
+    if (!applied) return;
+    const timeout = setTimeout(() => setApplied(false), 3000);
+    return () => clearTimeout(timeout);
+  }, [applied]);
+
+  // Clear success when new items arrive
+  useEffect(() => {
+    if (applied && soulQueue.length > 0) setApplied(false);
+  }, [soulQueue.length, applied]);
+
+  // Reset dismissed when queue timer restarts (new items added)
+  useEffect(() => {
+    setDismissed(false);
+  }, [soulQueueStartedAt]);
+
+  if (
+    dismissed ||
+    (soulQueue.length === 0 && !isApplying && !applied && !soulQueueError)
+  )
+    return null;
 
   const handleApplyNow = async () => {
+    setApplied(false);
+    setDismissed(false);
     setApplyingManually(true);
     try {
       const updated = await applySoulQueue(project.id);
@@ -137,7 +206,7 @@ export const SoulQueueSnackbar = ({
         queryClient.invalidateQueries({ queryKey: key }),
       );
     } catch {
-      toast.error('Failed to apply queue');
+      // Error state now driven by soulQueueError from backend
     } finally {
       setApplyingManually(false);
     }
@@ -160,9 +229,47 @@ export const SoulQueueSnackbar = ({
     }
   };
 
+  const handleCancel = async () => {
+    setCancelling(true);
+    try {
+      // Revert all proposal-type operations before clearing
+      for (const op of soulQueue) {
+        if (op.type === 'apply_proposal' || op.type === 'apply_plan_proposal') {
+          onApplyProposalReverted?.(op.messageId, op.proposalId);
+        }
+      }
+      const updated = await cancelSoulQueue(project.id);
+      queryClient.setQueryData(queryKeys.projects.detail(project.id), updated);
+    } catch {
+      toast.error('Failed to cancel queue');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  if (applied) {
+    return (
+      <div className="fixed top-6 right-6 z-50 w-full max-w-lg">
+        <div className="bg-card rounded-xl border border-green-500/40 shadow-lg">
+          <div className="flex items-center gap-3 px-4 py-3">
+            <Check className="size-4 text-green-500" />
+            <span className="text-sm font-medium">
+              Changes applied successfully
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed top-6 right-6 z-50 w-full max-w-lg">
-      <div className="bg-card rounded-xl border opacity-80 shadow-lg transition-opacity duration-200 focus-within:opacity-100 hover:opacity-100">
+      <div
+        className={cn(
+          'bg-card rounded-xl border opacity-80 shadow-lg transition-opacity duration-200 focus-within:opacity-100 hover:opacity-100',
+          soulQueueError && 'border-red-500/40 opacity-100',
+        )}
+      >
         {/* Collapsed bar */}
         <div className="flex items-center gap-3 px-4 py-3">
           <div className="flex items-center gap-2 text-sm font-medium">
@@ -173,9 +280,21 @@ export const SoulQueueSnackbar = ({
           </div>
 
           {isApplying ? (
-            <div className="text-muted-foreground flex flex-1 items-center gap-2 text-sm">
-              <Loader2 className="size-4 animate-spin" />
-              <span>Applying changes…</span>
+            <div className="flex flex-1 items-center justify-between gap-2">
+              <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                <Loader2 className="size-4 animate-spin" />
+                <span>Applying changes…</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs"
+                disabled={cancelling}
+                loading={cancelling}
+                onClick={handleCancel}
+              >
+                Cancel
+              </Button>
             </div>
           ) : (
             <>
@@ -190,7 +309,7 @@ export const SoulQueueSnackbar = ({
               <div className="flex items-center gap-1">
                 <Button size="sm" onClick={handleApplyNow}>
                   <Play className="size-3.5" />
-                  Apply Now
+                  {soulQueueError ? 'Retry' : 'Apply Now'}
                 </Button>
                 <Button
                   variant="ghost"
@@ -208,6 +327,38 @@ export const SoulQueueSnackbar = ({
             </>
           )}
         </div>
+
+        {/* Error banner */}
+        {soulQueueError && !isApplying && (
+          <div className="border-t border-red-500/20 bg-red-500/10 px-4 py-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-sm text-red-500">
+                <AlertCircle className="size-3.5 shrink-0" />
+                <span>{soulQueueError}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-xs"
+                  disabled={cancelling}
+                  loading={cancelling}
+                  onClick={handleCancel}
+                >
+                  Cancel All
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-6 shrink-0"
+                  onClick={() => setDismissed(true)}
+                >
+                  <X className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Expanded list */}
         {expanded && !isApplying && (
