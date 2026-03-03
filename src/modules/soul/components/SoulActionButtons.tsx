@@ -22,7 +22,7 @@ export const SoulActionButtons = ({
 
   return (
     <div className={'flex flex-col gap-2'}>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-5">
         <BrainstormForm project={project} onSoulChanged={onSoulChanged} />
 
         <Button variant={oqCount > 0 ? 'warning' : 'outline'} asChild>

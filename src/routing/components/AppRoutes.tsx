@@ -33,6 +33,7 @@ import { CheckoutSuccessPage } from '@/modules/subscriptions/pages/CheckoutSucce
 import { TimelinePage } from '@/modules/timeline/pages/TimelinePage';
 import { AccountPage } from '@/modules/users/pages/AccountPage';
 import { InternalElement } from '@/routing/components/InternalElement';
+import { ProjectLayout } from '@/routing/components/ProjectLayout';
 
 export const AppRoutes = () => {
   return (
@@ -94,166 +95,35 @@ export const AppRoutes = () => {
             </InternalElement>
           }
         />
+
         <Route
           path="/project/:projectId"
           element={
             <InternalElement>
-              <DashboardPage />
+              <ProjectLayout />
             </InternalElement>
           }
-        />
-        <Route
-          path="/project/:projectId/phase/:phaseId"
-          element={
-            <InternalElement>
-              <PhaseViewPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/focus"
-          element={
-            <InternalElement>
-              <FocusPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/timeline"
-          element={
-            <InternalElement>
-              <TimelinePage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/competitors"
-          element={
-            <InternalElement>
-              <CompetitorsPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/auditory"
-          element={
-            <InternalElement>
-              <AuditoryPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/chat"
-          element={
-            <InternalElement>
-              <ChatPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/chat/:chatId"
-          element={
-            <InternalElement>
-              <ChatViewPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/open-questions"
-          element={
-            <InternalElement>
-              <OpenQuestionsPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/assumptions"
-          element={
-            <InternalElement>
-              <AssumptionsPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/workstreams"
-          element={
-            <InternalElement>
-              <WorkstreamsPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/decisions"
-          element={
-            <InternalElement>
-              <DecisionsPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/desired-outcomes"
-          element={
-            <InternalElement>
-              <DesiredOutcomesPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/constraints"
-          element={
-            <InternalElement>
-              <ConstraintsPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/resources"
-          element={
-            <InternalElement>
-              <ResourcesPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/target-users"
-          element={
-            <InternalElement>
-              <TargetUsersPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/context"
-          element={
-            <InternalElement>
-              <ProjectContextPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/roadmap"
-          element={
-            <InternalElement>
-              <RoadmapPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/milestone/:milestoneId"
-          element={
-            <InternalElement>
-              <MilestonePage />
-            </InternalElement>
-          }
-        />
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="phase/:phaseId" element={<PhaseViewPage />} />
+          <Route path="focus" element={<FocusPage />} />
+          <Route path="timeline" element={<TimelinePage />} />
+          <Route path="competitors" element={<CompetitorsPage />} />
+          <Route path="auditory" element={<AuditoryPage />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="chat/:chatId" element={<ChatViewPage />} />
+          <Route path="open-questions" element={<OpenQuestionsPage />} />
+          <Route path="assumptions" element={<AssumptionsPage />} />
+          <Route path="workstreams" element={<WorkstreamsPage />} />
+          <Route path="decisions" element={<DecisionsPage />} />
+          <Route path="desired-outcomes" element={<DesiredOutcomesPage />} />
+          <Route path="constraints" element={<ConstraintsPage />} />
+          <Route path="resources" element={<ResourcesPage />} />
+          <Route path="target-users" element={<TargetUsersPage />} />
+          <Route path="context" element={<ProjectContextPage />} />
+          <Route path="roadmap" element={<RoadmapPage />} />
+          <Route path="milestone/:milestoneId" element={<MilestonePage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

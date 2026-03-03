@@ -9,7 +9,6 @@ import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNot
 import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { InitSoulForm } from '@/modules/soul/components/InitSoulForm';
 import { SoulBlock } from '@/modules/soul/components/SoulBlock';
-import { SoulQueueSnackbar } from '@/modules/soul/components/SoulQueueSnackbar';
 import { ActiveProjectGuard } from '@/modules/subscriptions/guards/ActiveProjectGuard';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import { Card } from '@/ui/card';
@@ -32,26 +31,23 @@ export const DashboardPage = () => {
             return <ProjectNotFound />;
           }
           return (
-            <>
-              <PageTemplate
-                header={{
-                  breadcrumbs: [{ title: 'Projects', href: '/projects' }],
-                  title: project.title,
-                }}
-              >
-                <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                  {project.status === 'active' && (
-                    <DaysCounter
-                      startedAt={project.startedAt}
-                      daysCount={project.daysNeeded}
-                    />
-                  )}
-                  <ProjectHeading project={project} />
-                  <DashboardContent project={project} onChanged={reload} />
-                </div>
-              </PageTemplate>
-              <SoulQueueSnackbar project={project} />
-            </>
+            <PageTemplate
+              header={{
+                breadcrumbs: [{ title: 'Projects', href: '/projects' }],
+                title: project.title,
+              }}
+            >
+              <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+                {project.status === 'active' && (
+                  <DaysCounter
+                    startedAt={project.startedAt}
+                    daysCount={project.daysNeeded}
+                  />
+                )}
+                <ProjectHeading project={project} />
+                <DashboardContent project={project} onChanged={reload} />
+              </div>
+            </PageTemplate>
           );
         }}
       </ProjectPageLoader>

@@ -5,6 +5,7 @@ import {
   Bot,
   FileSearch,
   Flag,
+  ListTodo,
   MessageCircle,
   Route,
   Search,
@@ -297,6 +298,7 @@ const TOOL_CALL_CONFIG: Record<string, { label: string; icon: typeof Search }> =
     load_phases: { label: 'Loading phases', icon: Route },
     load_milestones: { label: 'Loading milestones', icon: Flag },
     propose_plan_update: { label: 'Preparing suggestion', icon: Sparkles },
+    generate_plan: { label: 'Generating plan', icon: ListTodo },
   };
 
 const PROPOSAL_STAGE_CONFIG: Record<

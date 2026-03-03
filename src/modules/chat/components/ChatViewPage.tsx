@@ -1,16 +1,13 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 
 import { queryKeys } from '@/lib/queryKeys';
-import {
-  ChatConversation,
-  type ProposalRevert,
-} from '@/modules/chat/components/ChatConversation';
+import { ChatConversation } from '@/modules/chat/components/ChatConversation';
 import { ProjectPageLoader } from '@/modules/projects/components/ProjectPageLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import type { ProjectEntity } from '@/modules/projects/types/entity';
-import { SoulQueueSnackbar } from '@/modules/soul/components/SoulQueueSnackbar';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
+import { useProjectLayoutContext } from '@/routing/components/ProjectLayout';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const ChatViewPage = () => {
@@ -53,8 +50,7 @@ const ChatViewContent = ({
   initialMessage?: string | null;
 }) => {
   const queryClient = useQueryClient();
-  const [proposalToRevert, setProposalToRevert] =
-    useState<ProposalRevert | null>(null);
+  const { proposalToRevert } = useProjectLayoutContext();
 
   const handleProjectChanged = useCallback(
     (updated?: ProjectEntity) => {
@@ -69,41 +65,28 @@ const ChatViewContent = ({
     [setProject, queryClient, project.id],
   );
 
-  const handleApplyProposalReverted = useCallback(
-    (messageId: string, proposalId: string) => {
-      setProposalToRevert({ messageId, proposalId });
-    },
-    [],
-  );
-
   return (
-    <>
-      <PageTemplate
-        header={{
-          breadcrumbs: [
-            { title: 'Projects', href: '/projects' },
-            { title: project.title, href: `/project/${project.id}` },
-            { title: 'Chats', href: `/project/${project.id}/chat` },
-          ],
-          title: 'Chat',
-        }}
-      >
-        <div className="flex flex-1 p-4 pt-0">
-          <div className="bg-card flex min-h-[calc(100vh-12rem)] w-full overflow-hidden rounded-xl border shadow-sm">
-            <ChatConversation
-              projectId={project.id}
-              chatId={chatId}
-              initialMessage={initialMessage}
-              onProjectUpdated={handleProjectChanged}
-              proposalToRevert={proposalToRevert}
-            />
-          </div>
+    <PageTemplate
+      header={{
+        breadcrumbs: [
+          { title: 'Projects', href: '/projects' },
+          { title: project.title, href: `/project/${project.id}` },
+          { title: 'Chats', href: `/project/${project.id}/chat` },
+        ],
+        title: 'Chat',
+      }}
+    >
+      <div className="flex flex-1 p-4 pt-0">
+        <div className="bg-card flex min-h-[calc(100vh-12rem)] w-full overflow-hidden rounded-xl border shadow-sm">
+          <ChatConversation
+            projectId={project.id}
+            chatId={chatId}
+            initialMessage={initialMessage}
+            onProjectUpdated={handleProjectChanged}
+            proposalToRevert={proposalToRevert}
+          />
         </div>
-      </PageTemplate>
-      <SoulQueueSnackbar
-        project={project}
-        onApplyProposalReverted={handleApplyProposalReverted}
-      />
-    </>
+      </div>
+    </PageTemplate>
   );
 };

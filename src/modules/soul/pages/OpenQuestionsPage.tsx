@@ -16,7 +16,6 @@ import type {
 import { addToSoulQueue } from '@/modules/soul/api/addToSoulQueue';
 import { removeFromSoulQueue } from '@/modules/soul/api/removeFromSoulQueue';
 import { DiscoverButton } from '@/modules/soul/components/DiscoverButton';
-import { SoulQueueSnackbar } from '@/modules/soul/components/SoulQueueSnackbar';
 import { ActiveProjectGuard } from '@/modules/subscriptions/guards/ActiveProjectGuard';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import {
@@ -55,47 +54,41 @@ const OpenQuestionsContent = ({
   const soul = project.soul;
 
   return (
-    <>
-      <PageTemplate
-        header={{
-          breadcrumbs: [
-            { title: 'Projects', href: '/projects' },
-            { title: project.title, href: `/project/${project.id}` },
-          ],
-          title: 'Open Questions',
-        }}
-      >
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex flex-col gap-0">
-              <h1 className="text-2xl font-semibold text-white">
-                Open Questions
-              </h1>
-              <div className="text-gray-200">
-                Review and resolve open questions for your project
-              </div>
+    <PageTemplate
+      header={{
+        breadcrumbs: [
+          { title: 'Projects', href: '/projects' },
+          { title: project.title, href: `/project/${project.id}` },
+        ],
+        title: 'Open Questions',
+      }}
+    >
+      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-0">
+            <h1 className="text-2xl font-semibold text-white">
+              Open Questions
+            </h1>
+            <div className="text-gray-200">
+              Review and resolve open questions for your project
             </div>
-            <DiscoverButton
-              projectId={project.id}
-              contextType="open_question"
-            />
           </div>
-
-          {soul && soul.openQuestions.length > 0 ? (
-            <OpenQuestionsList
-              soul={soul}
-              soulQueue={project.soulQueue}
-              projectId={project.id}
-            />
-          ) : (
-            <Card className="p-5">
-              <p className="text-muted-foreground text-sm">No open questions</p>
-            </Card>
-          )}
+          <DiscoverButton projectId={project.id} contextType="open_question" />
         </div>
-      </PageTemplate>
-      <SoulQueueSnackbar project={project} />
-    </>
+
+        {soul && soul.openQuestions.length > 0 ? (
+          <OpenQuestionsList
+            soul={soul}
+            soulQueue={project.soulQueue}
+            projectId={project.id}
+          />
+        ) : (
+          <Card className="p-5">
+            <p className="text-muted-foreground text-sm">No open questions</p>
+          </Card>
+        )}
+      </div>
+    </PageTemplate>
   );
 };
 
