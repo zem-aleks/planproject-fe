@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { Check, MessageCircle, Undo2, X } from 'lucide-react';
@@ -59,13 +59,16 @@ const OpenQuestionsContent = ({
         }}
       >
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="flex flex-col gap-0">
-            <h1 className="text-2xl font-semibold text-white">
-              Open Questions
-            </h1>
-            <div className="text-gray-200">
-              Review and resolve open questions for your project
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex flex-col gap-0">
+              <h1 className="text-2xl font-semibold text-white">
+                Open Questions
+              </h1>
+              <div className="text-gray-200">
+                Review and resolve open questions for your project
+              </div>
             </div>
+            <ChatAboutQuestionsButton projectId={project.id} />
           </div>
 
           {soul && soul.openQuestions.length > 0 ? (
@@ -372,5 +375,30 @@ const OpenQuestionsList = ({
         );
       })}
     </div>
+  );
+};
+
+const ChatAboutQuestionsButton = ({ projectId }: { projectId: string }) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = useCallback(async () => {
+    setLoading(true);
+    try {
+      const chat = await createChat(projectId, {
+        type: 'open_question',
+      });
+      navigate(`/project/${projectId}/chat/${chat.id}`);
+    } catch {
+      toast.error('Failed to create chat');
+      setLoading(false);
+    }
+  }, [projectId, navigate]);
+
+  return (
+    <Button variant="default" size="sm" loading={loading} onClick={handleClick}>
+      <MessageCircle className="size-3.5" />
+      Discover
+    </Button>
   );
 };

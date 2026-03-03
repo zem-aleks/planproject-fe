@@ -176,7 +176,7 @@ const SoulBuildingCard = ({ onChanged }: { onChanged: () => void }) => {
       <div className="w-full">
         <div className="text-xl font-bold">Please wait</div>
         <div className="text-lg">
-          At this moment we&apos;re doing initialization of your project SOUL
+          At this moment we&apos;re doing initialization of your Project Profile
         </div>
       </div>
     </Card>

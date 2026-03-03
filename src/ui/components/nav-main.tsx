@@ -1,12 +1,14 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
 import {
+  BookOpen,
   ChartGantt,
+  ChevronRight,
   ClipboardCheck,
   EqualApproximately,
   Layers,
   Lightbulb,
-  Lock,
   Map,
   MessageCircle,
   PersonStanding,
@@ -15,6 +17,8 @@ import {
 } from 'lucide-react';
 
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
+import type { ProjectSoul } from '@/modules/projects/types/entity';
+import { cn } from '@/ui/lib/utils';
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -22,6 +26,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
 } from '@/ui/sidebar';
 import { IconAdjustmentsStar, IconPackages } from '@tabler/icons-react';
 
@@ -30,6 +37,12 @@ export function NavMain() {
   // const { projects } = useContext(ProjectsContext);
   const { project } = useProjectByUrlParam();
   const isProjectEditPage = pathname.startsWith('/projects/edit/');
+  const hasSoul = !!project?.soul;
+  const isPlanned =
+    project?.status === 'analyzing' ||
+    project?.status === 'active' ||
+    project?.status === 'completed' ||
+    project?.status === 'onHold';
 
   if (!project || isProjectEditPage) {
     return (
@@ -88,60 +101,48 @@ export function NavMain() {
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link to={`/project/${project.id}/open-questions`}>
-              <SidebarMenuButton
-                isActive={pathname === `/project/${project.id}/open-questions`}
-              >
-                <ClipboardCheck />
-                <span>Open Questions</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link to={`/project/${project.id}/assumptions`}>
-              <SidebarMenuButton
-                isActive={pathname === `/project/${project.id}/assumptions`}
-              >
-                <ShieldAlert />
-                <span>Assumptions</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link to={`/project/${project.id}/workstreams`}>
-              <SidebarMenuButton
-                isActive={pathname === `/project/${project.id}/workstreams`}
-              >
-                <Layers />
-                <span>Workstreams</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link to={`/project/${project.id}/decisions`}>
-              <SidebarMenuButton
-                isActive={pathname === `/project/${project.id}/decisions`}
-              >
-                <Lightbulb />
-                <span>Decisions</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link to={`/project/${project.id}/roadmap`}>
-              <SidebarMenuButton
-                isActive={pathname === `/project/${project.id}/roadmap`}
-              >
-                {project.activated ? (
-                  <Map />
-                ) : (
-                  <Lock className={'font-semibold text-yellow-500'} />
-                )}
-                <span>Roadmap</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
+          {hasSoul && (
+            <KnowledgeBaseMenu
+              projectId={project.id}
+              pathname={pathname}
+              soul={project.soul!}
+            />
+          )}
+
+          {isPlanned && (
+            <>
+              <SidebarMenuItem>
+                <Link to={`/project/${project.id}/roadmap`}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/project/${project.id}/roadmap`}
+                  >
+                    <Map />
+                    <span>Roadmap</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to={`/project/${project.id}/competitors`}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/project/${project.id}/competitors`}
+                  >
+                    <EqualApproximately />
+                    <span>Competitors</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <Link to={`/project/${project.id}/auditory`}>
+                  <SidebarMenuButton
+                    isActive={pathname === `/project/${project.id}/auditory`}
+                  >
+                    <PersonStanding />
+                    <span>Auditory</span>
+                  </SidebarMenuButton>
+                </Link>
+              </SidebarMenuItem>
+            </>
+          )}
 
           <SidebarMenuItem>
             <Link to={`/project/${project.id}/chat`}>
@@ -150,34 +151,6 @@ export function NavMain() {
               >
                 <MessageCircle />
                 <span>Chats</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link to={`/project/${project.id}/competitors`}>
-              <SidebarMenuButton
-                isActive={pathname === `/project/${project.id}/competitors`}
-              >
-                {project.activated ? (
-                  <EqualApproximately />
-                ) : (
-                  <Lock className={'font-semibold text-yellow-500'} />
-                )}
-                <span>Competitors</span>
-              </SidebarMenuButton>
-            </Link>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <Link to={`/project/${project.id}/auditory`}>
-              <SidebarMenuButton
-                isActive={pathname === `/project/${project.id}/auditory`}
-              >
-                {project.activated ? (
-                  <PersonStanding />
-                ) : (
-                  <Lock className={'font-semibold text-yellow-500'} />
-                )}
-                <span>Auditory</span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -212,3 +185,86 @@ export function NavMain() {
     </SidebarGroup>
   );
 }
+
+const KNOWLEDGE_BASE_ITEMS = [
+  {
+    path: 'open-questions',
+    label: 'Open Questions',
+    icon: ClipboardCheck,
+    countKey: 'openQuestions' as const,
+  },
+  {
+    path: 'assumptions',
+    label: 'Assumptions',
+    icon: ShieldAlert,
+    countKey: 'assumptions' as const,
+  },
+  {
+    path: 'workstreams',
+    label: 'Workstreams',
+    icon: Layers,
+    countKey: 'workstreams' as const,
+  },
+  {
+    path: 'decisions',
+    label: 'Decisions',
+    icon: Lightbulb,
+    countKey: 'decisions' as const,
+  },
+];
+
+const KnowledgeBaseMenu = ({
+  projectId,
+  pathname,
+  soul,
+}: {
+  projectId: string;
+  pathname: string;
+  soul: ProjectSoul;
+}) => {
+  const isChildActive = KNOWLEDGE_BASE_ITEMS.some(
+    (item) => pathname === `/project/${projectId}/${item.path}`,
+  );
+  const [open, setOpen] = useState(isChildActive);
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton onClick={() => setOpen((o) => !o)}>
+        <BookOpen />
+        <span>Knowledge Base</span>
+        <ChevronRight
+          className={cn(
+            'ml-auto size-4 transition-transform duration-200',
+            open && 'rotate-90',
+          )}
+        />
+      </SidebarMenuButton>
+      {open && (
+        <SidebarMenuSub>
+          {KNOWLEDGE_BASE_ITEMS.map((item) => (
+            <SidebarMenuSubItem key={item.path}>
+              <Link to={`/project/${projectId}/${item.path}`}>
+                <SidebarMenuSubButton
+                  isActive={pathname === `/project/${projectId}/${item.path}`}
+                >
+                  <item.icon className="size-3.5" />
+                  <span>{item.label}</span>
+                  <NavCount count={soul[item.countKey].length} />
+                </SidebarMenuSubButton>
+              </Link>
+            </SidebarMenuSubItem>
+          ))}
+        </SidebarMenuSub>
+      )}
+    </SidebarMenuItem>
+  );
+};
+
+const NavCount = ({ count }: { count: number }) => {
+  if (count === 0) return null;
+  return (
+    <span className="bg-primary/15 text-primary ml-auto flex size-5 items-center justify-center rounded-full text-[10px] font-semibold">
+      {count}
+    </span>
+  );
+};
