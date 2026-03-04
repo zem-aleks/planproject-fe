@@ -50,10 +50,8 @@ export const DashboardShaping = () => {
                   navigate(`/project/${project.id}/focus`);
                   break;
 
+                case 'onPlanBuilt':
                 case 'onPhasesChanged':
-                  reload();
-                  break;
-
                 case 'onSoulChanged':
                   reload();
                   break;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { Check, MessageCircle, Undo2, X } from 'lucide-react';
+import { Check, MessageCircle, Sparkles, Undo2, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { queryKeys } from '@/lib/queryKeys';
@@ -42,6 +42,21 @@ export const AssumptionsPage = () => {
 
 const AssumptionsContent = ({ project }: { project: ProjectPreviewEntity }) => {
   const soul = project.soul;
+  const navigate = useNavigate();
+  const [creatingChat, setCreatingChat] = useState(false);
+
+  const handleReviewAssumptions = async () => {
+    setCreatingChat(true);
+    try {
+      const chat = await createChat(project.id);
+      navigate(
+        `/project/${project.id}/chat/${chat.id}?message=${encodeURIComponent('Review the project and check if there are any assumptions that should be identified or discussed. If you find any, please create a proposal.')}`,
+      );
+    } catch {
+      toast.error('Failed to create chat');
+      setCreatingChat(false);
+    }
+  };
 
   return (
     <PageTemplate
@@ -71,8 +86,17 @@ const AssumptionsContent = ({ project }: { project: ProjectPreviewEntity }) => {
             projectId={project.id}
           />
         ) : (
-          <Card className="p-5">
-            <p className="text-muted-foreground text-sm">No assumptions</p>
+          <Card className="flex flex-col items-center gap-3 p-8 text-center">
+            <p className="text-muted-foreground text-sm">No assumptions yet</p>
+            <Button
+              size="sm"
+              loading={creatingChat}
+              disabled={creatingChat}
+              onClick={handleReviewAssumptions}
+            >
+              <Sparkles className="size-3.5" />
+              Check for new assumptions
+            </Button>
           </Card>
         )}
       </div>

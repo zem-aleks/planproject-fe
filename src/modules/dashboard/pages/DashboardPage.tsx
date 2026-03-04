@@ -2,17 +2,22 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
 import { WelcomeModal } from '@/modules/dashboard/components/WelcomeModal';
+import { PhaseItemBuilder } from '@/modules/phases/components/PhaseItemBuilder';
+import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
+import { PhasesTimeline } from '@/modules/phases/components/PhasesTimeline';
 import { ProjectActions } from '@/modules/projects/components/ProjectActions';
 import { ProjectHeading } from '@/modules/projects/components/ProjectHeading';
 import { ProjectPageLoader } from '@/modules/projects/components/ProjectPageLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
-import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import { ModifyPhasesForm } from '@/modules/projects/components/forms/ModifyPhasesForm';
+import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { InitSoulForm } from '@/modules/soul/components/InitSoulForm';
 import { SoulBlock } from '@/modules/soul/components/SoulBlock';
 import { ActiveProjectGuard } from '@/modules/subscriptions/guards/ActiveProjectGuard';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
+import { Separator } from '@/ui/separator';
 import { notReachable } from '@/utils/notReachable';
 
 export const DashboardPage = () => {
@@ -59,7 +64,7 @@ const DashboardContent = ({
   project,
   onChanged,
 }: {
-  project: ProjectPreviewEntity;
+  project: ProjectEntity;
   onChanged: () => void;
 }) => {
   const navigate = useNavigate();
@@ -144,6 +149,46 @@ const DashboardContent = ({
           />
 
           <SoulBlock project={project} />
+          <PhasesLoader projectId={project.id}>
+            {(phases, reload) => (
+              <div className={'flex flex-col gap-4'}>
+                <Card className={'mt-4 flex flex-col gap-2 p-4 px-4'}>
+                  <div className={'mb-4 flex flex-col gap-2'}>
+                    <div className={'flex items-center justify-between gap-2'}>
+                      <h2 className={'text-lg font-semibold'}>Main phases</h2>
+                      <div className={'flex gap-2'}>
+                        <ModifyPhasesForm
+                          project={project}
+                          onModified={reload}
+                        />
+
+                        {/*<Button variant={'outline'} size={'sm'} asChild={true}>*/}
+                        {/*  <Link to={`/project/${project.id}/roadmap`}>*/}
+                        {/*    <Map />*/}
+                        {/*    Full Roadmap*/}
+                        {/*  </Link>*/}
+                        {/*</Button>*/}
+                      </div>
+                    </div>
+                    <ol className={'flex flex-col gap-2 overflow-hidden'}>
+                      {phases.map((phase, index) => (
+                        <li key={phase.id} className={''}>
+                          <PhaseItemBuilder
+                            phase={phase}
+                            project={project}
+                            index={index}
+                            onChange={() => reload()}
+                          />
+                          <Separator className={'mt-2'} />
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </Card>
+                <PhasesTimeline phases={phases} />
+              </div>
+            )}
+          </PhasesLoader>
         </>
       );
 

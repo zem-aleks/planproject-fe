@@ -58,6 +58,8 @@ const getOperationLabel = (op: SoulOperation): string => {
     case 'apply_proposal':
     case 'apply_plan_proposal':
       return `Chat proposal: ${truncate(op.description, 60)}`;
+    case 'generate_plan':
+      return `Generate plan: ${truncate(op.description, 60)}`;
     default:
       return notReachable(op);
   }
@@ -157,10 +159,14 @@ export const SoulQueueSnackbar = ({
     if (prevIsApplyingRef.current && !isApplying) {
       if (soulQueue.length === 0 && !soulQueueError) {
         setApplied(true);
+        // Refresh sidebar counters and other project-dependent views
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.projects.list(),
+        });
       }
     }
     prevIsApplyingRef.current = isApplying;
-  }, [isApplying, soulQueue.length, soulQueueError]);
+  }, [isApplying, soulQueue.length, soulQueueError]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-dismiss success after 3s
   useEffect(() => {
@@ -218,7 +224,11 @@ export const SoulQueueSnackbar = ({
       const updated = await removeFromSoulQueue(project.id, {
         operationId: op.id,
       });
-      if (op.type === 'apply_proposal' || op.type === 'apply_plan_proposal') {
+      if (
+        op.type === 'apply_proposal' ||
+        op.type === 'apply_plan_proposal' ||
+        op.type === 'generate_plan'
+      ) {
         onApplyProposalReverted?.(op.messageId, op.proposalId);
       }
       queryClient.setQueryData(queryKeys.projects.detail(project.id), updated);
@@ -234,7 +244,11 @@ export const SoulQueueSnackbar = ({
     try {
       // Revert all proposal-type operations before clearing
       for (const op of soulQueue) {
-        if (op.type === 'apply_proposal' || op.type === 'apply_plan_proposal') {
+        if (
+          op.type === 'apply_proposal' ||
+          op.type === 'apply_plan_proposal' ||
+          op.type === 'generate_plan'
+        ) {
           onApplyProposalReverted?.(op.messageId, op.proposalId);
         }
       }

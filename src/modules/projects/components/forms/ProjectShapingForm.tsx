@@ -11,7 +11,6 @@ import { addShapingUserMessage } from '@/modules/shaping/api/addShapingUserMessa
 import { finishShaping } from '@/modules/shaping/api/finishShaping';
 import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
 import { ShapingScore } from '@/modules/shaping/components/ShapingScore';
-import { ShapingSummary } from '@/modules/shaping/components/ShapingSummary';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
@@ -49,13 +48,19 @@ export const ProjectShapingForm = ({
   const lastAssistantMessage = assistantMessages[assistantMessages.length - 1];
 
   useEffect(() => {
+    if (shaping.score >= 100 && finishStatus === 'idle') {
+      finish(shaping.id);
+    }
+  }, [shaping, finishStatus, finish]);
+
+  useEffect(() => {
     switch (status) {
       case 'idle':
       case 'pending':
         break;
 
       case 'success':
-        onUpdate(data!);
+        onUpdate(data);
         setMessage('');
         reset();
         break;
@@ -99,27 +104,27 @@ export const ProjectShapingForm = ({
     );
   }
 
-  if (shaping.score >= 100) {
-    return (
-      <div className={'flex w-full flex-col gap-2 p-4 py-0'}>
-        <Card className={'w-full px-2 py-1'}>
-          <ShapingSummary
-            shaping={shaping}
-            onMsg={(msg) => {
-              switch (msg.type) {
-                case 'onAccepted':
-                  finish(shaping.id);
-                  break;
-
-                default:
-                  return notReachable(msg.type);
-              }
-            }}
-          />
-        </Card>
-      </div>
-    );
-  }
+  // if (shaping.score >= 100) {
+  //   return (
+  //     <div className={'flex w-full flex-col gap-2 p-4 py-0'}>
+  //       <Card className={'w-full px-2 py-1'}>
+  //         <ShapingSummary
+  //           shaping={shaping}
+  //           onMsg={(msg) => {
+  //             switch (msg.type) {
+  //               case 'onAccepted':
+  //                 finish(shaping.id);
+  //                 break;
+  //
+  //               default:
+  //                 return notReachable(msg.type);
+  //             }
+  //           }}
+  //         />
+  //       </Card>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className={'flex w-full flex-col gap-2 p-4 py-0'}>

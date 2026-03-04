@@ -225,6 +225,13 @@ export type SoulOperation =
       proposalId: string;
       messageId: string;
       changes: { soul?: string; plan?: string };
+    }
+  | {
+      id: string;
+      type: 'generate_plan';
+      description: string;
+      proposalId: string;
+      messageId: string;
     };
 
 export type SoulOperationInput = {

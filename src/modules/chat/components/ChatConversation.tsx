@@ -23,7 +23,7 @@ import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { Badge } from '@/ui/badge';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export type ProposalRevert = {
   messageId: string;
@@ -45,7 +45,11 @@ export const ChatConversation = ({
   onProjectUpdated?: (project: ProjectEntity) => void;
   proposalToRevert?: ProposalRevert | null;
 }) => {
-  const { data, status } = useQuery<ChatEntity, AxiosError<Error>>({
+  const queryClient = useQueryClient();
+  const { data, status, dataUpdatedAt } = useQuery<
+    ChatEntity,
+    AxiosError<Error>
+  >({
     queryKey: queryKeys.chats.detail(chatId),
     queryFn: ({ signal }) => getChat({ projectId, chatId }, { signal }),
   });
@@ -56,14 +60,14 @@ export const ChatConversation = ({
   );
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Reset local state when chat loads
+  // Reset local state when chat data is fetched/refetched
   useEffect(() => {
     if (status === 'success') {
       setLocalMessages(data!.messages);
       setStreamingContent('');
       setStreamingProposals([]);
     }
-  }, [status === 'success' && data!.id]);
+  }, [dataUpdatedAt]);
 
   // Optimistically revert a proposal back to pending
   useEffect(() => {
@@ -149,6 +153,9 @@ export const ChatConversation = ({
             return [];
           });
           return '';
+        });
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.chats.detail(chatId),
         });
         if (chatName) {
           onChatNameChange?.(chatName);

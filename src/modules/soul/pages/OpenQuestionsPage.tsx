@@ -1,7 +1,7 @@
 import { type FormEvent, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
-import { MessageCircle, Send, Trash2, Undo2 } from 'lucide-react';
+import { Check, Send, Sparkles, Trash2, Undo2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { queryKeys } from '@/lib/queryKeys';
@@ -28,6 +28,7 @@ import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
 import { cn } from '@/ui/lib/utils';
+import { Separator } from '@/ui/separator';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const OpenQuestionsPage = () => {
@@ -52,6 +53,21 @@ const OpenQuestionsContent = ({
   project: ProjectPreviewEntity;
 }) => {
   const soul = project.soul;
+  const navigate = useNavigate();
+  const [creatingChat, setCreatingChat] = useState(false);
+
+  const handleReviewQuestions = async () => {
+    setCreatingChat(true);
+    try {
+      const chat = await createChat(project.id);
+      navigate(
+        `/project/${project.id}/chat/${chat.id}?message=${encodeURIComponent('Review the project and check if there are any open questions that should be raised or discussed. If you find any, please create a proposal.')}`,
+      );
+    } catch {
+      toast.error('Failed to create chat');
+      setCreatingChat(false);
+    }
+  };
 
   return (
     <PageTemplate
@@ -83,8 +99,19 @@ const OpenQuestionsContent = ({
             projectId={project.id}
           />
         ) : (
-          <Card className="p-5">
-            <p className="text-muted-foreground text-sm">No open questions</p>
+          <Card className="flex flex-col items-center gap-3 p-8 text-center">
+            <p className="text-muted-foreground text-sm">
+              No open questions yet
+            </p>
+            <Button
+              size="sm"
+              loading={creatingChat}
+              disabled={creatingChat}
+              onClick={handleReviewQuestions}
+            >
+              <Sparkles className="size-3.5" />
+              Check for new questions
+            </Button>
           </Card>
         )}
       </div>
@@ -144,6 +171,7 @@ const OpenQuestionsList = ({
   const [removingIndex, setRemovingIndex] = useState<number | null>(null);
   const [undoingId, setUndoingId] = useState<string | null>(null);
   const [loadingChat, setLoadingChat] = useState<string | null>(null);
+  const [answeringOption, setAnsweringOption] = useState<string | null>(null);
 
   const invalidateProject = () => {
     queryClient.invalidateQueries({
@@ -178,6 +206,23 @@ const OpenQuestionsList = ({
     }
   };
 
+  const handleAnswer = async (topic: string, chosenOption: string) => {
+    const key = `${topic}:${chosenOption}`;
+    setAnsweringOption(key);
+    try {
+      await addToSoulQueue(projectId, {
+        type: 'answer_open_question',
+        topic,
+        chosenOption,
+      });
+      invalidateProject();
+    } catch {
+      toast.error('Failed to queue answer');
+    } finally {
+      setAnsweringOption(null);
+    }
+  };
+
   const startChatWithMessage = async (topic: string, message: string) => {
     const key = `${topic}:${message}`;
     setLoadingChat(key);
@@ -204,22 +249,36 @@ const OpenQuestionsList = ({
 
         if (queueOp) {
           return (
-            <Card key={i} className="flex items-center gap-3 p-4 opacity-60">
-              <span className="flex-1 text-sm font-medium">{q.topic}</span>
-              <Badge variant="warning">queued</Badge>
-              <span className="text-muted-foreground text-xs">
-                <PendingActionLabel op={queueOp} />
-              </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                loading={undoingId === queueOp.id}
-                disabled={undoingId === queueOp.id}
-                onClick={() => handleUndo(queueOp.id)}
-              >
-                <Undo2 className="size-3.5" />
-                Undo
-              </Button>
+            <Card key={i} className="flex flex-col gap-0 p-4">
+              <div className="opacity-50">
+                <div className="text-sm font-medium">{q.topic}</div>
+                {q.context && (
+                  <p className="text-muted-foreground mt-1 text-xs leading-relaxed">
+                    {q.context}
+                  </p>
+                )}
+              </div>
+
+              <Separator className="my-3" />
+
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="warning">queued</Badge>
+                  <span className="text-muted-foreground text-xs">
+                    <PendingActionLabel op={queueOp} />
+                  </span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  loading={undoingId === queueOp.id}
+                  disabled={undoingId === queueOp.id}
+                  onClick={() => handleUndo(queueOp.id)}
+                >
+                  <Undo2 className="size-3.5" />
+                  Undo
+                </Button>
+              </div>
             </Card>
           );
         }
@@ -266,29 +325,31 @@ const OpenQuestionsList = ({
                     </div>
                   )}
 
-                  {/* Suggested options as chat starters */}
+                  {/* Suggested options — selecting queues an answer */}
                   {q.suggestedOptions && q.suggestedOptions.length > 0 && (
                     <div className="flex flex-col gap-1.5">
                       <p className="text-muted-foreground text-xs font-medium">
-                        Suggested answers — click to discuss:
+                        Suggested answers — click to accept:
                       </p>
                       <div className="flex flex-col gap-1">
-                        {q.suggestedOptions.map((opt, j) => (
-                          <button
-                            key={j}
-                            type="button"
-                            disabled={!!loadingChat || isLoading}
-                            onClick={() => startChatWithMessage(q.topic, opt)}
-                            className={cn(
-                              'border-border hover:border-primary/40 hover:bg-muted flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors',
-                              loadingChat === `${q.topic}:${opt}` &&
-                                'opacity-50',
-                            )}
-                          >
-                            <MessageCircle className="text-muted-foreground size-3.5 shrink-0" />
-                            <span className="flex-1">{opt}</span>
-                          </button>
-                        ))}
+                        {q.suggestedOptions.map((opt, j) => {
+                          const optKey = `${q.topic}:${opt}`;
+                          return (
+                            <button
+                              key={j}
+                              type="button"
+                              disabled={isLoading || answeringOption === optKey}
+                              onClick={() => handleAnswer(q.topic, opt)}
+                              className={cn(
+                                'border-border hover:border-primary/40 hover:bg-muted flex items-center gap-2 rounded-lg border px-3 py-2 text-left text-sm transition-colors',
+                                answeringOption === optKey && 'opacity-50',
+                              )}
+                            >
+                              <Check className="text-muted-foreground size-3.5 shrink-0" />
+                              <span className="flex-1">{opt}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   )}

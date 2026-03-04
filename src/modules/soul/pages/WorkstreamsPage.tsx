@@ -1,10 +1,14 @@
-import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useMemo, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router';
 
+import type { AxiosError } from 'axios';
 import { Layers, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { queryKeys } from '@/lib/queryKeys';
 import { createChat } from '@/modules/chat/api/createChat';
+import { getChats } from '@/modules/chat/api/getChats';
+import type { ChatPreviewEntity } from '@/modules/chat/types/entity';
 import { ProjectPageLoader } from '@/modules/projects/components/ProjectPageLoader';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import type {
@@ -17,6 +21,7 @@ import { PageTemplate } from '@/modules/templates/components/PageTemplate';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
 import { Card } from '@/ui/card';
+import { useQuery } from '@tanstack/react-query';
 
 export const WorkstreamsPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -111,6 +116,24 @@ const WorkstreamsList = ({
   const navigate = useNavigate();
   const [chattingIndex, setChattingIndex] = useState<number | null>(null);
 
+  const { data: chats } = useQuery<ChatPreviewEntity[], AxiosError<Error>>({
+    queryKey: queryKeys.chats.byProject(projectId),
+    queryFn: ({ signal }) => getChats(projectId, { signal }),
+  });
+
+  const chatsByWorkstream = useMemo(() => {
+    if (!chats) return new Map<string, ChatPreviewEntity[]>();
+    const map = new Map<string, ChatPreviewEntity[]>();
+    for (const chat of chats) {
+      if (chat.context?.type === 'workstream' && chat.context.entityId) {
+        const existing = map.get(chat.context.entityId) ?? [];
+        existing.push(chat);
+        map.set(chat.context.entityId, existing);
+      }
+    }
+    return map;
+  }, [chats]);
+
   const handleStartChat = async (index: number, name: string) => {
     setChattingIndex(index);
     try {
@@ -128,37 +151,62 @@ const WorkstreamsList = ({
 
   return (
     <div className="flex flex-col gap-3">
-      {sorted.map((ws, i) => (
-        <Card key={i} className="flex items-start justify-between gap-3 p-4">
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-2">
-              <Layers className="text-muted-foreground size-4 shrink-0" />
-              <span className="text-sm font-medium">{ws.name}</span>
-              {ws.inferred && (
-                <Badge variant="outline" className="text-[10px]">
-                  Suggested
-                </Badge>
-              )}
-              <PriorityBadge priority={ws.priority} />
+      {sorted.map((ws, i) => {
+        const wsChats = chatsByWorkstream.get(ws.name) ?? [];
+        return (
+          <Card key={i} className="flex flex-col gap-3 p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex flex-col gap-0.5">
+                <div className="flex items-center gap-2">
+                  <Layers className="text-muted-foreground size-4 shrink-0" />
+                  <span className="text-sm font-medium">{ws.name}</span>
+                  {ws.inferred && (
+                    <Badge variant="outline" className="text-[10px]">
+                      Suggested
+                    </Badge>
+                  )}
+                  <PriorityBadge priority={ws.priority} />
+                </div>
+                <p className="text-muted-foreground pl-6 text-xs leading-relaxed">
+                  {ws.description}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  loading={chattingIndex === i}
+                  disabled={chattingIndex === i}
+                  onClick={() => handleStartChat(i, ws.name)}
+                >
+                  <MessageCircle className="size-3.5" />
+                  Discover
+                </Button>
+              </div>
             </div>
-            <p className="text-muted-foreground pl-6 text-xs leading-relaxed">
-              {ws.description}
-            </p>
-          </div>
-          <div className="flex shrink-0 items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              loading={chattingIndex === i}
-              disabled={chattingIndex === i}
-              onClick={() => handleStartChat(i, ws.name)}
-            >
-              <MessageCircle className="size-3.5" />
-              Discover
-            </Button>
-          </div>
-        </Card>
-      ))}
+
+            {wsChats.length > 0 && (
+              <div className="flex flex-col gap-1.5 pl-6">
+                <span className="text-muted-foreground text-xs font-medium">
+                  {wsChats.length} {wsChats.length === 1 ? 'chat' : 'chats'}
+                </span>
+                {wsChats.map((chat) => (
+                  <Link
+                    key={chat.id}
+                    to={`/project/${projectId}/chat/${chat.id}`}
+                    className="hover:bg-accent flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors"
+                  >
+                    <MessageCircle className="text-muted-foreground size-3.5 shrink-0" />
+                    <span className="truncate text-xs">
+                      {chat.name || 'New chat'}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 };
