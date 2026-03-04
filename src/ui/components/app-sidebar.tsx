@@ -125,7 +125,7 @@ export function AppSidebar() {
                     {project.title.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <span className="truncate text-sm font-semibold">
+                <span className="line-clamp-3 text-sm font-semibold">
                   {project.title}
                 </span>
               </Link>
