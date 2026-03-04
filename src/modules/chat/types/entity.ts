@@ -49,3 +49,5 @@ export type ChatProposal = {
   description: string;
   status: 'pending' | 'approved' | 'rejected';
 };
+
+export type UnlockedSection = 'competitors' | 'auditory';

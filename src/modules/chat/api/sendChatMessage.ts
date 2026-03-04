@@ -1,3 +1,4 @@
+import type { UnlockedSection } from '@/modules/chat/types/entity';
 import { ENV } from '@/modules/config';
 
 export type ProposalProgressStage = 'analyzing' | 'generating_changes';
@@ -7,6 +8,7 @@ type SSECallbacks = {
   onToolCall: (name: string) => void;
   onProposalProgress: (stage: ProposalProgressStage) => void;
   onConfirm: (proposal: { id: string; description: string }) => void;
+  onSectionUnlocked: (section: UnlockedSection) => void;
   onDone: (messageId: string, chatName?: string) => void;
   onError: (messageId: string | null) => void;
 };
@@ -62,6 +64,9 @@ export const sendChatMessage = async (
             id: data.proposalId,
             description: data.description,
           });
+          return false;
+        case 'section_unlocked':
+          callbacks.onSectionUnlocked(data.section);
           return false;
         case 'done':
           callbacks.onDone(data.messageId, data.chatName);

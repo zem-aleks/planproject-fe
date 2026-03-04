@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
 
+import { queryKeys } from '@/lib/queryKeys';
 import { WelcomeModal } from '@/modules/dashboard/components/WelcomeModal';
 import { PhaseItemBuilder } from '@/modules/phases/components/PhaseItemBuilder';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
@@ -19,6 +20,7 @@ import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { Separator } from '@/ui/separator';
 import { notReachable } from '@/utils/notReachable';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const DashboardPage = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -68,6 +70,7 @@ const DashboardContent = ({
   onChanged: () => void;
 }) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   switch (project.status) {
     case 'soulBuilding':
@@ -91,6 +94,9 @@ const DashboardContent = ({
 
                 case 'onPlanBuilt':
                   onChanged();
+                  queryClient.invalidateQueries({
+                    queryKey: queryKeys.phases.byProject(project.id),
+                  });
                   break;
 
                 case 'onPhasesChanged':
@@ -132,6 +138,9 @@ const DashboardContent = ({
 
                 case 'onPlanBuilt':
                   onChanged();
+                  queryClient.invalidateQueries({
+                    queryKey: queryKeys.phases.byProject(project.id),
+                  });
                   break;
 
                 case 'onPhasesChanged':

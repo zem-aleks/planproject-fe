@@ -5,7 +5,7 @@ import {
   type ProposalProgressStage,
   sendChatMessage,
 } from '@/modules/chat/api/sendChatMessage';
-import type { ChatMessage } from '@/modules/chat/types/entity';
+import type { ChatMessage, UnlockedSection } from '@/modules/chat/types/entity';
 
 type UseChatStreamParams = {
   projectId: string;
@@ -13,6 +13,7 @@ type UseChatStreamParams = {
   onUserMessage: (message: ChatMessage) => void;
   onAssistantChunk: (content: string) => void;
   onConfirm: (proposal: { id: string; description: string }) => void;
+  onSectionUnlocked?: (section: UnlockedSection) => void;
   onAssistantDone: (messageId: string, chatName?: string) => void;
   onError: () => void;
 };
@@ -23,6 +24,7 @@ export const useChatStream = ({
   onUserMessage,
   onAssistantChunk,
   onConfirm,
+  onSectionUnlocked,
   onAssistantDone,
   onError,
 }: UseChatStreamParams) => {
@@ -67,6 +69,9 @@ export const useChatStream = ({
             onToolCall: (name) => {
               setToolCallName(name);
               setProposalStage(null);
+            },
+            onSectionUnlocked: (section) => {
+              onSectionUnlocked?.(section);
             },
             onProposalProgress: (stage) => {
               setProposalStage(stage);
@@ -115,6 +120,7 @@ export const useChatStream = ({
       onUserMessage,
       onAssistantChunk,
       onConfirm,
+      onSectionUnlocked,
       onAssistantDone,
       onError,
     ],

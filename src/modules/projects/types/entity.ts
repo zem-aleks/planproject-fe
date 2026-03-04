@@ -14,6 +14,8 @@ export type ProjectPreviewEntity = {
   soulQueueStartedAt: Date | null;
   soulQueueApplying: boolean;
   soulQueueError: string | null;
+  competitorsUnlocked: boolean;
+  auditoryUnlocked: boolean;
 };
 
 export type ProjectEntity = {
@@ -34,6 +36,8 @@ export type ProjectEntity = {
   soulQueueStartedAt: Date | null;
   soulQueueApplying: boolean;
   soulQueueError: string | null;
+  competitorsUnlocked: boolean;
+  auditoryUnlocked: boolean;
 };
 
 export type ProjectStatus =

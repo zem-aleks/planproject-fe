@@ -9,6 +9,7 @@ import { getChat } from '@/modules/chat/api/getChat';
 import { ChatInput } from '@/modules/chat/components/ChatInput';
 import { ChatMessageBubble } from '@/modules/chat/components/ChatMessageBubble';
 import {
+  SectionUnlockedCard,
   ThinkingBubble,
   ToolCallBubble,
 } from '@/modules/chat/components/ChatStreamingIndicators';
@@ -18,6 +19,7 @@ import type {
   ChatEntity,
   ChatMessage,
   ChatProposal,
+  UnlockedSection,
 } from '@/modules/chat/types/entity';
 import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { Badge } from '@/ui/badge';
@@ -56,6 +58,9 @@ export const ChatConversation = ({
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const [streamingContent, setStreamingContent] = useState('');
   const [streamingProposals, setStreamingProposals] = useState<ChatProposal[]>(
+    [],
+  );
+  const [unlockedSections, setUnlockedSections] = useState<UnlockedSection[]>(
     [],
   );
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -118,14 +123,38 @@ export const ChatConversation = ({
     [onProjectUpdated],
   );
 
+  const handleSectionUnlocked = useCallback(
+    (section: UnlockedSection) => {
+      setUnlockedSections((prev) =>
+        prev.includes(section) ? prev : [...prev, section],
+      );
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.list(),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.detail(projectId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.competitors.byProject(projectId),
+      });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.auditory.byProject(projectId),
+      });
+      scrollToBottom();
+    },
+    [queryClient, projectId, scrollToBottom],
+  );
+
   const { sendMessage, isStreaming, toolCallName, proposalStage, abort } =
     useChatStream({
       projectId,
       chatId,
+      onSectionUnlocked: handleSectionUnlocked,
       onUserMessage: (msg) => {
         setLocalMessages((prev) => [...prev, msg]);
         setStreamingContent('');
         setStreamingProposals([]);
+        setUnlockedSections([]);
         scrollToBottom();
       },
       onAssistantChunk: (content) => {
@@ -243,6 +272,13 @@ export const ChatConversation = ({
                   proposalStage={proposalStage}
                 />
               )}
+            {unlockedSections.map((section) => (
+              <SectionUnlockedCard
+                key={section}
+                section={section}
+                projectId={projectId}
+              />
+            ))}
             {isStreaming && streamingContent && (
               <>
                 <ChatMessageBubble

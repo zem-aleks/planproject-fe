@@ -30,16 +30,14 @@ export const PhasesLoader = ({ projectId, children }: Props): ReactNode => {
   >({
     queryKey,
     queryFn: ({ signal }) => getPhases(projectId, { signal }),
-    refetchInterval: polling ? 3000 : false,
+    refetchInterval: polling ? 5000 : false,
   });
 
   useEffect(() => {
-    if (
-      status === 'success' &&
-      data!.length > 0 &&
-      data!.every((p) => p.status !== 'building')
-    ) {
-      setPolling(false);
+    if (status === 'success') {
+      const hasBuilding =
+        data!.length === 0 || data!.some((p) => p.status === 'building');
+      setPolling(hasBuilding);
     }
   }, [status, data]); // eslint-disable-line react-hooks/exhaustive-deps
 

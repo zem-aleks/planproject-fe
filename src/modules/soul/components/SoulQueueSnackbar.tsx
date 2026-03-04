@@ -91,18 +91,28 @@ export const SoulQueueSnackbar = ({
     queryClient.invalidateQueries({
       queryKey: queryKeys.projects.detail(project.id),
     });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.projects.list(),
+    });
   };
 
-  // Poll while backend is applying until it finishes
+  // Timer expired but queue not yet cleared — backend is applying or about to
+  const timerExpired =
+    soulQueue.length > 0 &&
+    !isApplying &&
+    remainingSeconds === 0 &&
+    !!soulQueueStartedAt;
+
+  // Poll while backend is applying (or timer expired awaiting apply) until it finishes
   useEffect(() => {
-    if (!soulQueueApplying) return;
+    if (!soulQueueApplying && !timerExpired) return;
 
     const interval = setInterval(() => {
       invalidateProject();
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [soulQueueApplying]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [soulQueueApplying, timerExpired]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (
