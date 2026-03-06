@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { ReactNode } from 'react';
 
 import {
   Bar,
@@ -91,7 +92,7 @@ export const PhasesTimeline = React.memo(
                 <LabelList
                   dataKey="duration"
                   position="inside"
-                  formatter={(v: number) => `${v} days`}
+                  formatter={(v: ReactNode) => `${v} days`}
                   className="fill-[var(--background)]"
                   fontSize={12}
                 />
