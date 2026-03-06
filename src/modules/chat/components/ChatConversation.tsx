@@ -364,6 +364,16 @@ const ALL_SUGGESTIONS: Partial<Record<ChatContext['type'], string[]>> = {
     'What has changed since the last review?',
     'Are there domain insights we should act on?',
   ],
+  milestone: [
+    'What is the current progress on milestones?',
+    'Which milestones are at risk?',
+    'How should I prioritize the remaining milestones?',
+  ],
+  task: [
+    'What tasks need attention right now?',
+    'Are there any blocked tasks?',
+    'Help me break down remaining work',
+  ],
 };
 
 const SPECIFIC_SUGGESTIONS: Partial<Record<ChatContext['type'], string[]>> = {
@@ -411,6 +421,16 @@ const SPECIFIC_SUGGESTIONS: Partial<Record<ChatContext['type'], string[]>> = {
     'How does this context affect our planning?',
     'What actions should we take based on this?',
     'Is this context still accurate?',
+  ],
+  milestone: [
+    'What are the next steps for this milestone?',
+    'What are the risks to completing this milestone?',
+    'Help me update the steps for this milestone',
+  ],
+  task: [
+    'Help me complete this task',
+    'What do I need to know to work on this?',
+    'Are there blockers for this task?',
   ],
 };
 
@@ -465,6 +485,8 @@ const SOUL_CONTEXT_LABELS: Partial<Record<ChatContext['type'], string>> = {
   resource: 'Resource',
   target_user: 'Target User',
   project_context: 'Project Context',
+  milestone: 'Milestone',
+  task: 'Task',
 };
 
 const ChatContextBanner = ({ context }: { context: ChatContext | null }) => {

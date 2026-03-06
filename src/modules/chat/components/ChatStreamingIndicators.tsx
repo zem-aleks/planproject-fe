@@ -3,6 +3,7 @@ import { Link } from 'react-router';
 import {
   ArrowRight,
   Bot,
+  CheckSquare,
   EqualApproximately,
   FileSearch,
   Flag,
@@ -45,6 +46,12 @@ const TOOL_CALL_CONFIG: Record<string, { label: string; icon: typeof Search }> =
     load_auditory: { label: 'Loading audience data', icon: Users },
     update_competitors: { label: 'Updating competitor', icon: Swords },
     update_auditory: { label: 'Updating audience data', icon: Users },
+    complete_step: { label: 'Completing step', icon: CheckSquare },
+    complete_milestone: { label: 'Completing milestone', icon: Flag },
+    update_milestone: { label: 'Updating milestone', icon: Flag },
+    update_step: { label: 'Updating step', icon: CheckSquare },
+    complete_task: { label: 'Completing task', icon: CheckSquare },
+    update_task: { label: 'Updating task', icon: CheckSquare },
   };
 
 const PROPOSAL_STAGE_CONFIG: Record<

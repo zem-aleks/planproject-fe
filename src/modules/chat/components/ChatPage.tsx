@@ -119,6 +119,10 @@ const ChatListContent = ({ projectId }: { projectId: string }) => {
         return 'Target User';
       case 'project_context':
         return 'Project Context';
+      case 'milestone':
+        return 'Milestone';
+      case 'task':
+        return 'Task';
       default:
         return null;
     }
