@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
+import { Link } from 'react-router';
 
 import type { AxiosError } from 'axios';
 import dayjs from 'dayjs';
-import { Flag, Goal } from 'lucide-react';
+import { Flag, Focus, Goal, MessageSquare, Sparkles } from 'lucide-react';
 
 import { queryKeys } from '@/lib/queryKeys';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
@@ -32,6 +33,7 @@ export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
   >({
     queryKey: queryKeys.timeline.history(project.id),
     queryFn: ({ signal }) => getHistoryTimeline(project.id, { signal }),
+    staleTime: 0,
   });
 
   switch (status) {
@@ -82,7 +84,7 @@ export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
                 <TimelineLine />
                 <TimelineDot />
               </div>
-              <EventsCard events={point.events} />
+              <EventsCard events={point.events} project={project} />
             </div>
           ))}
         </div>
@@ -94,7 +96,13 @@ export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
   }
 };
 
-const EventsCard = ({ events }: { events: TimelineEventHydrated[] }) => {
+const EventsCard = ({
+  events,
+  project,
+}: {
+  events: TimelineEventHydrated[];
+  project: ProjectPreviewEntity;
+}) => {
   return (
     <div
       className={
@@ -104,7 +112,7 @@ const EventsCard = ({ events }: { events: TimelineEventHydrated[] }) => {
       <ul className={'flex flex-col gap-1'}>
         {events.map((event) => (
           <li>
-            <EventCard event={event} />
+            <EventCard event={event} project={project} />
           </li>
         ))}
       </ul>
@@ -112,7 +120,13 @@ const EventsCard = ({ events }: { events: TimelineEventHydrated[] }) => {
   );
 };
 
-const EventCard = ({ event }: { event: TimelineEventHydrated }) => {
+const EventCard = ({
+  event,
+  project,
+}: {
+  event: TimelineEventHydrated;
+  project: ProjectPreviewEntity;
+}) => {
   switch (event.type) {
     case 'milestone.started':
       return (
@@ -167,6 +181,54 @@ const EventCard = ({ event }: { event: TimelineEventHydrated }) => {
         <div className={''}>
           <Flag className={'inline-block text-green-600'} /> Congratulations!
           You completed the project!
+        </div>
+      );
+
+    case 'focus.changed':
+      return (
+        <div className={''}>
+          <Focus className={'mr-1 inline-block text-purple-500'} />
+          {event.milestoneIds.length === 0
+            ? 'All milestones unfocused'
+            : `Focus changed to: ${event.milestoneTitles.join(', ')}`}
+        </div>
+      );
+
+    case 'soul.updated':
+      return (
+        <div className={''}>
+          <Sparkles className={'mr-1 inline-block text-amber-500'} />
+          Project profile updated: {event.description}
+        </div>
+      );
+
+    case 'chat.created':
+      return (
+        <div className={''}>
+          <MessageSquare className={'mr-1 inline-block text-blue-500'} />
+          <Link
+            to={`/project/${project.id}/chat/${event.chatId}`}
+            className={'underline'}
+          >
+            New chat started
+          </Link>
+          {event.contextType && event.contextLabel && (
+            <span className={'text-muted-foreground'}>
+              {' '}
+              — {event.contextType}: {event.contextLabel}
+            </span>
+          )}
+        </div>
+      );
+
+    case 'task.completed':
+      return (
+        <div className={''}>
+          <IconCheck className={'mr-1 inline-block text-green-600'} />
+          Task completed: <strong>{event.taskTitle}</strong>
+          {event.message && (
+            <span className={'text-muted-foreground'}> — {event.message}</span>
+          )}
         </div>
       );
 

@@ -34,12 +34,51 @@ export type TimelineEventProject =
   | { type: 'project.started'; projectId: string }
   | { type: 'project.completed'; projectId: string };
 
+export type TimelineEventFocus = {
+  type: 'focus.changed';
+  milestoneIds: string[];
+  milestoneTitles: string[];
+  createdAt: string;
+};
+
+export type TimelineEventSoul = {
+  type: 'soul.updated';
+  description: string;
+  createdAt: string;
+};
+
+export type TimelineEventChat = {
+  type: 'chat.created';
+  chatId: string;
+  chatName: string | null;
+  contextType: string | null;
+  contextLabel: string | null;
+  createdAt: string;
+};
+
+export type TimelineEventTask = {
+  type: 'task.completed';
+  taskId: string;
+  taskTitle: string;
+  milestoneId: string;
+  message: string;
+  completedAt: string;
+};
+
 export type TimelineEvent =
   | TimelineEventMilestone
   | TimelineEventPhase
-  | TimelineEventProject;
+  | TimelineEventProject
+  | TimelineEventFocus
+  | TimelineEventSoul
+  | TimelineEventChat
+  | TimelineEventTask;
 
 export type TimelineEventHydrated =
   | (TimelineEventMilestone & { milestone: MilestoneDetailsEntity })
   | (TimelineEventPhase & { phase: PhaseEntity })
-  | (TimelineEventProject & { project: ProjectEntity });
+  | (TimelineEventProject & { project: ProjectEntity })
+  | TimelineEventFocus
+  | TimelineEventSoul
+  | TimelineEventChat
+  | TimelineEventTask;
