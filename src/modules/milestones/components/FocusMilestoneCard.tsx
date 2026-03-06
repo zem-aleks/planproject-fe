@@ -74,6 +74,9 @@ export const FocusMilestoneCard = ({
     queryClient.invalidateQueries({
       queryKey: queryKeys.chats.byProject(milestone.projectId),
     });
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.timeline.today(milestone.projectId),
+    });
     setChatOpen(false);
     setTimeout(() => {
       refetchMilestone();

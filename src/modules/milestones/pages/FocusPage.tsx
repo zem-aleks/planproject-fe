@@ -44,10 +44,10 @@ export const FocusPage = () => {
         </div>
 
         <TodayTimelineLoader projectId={project.id}>
-          {(milestone, reload) => (
+          {(milestones, reload) => (
             <TodayTimelineContent
               project={project}
-              milestone={milestone}
+              milestones={milestones}
               onMsg={(msg) => {
                 switch (msg.type) {
                   case 'onNewMilestoneActivated':

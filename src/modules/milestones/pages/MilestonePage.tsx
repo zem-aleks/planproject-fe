@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 import type { AxiosError } from 'axios';
-import { BookOpen, MessageCircle } from 'lucide-react';
+import { BookOpen, Focus, MessageCircle } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { queryKeys } from '@/lib/queryKeys';
 import { getChats } from '@/modules/chat/api/getChats';
@@ -10,6 +11,7 @@ import type {
   ChatContext,
   ChatPreviewEntity,
 } from '@/modules/chat/types/entity';
+import { toggleFocusMilestone } from '@/modules/milestones/api/focusMilestone';
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneChatDialog } from '@/modules/milestones/components/MilestoneChatDialog';
@@ -119,7 +121,9 @@ const LoadedContentPage = ({
   onChanged: () => void;
 }) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [currentMilestone, setCurrentMilestone] = useState(milestone);
+  const [focusing, setFocusing] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatContext, setChatContext] = useState<ChatContext>({
     type: 'milestone',
@@ -152,6 +156,18 @@ const LoadedContentPage = ({
 
   const handleStepUpdated = (updated: MilestoneEntity) => {
     setCurrentMilestone((prev) => ({ ...prev, ...updated }));
+  };
+
+  const handleFocus = async () => {
+    setFocusing(true);
+    try {
+      await toggleFocusMilestone(milestone.id);
+      queryClient.setQueryData(queryKeys.timeline.today(project.id), undefined);
+      navigate(`/project/${project.id}/focus`);
+    } catch {
+      toast.error('Failed to focus milestone');
+      setFocusing(false);
+    }
   };
 
   const handleChatClosed = useCallback(() => {
@@ -234,6 +250,17 @@ const LoadedContentPage = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {currentMilestone.status === 'inProgress' && (
+              <Button
+                variant={currentMilestone.focused ? 'secondary' : 'default'}
+                size="sm"
+                onClick={handleFocus}
+                loading={focusing}
+              >
+                <Focus className="size-4" />
+                {currentMilestone.focused ? 'Focused' : 'Focus'}
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={openMilestoneChat}>
               <MessageCircle className="size-4" />
               Chat

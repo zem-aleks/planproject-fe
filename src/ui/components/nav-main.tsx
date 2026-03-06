@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
+import type { AxiosError } from 'axios';
 import {
   BookOpen,
   ChartGantt,
@@ -21,8 +22,11 @@ import {
   Zap,
 } from 'lucide-react';
 
+import { queryKeys } from '@/lib/queryKeys';
+import type { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import type { ProjectSoul } from '@/modules/projects/types/entity';
+import { getTodayTimeline } from '@/modules/timeline/api/getTodayTimeline';
 import { cn } from '@/ui/lib/utils';
 import {
   SidebarGroup,
@@ -35,6 +39,7 @@ import {
   SidebarMenuSubItem,
 } from '@/ui/sidebar';
 import { IconAdjustmentsStar, IconPackages } from '@tabler/icons-react';
+import { useQuery } from '@tanstack/react-query';
 
 export function NavMain() {
   const { pathname } = useLocation();
@@ -164,16 +169,7 @@ export function NavMain() {
 
           {project.status === 'active' && (
             <>
-              <SidebarMenuItem>
-                <Link to={`/project/${project.id}/focus`}>
-                  <SidebarMenuButton
-                    isActive={pathname === `/project/${project.id}/focus`}
-                  >
-                    <Zap />
-                    <span>Focus Space</span>
-                  </SidebarMenuButton>
-                </Link>
-              </SidebarMenuItem>
+              <FocusSpaceMenuItem projectId={project.id} pathname={pathname} />
 
               <SidebarMenuItem>
                 <Link to={`/project/${project.id}/timeline`}>
@@ -290,6 +286,35 @@ const KnowledgeBaseMenu = ({
           ))}
         </SidebarMenuSub>
       )}
+    </SidebarMenuItem>
+  );
+};
+
+const FocusSpaceMenuItem = ({
+  projectId,
+  pathname,
+}: {
+  projectId: string;
+  pathname: string;
+}) => {
+  const { data } = useQuery<MilestoneDetailsEntity[], AxiosError<Error>>({
+    queryKey: queryKeys.timeline.today(projectId),
+    queryFn: ({ signal }) => getTodayTimeline(projectId, { signal }),
+  });
+
+  const count = (data ?? []).length;
+
+  return (
+    <SidebarMenuItem>
+      <Link to={`/project/${projectId}/focus`}>
+        <SidebarMenuButton
+          isActive={pathname === `/project/${projectId}/focus`}
+        >
+          <Zap />
+          <span>Focus Space</span>
+          {count > 0 && <NavCount count={count} />}
+        </SidebarMenuButton>
+      </Link>
     </SidebarMenuItem>
   );
 };

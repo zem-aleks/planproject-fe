@@ -1,12 +1,12 @@
-import { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 import { api } from '@/modules/api/api';
-import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
+import type { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 
 export const getTodayTimeline = async (
   projectId: string,
   config?: AxiosRequestConfig,
-): Promise<MilestoneDetailsEntity | null> => {
+): Promise<MilestoneDetailsEntity[]> => {
   return api.get(`/timeline/${projectId}/today`, {
     signal: config?.signal,
   });

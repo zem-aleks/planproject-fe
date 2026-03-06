@@ -1,9 +1,9 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import type { AxiosError } from 'axios';
 
 import { queryKeys } from '@/lib/queryKeys';
-import { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
+import type { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
 import { getTodayTimeline } from '@/modules/timeline/api/getTodayTimeline';
 import { Button } from '@/ui/button.tsx';
 import { Card } from '@/ui/card';
@@ -14,7 +14,7 @@ import { useQuery } from '@tanstack/react-query';
 type Props = {
   projectId: string;
   children: (
-    milestone: MilestoneDetailsEntity | null,
+    milestones: MilestoneDetailsEntity[],
     reload: () => void,
   ) => ReactNode;
 };
@@ -24,7 +24,7 @@ export const TodayTimelineLoader = ({
   children,
 }: Props): ReactNode => {
   const { data, error, status, refetch } = useQuery<
-    MilestoneDetailsEntity | null,
+    MilestoneDetailsEntity[],
     AxiosError<Error>
   >({
     queryKey: queryKeys.timeline.today(projectId),
@@ -40,7 +40,6 @@ export const TodayTimelineLoader = ({
       );
 
     case 'error':
-      // TODO: process different error properly / project completed
       return (
         <Card className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Timeline loading error</p>

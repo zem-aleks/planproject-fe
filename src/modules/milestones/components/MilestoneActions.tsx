@@ -1,7 +1,14 @@
-import { Link } from 'react-router';
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router';
 
-import { MilestoneEntity } from '@/modules/milestones/types/entity';
+import { Focus } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { queryKeys } from '@/lib/queryKeys';
+import { toggleFocusMilestone } from '@/modules/milestones/api/focusMilestone';
+import type { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { Button } from '@/ui/button';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const MilestoneActions = ({
   milestone,
@@ -9,15 +16,46 @@ export const MilestoneActions = ({
   milestone: MilestoneEntity;
   onUpdated: (milestone: MilestoneEntity) => void;
 }) => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [focusing, setFocusing] = useState(false);
+
+  const handleFocus = async () => {
+    setFocusing(true);
+    try {
+      await toggleFocusMilestone(milestone.id);
+      queryClient.removeQueries({
+        queryKey: queryKeys.timeline.today(milestone.projectId),
+      });
+      navigate(`/project/${milestone.projectId}/focus`);
+    } catch {
+      toast.error('Failed to focus milestone');
+      setFocusing(false);
+    }
+  };
+
   return (
-    <Button variant="warning" className={'w-full py-2'} asChild>
-      <Link
-        to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
-        className="w-full"
-      >
-        View Details
-      </Link>
-    </Button>
+    <div className="flex flex-col gap-2">
+      <Button variant="warning" className={'w-full py-2'} asChild>
+        <Link
+          to={`/project/${milestone.projectId}/milestone/${milestone.id}`}
+          className="w-full"
+        >
+          View Details
+        </Link>
+      </Button>
+      {milestone.status !== 'completed' && (
+        <Button
+          variant={milestone.focused ? 'secondary' : 'default'}
+          className={'w-full py-2'}
+          onClick={handleFocus}
+          loading={focusing}
+        >
+          <Focus className="size-4" />
+          {milestone.focused ? 'Focused' : 'Focus'}
+        </Button>
+      )}
+    </div>
   );
 
   // const { state, load } = useLazyLoadableData(startMilestone);
