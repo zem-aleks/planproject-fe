@@ -45,6 +45,8 @@ export const PhasesTimeline = React.memo(
     });
 
     const endOfTimeline = Math.max(...phases.map((p) => p.timelineEndDay), 0);
+    const rowHeight = 70;
+    const chartHeight = Math.max(300, phases.length * rowHeight + 40);
 
     return (
       <Card className={'py-4'}>
@@ -57,7 +59,8 @@ export const PhasesTimeline = React.memo(
         <CardContent>
           <ChartContainer
             config={chartConfig}
-            className={'aspect-auto h-[520px] w-full'}
+            className={'aspect-auto w-full'}
+            style={{ height: `${chartHeight}px` }}
           >
             <BarChart accessibilityLayer data={chartData} layout="vertical">
               <CartesianGrid horizontal={false} />
@@ -68,7 +71,7 @@ export const PhasesTimeline = React.memo(
                 axisLine={true}
                 tickLine={true}
                 unit={'days'}
-                domain={[0, endOfTimeline + 10]} // adjust max to fit your data
+                domain={[0, endOfTimeline + 10]}
                 tickCount={endOfTimeline}
               />
               <YAxis
@@ -83,21 +86,21 @@ export const PhasesTimeline = React.memo(
                 dataKey={({ startDay, endDay }) => [startDay, endDay]}
                 fill="#ad46ff99"
                 radius={5}
+                barSize={24}
               >
                 <LabelList
                   dataKey="duration"
                   position="inside"
-                  formatter={(v) => `${v} days`}
+                  formatter={(v: number) => `${v} days`}
                   className="fill-[var(--background)]"
                   fontSize={12}
                 />
                 <LabelList
                   dataKey="title"
-                  position="right"
-                  offset={8}
-                  className="fill-[#000]"
-                  fontSize={14}
-                  style={{ height: '30px' }}
+                  position="top"
+                  offset={6}
+                  className="fill-foreground"
+                  fontSize={13}
                 />
               </Bar>
             </BarChart>

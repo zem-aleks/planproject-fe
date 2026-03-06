@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
+import { queryKeys } from '@/lib/queryKeys';
+import { getPhases } from '@/modules/phases/api/getPhases';
+import type { PhaseEntityWithMilestones } from '@/modules/phases/types/entity';
 import { startProject } from '@/modules/projects/api/startProject';
 import {
   ProjectEntity,
@@ -16,9 +19,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/ui/dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 import { notReachable } from '@/utils/notReachable';
 import { IconFlag } from '@tabler/icons-react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const StartProjectForm = ({
   project,
@@ -28,6 +32,19 @@ export const StartProjectForm = ({
   onStarted: () => void;
 }) => {
   const [open, setOpen] = useState<boolean>(false);
+
+  const { data: phases } = useQuery<
+    PhaseEntityWithMilestones[],
+    AxiosError<Error>
+  >({
+    queryKey: queryKeys.phases.byProject(project.id),
+    queryFn: ({ signal }) => getPhases(project.id, { signal }),
+  });
+
+  const milestonesReady =
+    !!phases &&
+    phases.length > 0 &&
+    phases.every((p) => p.status !== 'building');
 
   return (
     <>
@@ -40,12 +57,25 @@ export const StartProjectForm = ({
           setOpen(false);
         }}
       />
-      <Button
-        className={`relative w-full animate-[glow_2s_ease_infinite] shadow shadow-white`}
-        onClick={() => setOpen(true)}
-      >
-        Start Project
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className="w-full">
+            <Button
+              className={`relative w-full ${milestonesReady ? 'animate-[glow_2s_ease_infinite] shadow shadow-white' : ''}`}
+              disabled={!milestonesReady}
+              onClick={() => setOpen(true)}
+            >
+              Start Project
+            </Button>
+          </span>
+        </TooltipTrigger>
+        {!milestonesReady && (
+          <TooltipContent>
+            Milestones are still being generated. Please wait until the plan is
+            ready.
+          </TooltipContent>
+        )}
+      </Tooltip>
     </>
   );
 };
