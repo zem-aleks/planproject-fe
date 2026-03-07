@@ -1,5 +1,7 @@
 import Markdown from 'react-markdown';
 
+import remarkGfm from 'remark-gfm';
+
 import { replaceUnicode } from '@/utils/replaceUnicode';
 
 export const MarkdownFormat = ({ children }: { children: string | null }) => {
@@ -9,6 +11,7 @@ export const MarkdownFormat = ({ children }: { children: string | null }) => {
 
   return (
     <Markdown
+      remarkPlugins={[remarkGfm]}
       components={{
         p: ({ children }) => <p className={`my-2`}>{children}</p>,
         ul: ({ children }) => (
@@ -44,6 +47,22 @@ export const MarkdownFormat = ({ children }: { children: string | null }) => {
         ),
         h3: ({ children }) => (
           <h3 className={`my-4 scroll-mt-20 text-xl font-bold`}>{children}</h3>
+        ),
+        table: ({ children }) => (
+          <div className="my-2 overflow-x-auto">
+            <table className="w-full border-collapse text-sm">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => (
+          <thead className="border-b bg-gray-100">{children}</thead>
+        ),
+        th: ({ children }) => (
+          <th className="px-3 py-1.5 text-left text-xs font-medium">
+            {children}
+          </th>
+        ),
+        td: ({ children }) => (
+          <td className="border-t px-3 py-1.5">{children}</td>
         ),
         a: ({ children, href }) => (
           <a

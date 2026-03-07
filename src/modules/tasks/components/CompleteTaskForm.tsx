@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { completeTask } from '@/modules/tasks/api/completeTask';
@@ -14,7 +15,7 @@ import {
 } from '@/ui/dialog';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useMutation } from '@tanstack/react-query';
 
 export const CompleteTaskForm = ({
   task,
@@ -51,7 +52,13 @@ const CompleteTaskModal = ({
   onClose: () => void;
   onUpdate: (task: TaskEntity) => void;
 }) => {
-  const { load, state } = useLazyLoadableData(completeTask);
+  const { mutate, status, data, error } = useMutation<
+    TaskEntity,
+    AxiosError<{ message: string }>,
+    { taskId: string; message: string }
+  >({
+    mutationFn: (params) => completeTask(params),
+  });
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [message, setMessage] = useState<string>('');
 
@@ -60,26 +67,26 @@ const CompleteTaskModal = ({
   }, []);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(
-          `Failed to submit: ${state.error.response?.data.message || state.error.message}`,
+          `Failed to submit: ${error!.response?.data.message || error!.message}`,
         );
         break;
 
-      case 'loaded':
+      case 'success':
         setMessage('');
-        onUpdate(state.data);
+        onUpdate(data!);
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   return (
     <Dialog
@@ -102,14 +109,14 @@ const CompleteTaskModal = ({
           onChange={(e) => setMessage(e.target.value)}
           rows={3}
           required={true}
-          disabled={state.type === 'loading'}
+          disabled={status === 'pending'}
           ref={textAreaRef}
           className={'w-full'}
         />
         <Button
           className={'w-full'}
-          onClick={() => load({ taskId: task.id, message })}
-          loading={state.type === 'loading'}
+          onClick={() => mutate({ taskId: task.id, message })}
+          loading={status === 'pending'}
         >
           Submit
         </Button>

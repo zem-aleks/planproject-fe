@@ -8,7 +8,7 @@ import { Button } from '@/ui/button';
 import { DropdownMenuItem } from '@/ui/dropdown-menu';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useMutation } from '@tanstack/react-query';
 
 export const StartPhaseForm = ({
   phase,
@@ -19,27 +19,29 @@ export const StartPhaseForm = ({
   onStarted: (phase: PhaseEntity) => void;
   variant: 'menuItem' | 'button';
 }) => {
-  const { state, load } = useLazyLoadableData(startPhase);
+  const { status, data, error, mutate } = useMutation({
+    mutationFn: (phaseId: string) => startPhase(phaseId),
+  });
 
   useEffect(() => {
-    switch (state.type) {
-      case 'loaded':
-        onStarted(state.data);
+    switch (status) {
+      case 'success':
+        onStarted(data!);
         toast.success(`Phase ${phase.title} started successfully!`);
         break;
 
       case 'error':
-        toast.error(`Failed to start the phase: ${state.error.message}`);
+        toast.error(`Failed to start the phase: ${error!.message}`);
         break;
 
-      case 'not_requested':
-      case 'loading':
+      case 'idle':
+      case 'pending':
         break;
 
       default:
-        notReachable(state);
+        notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   if (variant === 'button') {
     return (
@@ -47,9 +49,9 @@ export const StartPhaseForm = ({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          load(phase.id);
+          mutate(phase.id);
         }}
-        loading={state.type === 'loading'}
+        loading={status === 'pending'}
         size={'sm'}
       >
         Start
@@ -62,11 +64,11 @@ export const StartPhaseForm = ({
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
-        load(phase.id);
+        mutate(phase.id);
       }}
-      disabled={state.type === 'loading'}
+      disabled={status === 'pending'}
     >
-      {state.type === 'loading' && <Spinner />}
+      {status === 'pending' && <Spinner />}
       Start
     </DropdownMenuItem>
   );

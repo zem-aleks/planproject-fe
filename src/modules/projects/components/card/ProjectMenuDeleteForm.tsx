@@ -7,7 +7,7 @@ import { deleteProject } from '@/modules/projects/api/deleteProject.ts';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { DropdownMenuItem } from '@/ui/dropdown-menu.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData.ts';
+import { useMutation } from '@tanstack/react-query';
 
 export type Msg = {
   type: 'onProjectDeleted';
@@ -20,40 +20,42 @@ type Props = {
 };
 
 export const ProjectMenuDeleteForm = ({ project, onMsg }: Props) => {
-  const { state, load } = useLazyLoadableData(deleteProject);
+  const { status, error, mutate } = useMutation({
+    mutationFn: (projectId: string) => deleteProject(projectId),
+  });
 
   useEffect(() => {
-    switch (state.type) {
-      case 'loaded':
+    switch (status) {
+      case 'success':
         onMsg({ type: 'onProjectDeleted', project });
         toast.success(`Project ${project.title} deleted successfully!`);
         break;
 
       case 'error':
-        toast.error(`Failed to delete project: ${state.error.message}`);
+        toast.error(`Failed to delete project: ${error!.message}`);
         break;
 
-      case 'not_requested':
-      case 'loading':
+      case 'idle':
+      case 'pending':
         // No action needed
         break;
 
       default:
-        notReachable(state);
+        notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
-  switch (state.type) {
+  switch (status) {
     case 'error':
-    case 'not_requested':
-    case 'loaded':
+    case 'idle':
+    case 'success':
       return (
         <DropdownMenuItem
           className={'text-destructive'}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            load(project.id);
+            mutate(project.id);
           }}
         >
           <Trash2 className={'text-destructive'} />
@@ -61,7 +63,7 @@ export const ProjectMenuDeleteForm = ({ project, onMsg }: Props) => {
         </DropdownMenuItem>
       );
 
-    case 'loading':
+    case 'pending':
       return (
         <DropdownMenuItem className={'text-destructive'}>
           <LoaderCircle className={'animate-spin'} />
@@ -70,6 +72,6 @@ export const ProjectMenuDeleteForm = ({ project, onMsg }: Props) => {
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

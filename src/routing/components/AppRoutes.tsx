@@ -4,6 +4,8 @@ import { AnalyticsTracker } from '@/modules/analytics/components/AnalyticsTracke
 import { AuditoryPage } from '@/modules/auditory/pages/AuditoryPage';
 import { AuthCallbackPage } from '@/modules/auth/pages/AuthCallbackPage';
 import { LoginPage } from '@/modules/auth/pages/LoginPage';
+import { ChatPage } from '@/modules/chat/components/ChatPage';
+import { ChatViewPage } from '@/modules/chat/components/ChatViewPage';
 import { CompetitorsPage } from '@/modules/competitors/pages/CompetitorsPage';
 import { DashboardPage } from '@/modules/dashboard/pages/DashboardPage';
 import { RoadmapPage } from '@/modules/dashboard/pages/RoadmapPage';
@@ -18,10 +20,20 @@ import { PhaseViewPage } from '@/modules/phases/pages/PhaseViewPage';
 import { ProjectCreatePage } from '@/modules/projects/pages/ProjectCreatePage.tsx';
 import { ProjectEditPage } from '@/modules/projects/pages/ProjectEditPage.tsx';
 import { ProjectsPage } from '@/modules/projects/pages/ProjectsPage.tsx';
+import { AssumptionsPage } from '@/modules/soul/pages/AssumptionsPage';
+import { ConstraintsPage } from '@/modules/soul/pages/ConstraintsPage';
+import { DecisionsPage } from '@/modules/soul/pages/DecisionsPage';
+import { DesiredOutcomesPage } from '@/modules/soul/pages/DesiredOutcomesPage';
+import { OpenQuestionsPage } from '@/modules/soul/pages/OpenQuestionsPage';
+import { ProjectContextPage } from '@/modules/soul/pages/ProjectContextPage';
+import { ResourcesPage } from '@/modules/soul/pages/ResourcesPage';
+import { TargetUsersPage } from '@/modules/soul/pages/TargetUsersPage';
+import { WorkstreamsPage } from '@/modules/soul/pages/WorkstreamsPage';
 import { CheckoutSuccessPage } from '@/modules/subscriptions/pages/CheckoutSuccessPage';
 import { TimelinePage } from '@/modules/timeline/pages/TimelinePage';
 import { AccountPage } from '@/modules/users/pages/AccountPage';
 import { InternalElement } from '@/routing/components/InternalElement';
+import { ProjectLayout } from '@/routing/components/ProjectLayout';
 
 export const AppRoutes = () => {
   return (
@@ -83,75 +95,35 @@ export const AppRoutes = () => {
             </InternalElement>
           }
         />
+
         <Route
           path="/project/:projectId"
           element={
             <InternalElement>
-              <DashboardPage />
+              <ProjectLayout />
             </InternalElement>
           }
-        />
-        <Route
-          path="/project/:projectId/phase/:phaseId"
-          element={
-            <InternalElement>
-              <PhaseViewPage />
-            </InternalElement>
-          }
-        />
-        <Route
-          path="/project/:projectId/focus"
-          element={
-            <InternalElement>
-              <FocusPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/timeline"
-          element={
-            <InternalElement>
-              <TimelinePage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/competitors"
-          element={
-            <InternalElement>
-              <CompetitorsPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/auditory"
-          element={
-            <InternalElement>
-              <AuditoryPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/roadmap"
-          element={
-            <InternalElement>
-              <RoadmapPage />
-            </InternalElement>
-          }
-        />
-
-        <Route
-          path="/project/:projectId/milestone/:milestoneId"
-          element={
-            <InternalElement>
-              <MilestonePage />
-            </InternalElement>
-          }
-        />
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="phase/:phaseId" element={<PhaseViewPage />} />
+          <Route path="focus" element={<FocusPage />} />
+          <Route path="timeline" element={<TimelinePage />} />
+          <Route path="competitors" element={<CompetitorsPage />} />
+          <Route path="auditory" element={<AuditoryPage />} />
+          <Route path="chat" element={<ChatPage />} />
+          <Route path="chat/:chatId" element={<ChatViewPage />} />
+          <Route path="open-questions" element={<OpenQuestionsPage />} />
+          <Route path="assumptions" element={<AssumptionsPage />} />
+          <Route path="workstreams" element={<WorkstreamsPage />} />
+          <Route path="decisions" element={<DecisionsPage />} />
+          <Route path="desired-outcomes" element={<DesiredOutcomesPage />} />
+          <Route path="constraints" element={<ConstraintsPage />} />
+          <Route path="resources" element={<ResourcesPage />} />
+          <Route path="target-users" element={<TargetUsersPage />} />
+          <Route path="context" element={<ProjectContextPage />} />
+          <Route path="roadmap" element={<RoadmapPage />} />
+          <Route path="milestone/:milestoneId" element={<MilestonePage />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

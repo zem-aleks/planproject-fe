@@ -7,7 +7,7 @@ import { finishShaping } from '@/modules/shaping/api/finishShaping';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useMutation } from '@tanstack/react-query';
 
 export const FinishShapingButton = ({
   shaping,
@@ -16,36 +16,38 @@ export const FinishShapingButton = ({
   shaping: ShapingEntity;
   onFinish: (project: ProjectEntity) => void;
 }) => {
-  const { state, load } = useLazyLoadableData(finishShaping);
+  const { status, data, mutate } = useMutation({
+    mutationFn: (shapingId: string) => finishShaping(shapingId),
+  });
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(`Failed the shaping processing. Please try again.`);
         break;
 
-      case 'loaded':
-        onFinish(state.data);
+      case 'success':
+        onFinish(data!);
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
-  if (shaping.score < 90 || state.type === 'loaded') {
+  if (shaping.score < 90 || status === 'success') {
     return null;
   }
 
   return (
     <Button
       className={'bg-green-600 text-white hover:bg-green-800'}
-      loading={state.type === 'loading'}
-      onClick={() => load(shaping.id)}
+      loading={status === 'pending'}
+      onClick={() => mutate(shaping.id)}
     >
       Finish
     </Button>

@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
 import { MilestoneActions } from '@/modules/milestones/components/MilestoneActions';
 import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
-import { MilestoneEntity } from '@/modules/milestones/types/entity';
-import { PhaseEntity } from '@/modules/phases/types/entity';
+import type { MilestoneEntity } from '@/modules/milestones/types/entity';
+import type { PhaseEntity } from '@/modules/phases/types/entity';
 import { Badge } from '@/ui/badge';
 import { Card } from '@/ui/card';
 import { Separator } from '@/ui/separator';
 
 export const MilestoneCard = ({
-  phase,
+  // phase,
   milestone,
   onUpdated,
 }: {
@@ -44,21 +44,19 @@ export const MilestoneCard = ({
         <p>{currentMilestone.definitionOfDone}</p>
       </div>
 
-      {phase.status === 'inProgress' && (
-        <div className={'flex flex-col gap-2'}>
-          <MilestoneActions
-            milestone={currentMilestone}
-            onUpdated={(milestone) => {
-              setCurrentMilestone(milestone);
-              onUpdated(milestone);
-            }}
-          />
+      <div className={'flex flex-col gap-2'}>
+        <MilestoneActions
+          milestone={currentMilestone}
+          onUpdated={(milestone) => {
+            setCurrentMilestone(milestone);
+            onUpdated(milestone);
+          }}
+        />
 
-          {milestone.status !== 'completed' && (
-            <CompleteMilestoneForm milestone={milestone} onUpdate={onUpdated} />
-          )}
-        </div>
-      )}
+        {milestone.status !== 'completed' && (
+          <CompleteMilestoneForm milestone={milestone} onUpdate={onUpdated} />
+        )}
+      </div>
 
       {/*<TasksBlock milestone={milestone} />*/}
     </Card>

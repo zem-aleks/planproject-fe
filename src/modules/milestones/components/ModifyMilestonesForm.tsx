@@ -1,23 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { LockIcon, PencilIcon } from 'lucide-react';
+import { LockIcon, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useUser } from '@/modules/auth/contexts/UserContext';
-import { modifyMilestones } from '@/modules/milestones/api/modifyMilestones';
+import { createChat } from '@/modules/chat/api/createChat';
+import { ChatInput } from '@/modules/chat/components/ChatInput';
+import { ChatMessageBubble } from '@/modules/chat/components/ChatMessageBubble';
+import {
+  ThinkingBubble,
+  ToolCallBubble,
+} from '@/modules/chat/components/ChatStreamingIndicators';
+import { useChatStream } from '@/modules/chat/helpers/useChatStream';
+import type { ChatMessage, ChatProposal } from '@/modules/chat/types/entity';
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { UpgradeSubscriptionModal } from '@/modules/subscriptions/components/UpgradeSubscriptionModal';
 import { Button } from '@/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/ui/dialog';
-import { Textarea } from '@/ui/textarea';
-import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/dialog';
+import { Spinner } from '@/ui/spinner';
 import { IconPencil } from '@tabler/icons-react';
 
 export const ModifyMilestonesForm = ({
@@ -25,10 +25,10 @@ export const ModifyMilestonesForm = ({
   onModified,
 }: {
   phase: PhaseEntity;
-  onModified: (phase: PhaseEntity) => void;
+  onModified: () => void;
 }) => {
   const { user } = useUser();
-  const [open, setOpen] = useState<boolean>(false);
+  const [open, setOpen] = useState(false);
 
   if (phase.status !== 'notStarted') {
     return null;
@@ -48,100 +48,241 @@ export const ModifyMilestonesForm = ({
 
   return (
     <>
-      <ModifyMilestonesModal
+      <ModifyMilestonesChat
         open={open}
         onClose={() => setOpen(false)}
         phase={phase}
-        onUpdate={(phase) => {
-          onModified(phase);
-          setOpen(false);
-        }}
+        onModified={onModified}
       />
       <Button variant={'warning'} onClick={() => setOpen(true)} size={'sm'}>
-        <IconPencil /> Modify Milestones
+        <IconPencil /> Modify Phase
       </Button>
     </>
   );
 };
 
-const ModifyMilestonesModal = ({
+const ModifyMilestonesChat = ({
   open,
   phase,
   onClose,
-  onUpdate,
+  onModified,
 }: {
   phase: PhaseEntity;
   open: boolean;
   onClose: () => void;
-  onUpdate: (phase: PhaseEntity) => void;
+  onModified: () => void;
 }) => {
-  const { load, state } = useLazyLoadableData(modifyMilestones);
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [message, setMessage] = useState<string>('');
+  const hadApprovalsRef = useRef(false);
+  const [chatId, setChatId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [streamingContent, setStreamingContent] = useState('');
+  const [streamingProposals, setStreamingProposals] = useState<ChatProposal[]>(
+    [],
+  );
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    textAreaRef.current?.focus();
+  const scrollToBottom = useCallback(() => {
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({
+        top: scrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 0);
   }, []);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
-        break;
+    if (!open) return;
 
-      case 'error':
-        toast.error(
-          `Failed to submit: ${state.error.response?.data.message || state.error.message}`,
-        );
-        break;
+    hadApprovalsRef.current = false;
+    setLoading(true);
+    setMessages([]);
+    setStreamingContent('');
+    setStreamingProposals([]);
+    setChatId(null);
 
-      case 'loaded':
-        setMessage('');
-        onUpdate(state.data);
-        break;
+    createChat(phase.projectId, { type: 'phase', entityId: phase.id })
+      .then((chat) => setChatId(chat.id))
+      .catch(() => {
+        toast.error('Failed to create chat');
+        onClose();
+      })
+      .finally(() => setLoading(false));
+  }, [open, phase.projectId, phase.id, onClose]);
 
-      default:
-        return notReachable(state);
-    }
-  }, [state]);
+  const handleProposalStatusChange = useCallback(
+    (proposalId: string, status: 'approved' | 'rejected') => {
+      if (status === 'approved') {
+        hadApprovalsRef.current = true;
+        onModified();
+      }
+      setMessages((prev) =>
+        prev.map((msg) => ({
+          ...msg,
+          proposals: (msg.proposals ?? []).map((p) =>
+            p.id === proposalId ? { ...p, status } : p,
+          ),
+        })),
+      );
+    },
+    [onModified],
+  );
+
+  const { sendMessage, isStreaming, abort, toolCallName, proposalStage } =
+    useChatStream({
+      projectId: phase.projectId,
+      chatId: chatId ?? '',
+      onUserMessage: (msg) => {
+        setMessages((prev) => [...prev, msg]);
+        setStreamingContent('');
+        setStreamingProposals([]);
+        scrollToBottom();
+      },
+      onAssistantChunk: (content) => {
+        setStreamingContent((prev) => prev + content);
+        scrollToBottom();
+      },
+      onConfirm: (proposal) => {
+        setStreamingProposals((prev) => [
+          ...prev,
+          { ...proposal, status: 'pending' },
+        ]);
+        scrollToBottom();
+      },
+      onAssistantDone: (messageId) => {
+        setStreamingContent((prev) => {
+          setStreamingProposals((currentProposals) => {
+            const finalMessage: ChatMessage = {
+              id: messageId,
+              role: 'assistant',
+              content: prev,
+              proposals: currentProposals,
+              createdAt: new Date().toISOString(),
+            };
+            setMessages((msgs) => [...msgs, finalMessage]);
+            return [];
+          });
+          return '';
+        });
+        scrollToBottom();
+      },
+      onError: () => {
+        toast.error('Failed to get response');
+        setStreamingContent((prev) => {
+          if (prev) {
+            const partial: ChatMessage = {
+              id: crypto.randomUUID(),
+              role: 'assistant',
+              content: prev,
+              proposals: [],
+              createdAt: new Date().toISOString(),
+            };
+            setMessages((msgs) => [...msgs, partial]);
+          }
+          return '';
+        });
+        setStreamingProposals([]);
+      },
+    });
 
   return (
     <Dialog
       open={open}
-      onOpenChange={(open) => !open && onClose()}
-      modal={true}
+      onOpenChange={(value) => {
+        if (!value) {
+          if (hadApprovalsRef.current) {
+            onModified();
+          }
+          onClose();
+        }
+      }}
+      modal
     >
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className={'text-xl'}>
-            <PencilIcon className={'mb-2'} />
-            Modify Milestones of "{phase.title}"
+      <DialogContent
+        className="flex h-[95vh] flex-col gap-0 p-0 sm:max-w-4xl"
+        showCloseButton
+      >
+        <DialogHeader className="border-b px-6 py-4">
+          <DialogTitle className="flex items-center gap-2">
+            <MessageCircle className="size-5" />
+            Modify Phase — {phase.title}
           </DialogTitle>
-          <DialogDescription className={'text-muted-foreground w-full'}>
-            Please describe what would you like to change? E.g., "Add a new
-            milestone about X", "Remove the milestone about Y", "Change the
-            description of milestone Z to ...", etc.
-          </DialogDescription>
         </DialogHeader>
 
-        <Textarea
-          placeholder="Enter your answer"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          rows={3}
-          required={true}
-          disabled={state.type === 'loading'}
-          ref={textAreaRef}
-          className={'w-full'}
-          maxLength={2000}
-        />
-        <Button
-          className={'w-full'}
-          onClick={() => load({ phaseId: phase.id, message })}
-          loading={state.type === 'loading'}
-        >
-          Submit
-        </Button>
+        {loading ? (
+          <div className="flex flex-1 items-center justify-center">
+            <Spinner />
+          </div>
+        ) : (
+          <>
+            <div
+              ref={scrollRef}
+              className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-4"
+            >
+              {messages.length === 0 && !isStreaming && (
+                <div className="text-muted-foreground flex flex-1 flex-col items-center justify-center gap-2">
+                  <MessageCircle className="size-8 opacity-50" />
+                  <p className="text-sm">
+                    Describe what you'd like to change about this phase or its
+                    milestones
+                  </p>
+                </div>
+              )}
+              {messages.map((msg) => (
+                <ChatMessageBubble
+                  key={msg.id}
+                  message={msg}
+                  proposals={msg.proposals}
+                  projectId={phase.projectId}
+                  chatId={chatId!}
+                  onProposalStatusChange={handleProposalStatusChange}
+                />
+              ))}
+              {isStreaming &&
+                !streamingContent &&
+                !toolCallName &&
+                !proposalStage && <ThinkingBubble />}
+              {isStreaming &&
+                !streamingContent &&
+                (toolCallName || proposalStage) && (
+                  <ToolCallBubble
+                    name={toolCallName}
+                    proposalStage={proposalStage}
+                  />
+                )}
+              {isStreaming && streamingContent && (
+                <>
+                  <ChatMessageBubble
+                    message={{
+                      id: 'streaming',
+                      role: 'assistant',
+                      content: streamingContent,
+                      proposals: [],
+                      createdAt: new Date().toISOString(),
+                    }}
+                    isStreaming={!toolCallName && !proposalStage}
+                    proposals={streamingProposals}
+                    projectId={phase.projectId}
+                    chatId={chatId!}
+                    onProposalStatusChange={handleProposalStatusChange}
+                  />
+                  {(toolCallName || proposalStage) && (
+                    <ToolCallBubble
+                      name={toolCallName}
+                      proposalStage={proposalStage}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+
+            <ChatInput
+              onSend={sendMessage}
+              isStreaming={isStreaming}
+              onStop={abort}
+            />
+          </>
+        )}
       </DialogContent>
     </Dialog>
   );

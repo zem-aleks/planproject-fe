@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
@@ -9,7 +10,7 @@ import { Button } from '@/ui/button';
 import { Label } from '@/ui/label';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useMutation } from '@tanstack/react-query';
 
 export type Msg = { type: 'onFinish'; shaping: ShapingEntity };
 
@@ -22,32 +23,38 @@ export const ShapingPublicFormForm = ({
   onMsg: (msg: Msg) => void;
 }) => {
   const { clientId } = useAuthSession();
-  const { state, load } = useLazyLoadableData(createStartShaping);
+  const { status, data, error, mutate } = useMutation<
+    ShapingEntity,
+    AxiosError<{ message: string }>,
+    { message: string; clientId: string }
+  >({
+    mutationFn: (params) => createStartShaping(params),
+  });
   const [message, setMessage] = useState<string>('');
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(
-          `Failed to submit: ${state.error.response?.data.message || state.error.message}`,
+          `Failed to submit: ${error!.response?.data.message || error!.message}`,
         );
         break;
 
-      case 'loaded':
+      case 'success':
         setMessage('');
-        onMsg({ type: 'onFinish', shaping: state.data });
+        onMsg({ type: 'onFinish', shaping: data! });
         textAreaRef.current?.focus();
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   // useEffect(() => {
   //   switch (finishState.type) {
@@ -92,7 +99,7 @@ export const ShapingPublicFormForm = ({
           onChange={(e) => setMessage(e.target.value)}
           rows={8}
           required={true}
-          disabled={state.type === 'loading'}
+          disabled={status === 'pending'}
           ref={textAreaRef}
           className={'w-full grow md:grow-0'}
           maxLength={4000}
@@ -100,8 +107,8 @@ export const ShapingPublicFormForm = ({
       </div>
       <Button
         className={'w-full'}
-        onClick={() => load({ clientId, message })}
-        loading={state.type === 'loading'}
+        onClick={() => mutate({ clientId, message })}
+        loading={status === 'pending'}
       >
         Submit
       </Button>

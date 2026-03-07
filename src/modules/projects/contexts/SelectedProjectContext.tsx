@@ -3,6 +3,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from 'react';
 
@@ -31,22 +32,24 @@ export const SelectedProjectContextProvider = ({
   children: ReactNode;
 }) => {
   const { projects } = useContext(ProjectsContext);
-  const selectedProjectId = localStorage.getItem('selectedProjectId');
-  const selectedProject =
-    projects.find((project) => project.id === selectedProjectId) || null;
+  const [selectedId, setSelectedId] = useState<string | null>(() =>
+    localStorage.getItem('selectedProjectId'),
+  );
 
-  const [project, setProject] = useState<ProjectPreviewEntity | null>(
-    selectedProject,
+  const project = useMemo(
+    () =>
+      selectedId ? (projects.find((p) => p.id === selectedId) ?? null) : null,
+    [projects, selectedId],
   );
 
   const select = useCallback((newProject: ProjectPreviewEntity) => {
     localStorage.setItem('selectedProjectId', newProject.id);
-    setProject(newProject);
+    setSelectedId(newProject.id);
   }, []);
 
   const unselect = useCallback(() => {
     localStorage.removeItem('selectedProjectId');
-    setProject(null);
+    setSelectedId(null);
   }, []);
 
   return (

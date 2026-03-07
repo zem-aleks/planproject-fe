@@ -1,11 +1,14 @@
 import { ReactNode } from 'react';
 
+import type { AxiosError } from 'axios';
+
+import { queryKeys } from '@/lib/queryKeys';
 import { getMilestones } from '@/modules/milestones/api/getMilestones';
 import { MilestoneEntity } from '@/modules/milestones/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Skeleton } from '@/ui/skeleton.tsx';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData.ts';
+import { useQuery } from '@tanstack/react-query';
 
 type Props = {
   phaseId: string;
@@ -13,26 +16,31 @@ type Props = {
 };
 
 export const MilestonesLoader = ({ phaseId, children }: Props): ReactNode => {
-  const { state, reload } = useReloadableData(getMilestones, phaseId);
+  const { data, error, status, refetch } = useQuery<
+    MilestoneEntity[],
+    AxiosError<Error>
+  >({
+    queryKey: queryKeys.milestones.byPhase(phaseId),
+    queryFn: ({ signal }) => getMilestones(phaseId, { signal }),
+  });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return <Skeleton className="h-[500px] w-full rounded-xl" />;
 
     case 'error':
       return (
         <div className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Milestones loading error</p>
-          <p className={'text-muted-foreground pb-2'}>{state.error.message}</p>
-          <Button onClick={reload}>Try again</Button>
+          <p className={'text-muted-foreground pb-2'}>{error.message}</p>
+          <Button onClick={() => refetch()}>Try again</Button>
         </div>
       );
 
-    case 'reloading':
-    case 'loaded':
-      return <>{children(state.data, reload)}</>;
+    case 'success':
+      return <>{children(data!, () => refetch())}</>;
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

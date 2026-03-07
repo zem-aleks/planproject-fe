@@ -1,9 +1,6 @@
-import { useNavigate } from 'react-router';
-
 import { MilestonesBlock } from '@/modules/milestones/components/MilestonesBlock';
 import { PhaseDescription } from '@/modules/phases/components/PhaseDescription';
 import { PhasesLoader } from '@/modules/phases/components/PhasesLoader';
-import { ProjectActions } from '@/modules/projects/components/ProjectActions';
 import { ProjectStatusBadge } from '@/modules/projects/components/ProjectStatus';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
@@ -17,11 +14,9 @@ import {
 } from '@/ui/accordion';
 import { Card } from '@/ui/card';
 import { DaysCounter } from '@/ui/custom/DaysCounter';
-import { notReachable } from '@/utils/notReachable';
 
 export const RoadmapPage = () => {
-  const navigate = useNavigate();
-  const { project, reload } = useProjectByUrlParam();
+  const { project } = useProjectByUrlParam();
   if (!project || project.status === 'draft') {
     return <ProjectNotFound />;
   }
@@ -53,25 +48,6 @@ export const RoadmapPage = () => {
                 start the project immediately or modify the phases and
                 milestones first.
               </p>
-
-              <ProjectActions
-                project={project}
-                onMsg={(msg) => {
-                  switch (msg.type) {
-                    case 'onProjectStarted':
-                      reload();
-                      navigate(`/project/${project.id}/focus`);
-                      break;
-
-                    case 'onPhasesChanged':
-                      reload();
-                      break;
-
-                    default:
-                      return notReachable(msg);
-                  }
-                }}
-              />
             </div>
           </div>
 

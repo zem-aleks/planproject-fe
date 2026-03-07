@@ -1,17 +1,29 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 
+import type { AxiosError } from 'axios';
+import { BookOpen, Focus, MessageCircle } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { queryKeys } from '@/lib/queryKeys';
+import { getChats } from '@/modules/chat/api/getChats';
+import type {
+  ChatContext,
+  ChatPreviewEntity,
+} from '@/modules/chat/types/entity';
+import { toggleFocusMilestone } from '@/modules/milestones/api/focusMilestone';
 import { getMilestone } from '@/modules/milestones/api/getMilestone';
 import { CompleteMilestoneForm } from '@/modules/milestones/components/CompleteMilestoneForm';
+import { MilestoneChatDialog } from '@/modules/milestones/components/MilestoneChatDialog';
 import { MilestoneStatusBadge } from '@/modules/milestones/components/MilestoneStatus';
 import { MilestoneStepsList } from '@/modules/milestones/components/MilestoneStepsList';
-import {
+import type {
   MilestoneDetailsEntity,
   MilestoneEntity,
 } from '@/modules/milestones/types/entity';
 import { ProjectNotFound } from '@/modules/projects/components/errors/ProjectNotFound';
 import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
-import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { PageTemplate } from '@/modules/templates/components/PageTemplate.tsx';
 import { Badge } from '@/ui/badge';
 import { Button } from '@/ui/button';
@@ -20,7 +32,7 @@ import { DaysCounter } from '@/ui/custom/DaysCounter';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable';
-import { useLoadableData } from '@/utils/useLoadableData';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const MilestonePage = () => {
   const { project } = useProjectByUrlParam();
@@ -39,9 +51,15 @@ const PageContent = ({
   project: ProjectPreviewEntity;
   milestoneId: string;
 }) => {
-  const { state, reload } = useLoadableData(getMilestone, milestoneId);
-  switch (state.type) {
-    case 'loading':
+  const { data, status, refetch } = useQuery<
+    MilestoneDetailsEntity,
+    AxiosError<Error>
+  >({
+    queryKey: queryKeys.milestones.detail(milestoneId),
+    queryFn: ({ signal }) => getMilestone(milestoneId, { signal }),
+  });
+  switch (status) {
+    case 'pending':
       return (
         <PageTemplate
           header={{
@@ -59,12 +77,12 @@ const PageContent = ({
         </PageTemplate>
       );
 
-    case 'loaded':
+    case 'success':
       return (
         <LoadedContentPage
           project={project}
-          milestone={state.data}
-          onChanged={reload}
+          milestone={data!}
+          onChanged={() => refetch()}
         />
       );
 
@@ -81,7 +99,7 @@ const PageContent = ({
         >
           <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4 pt-0">
             <div className={'text-xl text-white'}>Something went wrong</div>
-            <Button onClick={reload} size={'lg'}>
+            <Button onClick={() => refetch()} size={'lg'}>
               Try again
             </Button>
           </div>
@@ -89,7 +107,7 @@ const PageContent = ({
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 
@@ -102,14 +120,101 @@ const LoadedContentPage = ({
   milestone: MilestoneDetailsEntity;
   onChanged: () => void;
 }) => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [currentMilestone, setCurrentMilestone] = useState(milestone);
+  const [focusing, setFocusing] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatContext, setChatContext] = useState<ChatContext>({
+    type: 'milestone',
+    entityId: milestone.id,
+    label: milestone.title,
+  });
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [chatInitialMessage, setChatInitialMessage] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     setCurrentMilestone(milestone);
   }, [milestone]);
 
+  const chatsQuery = useQuery<ChatPreviewEntity[], AxiosError<Error>>({
+    queryKey: queryKeys.chats.byProject(project.id),
+    queryFn: ({ signal }) => getChats(project.id, { signal }),
+  });
+
+  const milestoneChats = useMemo(
+    () =>
+      chatsQuery.data?.filter(
+        (c) =>
+          c.context?.type === 'milestone' &&
+          c.context.entityId === milestone.id,
+      ) ?? [],
+    [chatsQuery.data, milestone.id],
+  );
+
   const handleStepUpdated = (updated: MilestoneEntity) => {
     setCurrentMilestone((prev) => ({ ...prev, ...updated }));
+  };
+
+  const handleFocus = async () => {
+    setFocusing(true);
+    try {
+      await toggleFocusMilestone(milestone.id);
+      queryClient.setQueryData(queryKeys.timeline.today(project.id), undefined);
+      navigate(`/project/${project.id}/focus`);
+    } catch {
+      toast.error('Failed to focus milestone');
+      setFocusing(false);
+    }
+  };
+
+  const handleChatClosed = useCallback(() => {
+    onChanged();
+    queryClient.invalidateQueries({
+      queryKey: queryKeys.chats.byProject(project.id),
+    });
+    setChatOpen(false);
+    // Context update runs async on backend, refetch again after a delay
+    setTimeout(() => onChanged(), 3000);
+  }, [onChanged, queryClient, project.id]);
+
+  const openMilestoneChat = () => {
+    setChatContext({
+      type: 'milestone',
+      entityId: milestone.id,
+      label: milestone.title,
+    });
+    setSelectedChatId(null);
+    setChatInitialMessage(null);
+    setChatOpen(true);
+  };
+
+  const openExistingChat = (chat: ChatPreviewEntity) => {
+    setChatContext(
+      chat.context ?? {
+        type: 'milestone',
+        entityId: milestone.id,
+        label: milestone.title,
+      },
+    );
+    setSelectedChatId(chat.id);
+    setChatInitialMessage(null);
+    setChatOpen(true);
+  };
+
+  const openStepChat = (step: { id: string; title: string }) => {
+    setChatContext({
+      type: 'task',
+      entityId: step.id,
+      label: step.title,
+    });
+    setSelectedChatId(null);
+    setChatInitialMessage(
+      `Help me with this step: "${step.title}". Provide clear instructions or a concrete result I can use right away.`,
+    );
+    setChatOpen(true);
   };
 
   return (
@@ -144,7 +249,24 @@ const LoadedContentPage = ({
             </h1>
           </div>
 
-          <MilestoneStatusBadge status={currentMilestone.status} />
+          <div className="flex items-center gap-2">
+            {currentMilestone.status === 'inProgress' && (
+              <Button
+                variant={currentMilestone.focused ? 'secondary' : 'default'}
+                size="sm"
+                onClick={handleFocus}
+                loading={focusing}
+              >
+                <Focus className="size-4" />
+                {currentMilestone.focused ? 'Focused' : 'Focus'}
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={openMilestoneChat}>
+              <MessageCircle className="size-4" />
+              Chat
+            </Button>
+            <MilestoneStatusBadge status={currentMilestone.status} />
+          </div>
         </div>
 
         <div className={'flex flex-col gap-2'}>
@@ -162,13 +284,58 @@ const LoadedContentPage = ({
             <MilestoneStepsList
               milestone={currentMilestone}
               onUpdated={handleStepUpdated}
+              onStepChat={openStepChat}
+              onOpenChat={(chatId) => {
+                const chat = chatsQuery.data?.find((c) => c.id === chatId);
+                if (chat) openExistingChat(chat);
+              }}
+              chats={chatsQuery.data ?? []}
             />
           </Card>
+
+          {currentMilestone.context && (
+            <Card className={'border-primary/20 w-full gap-3 p-4'}>
+              <div className="flex items-center gap-2">
+                <div className="bg-primary/15 text-primary flex size-7 items-center justify-center rounded-lg">
+                  <BookOpen className="size-4" />
+                </div>
+                <span className="text-sm font-semibold">Progress Summary</span>
+              </div>
+              <div className="text-sm leading-relaxed">
+                <MarkdownFormat>{currentMilestone.context}</MarkdownFormat>
+              </div>
+            </Card>
+          )}
+
           <Card className={'w-full gap-2 p-4'}>
             <div className={'font-semibold'}>Useful resources:</div>
             <MarkdownFormat>{currentMilestone.usefulResources}</MarkdownFormat>
           </Card>
         </div>
+
+        {milestoneChats.length > 0 && (
+          <Card className={'w-full gap-2 p-4'}>
+            <div className={'font-semibold'}>Previous chats:</div>
+            <div className={'flex flex-col gap-1'}>
+              {milestoneChats.map((chat) => (
+                <button
+                  key={chat.id}
+                  type="button"
+                  onClick={() => openExistingChat(chat)}
+                  className="hover:bg-accent flex items-center gap-2 rounded-lg border p-3 text-left transition-colors"
+                >
+                  <MessageCircle className="text-muted-foreground size-4 shrink-0" />
+                  <span className="truncate text-sm font-medium">
+                    {chat.name || 'New chat'}
+                  </span>
+                  <span className="text-muted-foreground ml-auto shrink-0 text-xs">
+                    {new Date(chat.updatedAt).toLocaleDateString()}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {currentMilestone.status !== 'completed' && (
           <CompleteMilestoneForm
@@ -187,7 +354,14 @@ const LoadedContentPage = ({
             </Card>
           )}
 
-        {/*<TasksBlock milestone={milestone} />*/}
+        <MilestoneChatDialog
+          projectId={project.id}
+          context={chatContext}
+          chatId={selectedChatId}
+          initialMessage={chatInitialMessage}
+          open={chatOpen}
+          onClose={handleChatClosed}
+        />
       </div>
     </PageTemplate>
   );

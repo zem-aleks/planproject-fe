@@ -1,22 +1,28 @@
+import type { AxiosError } from 'axios';
+
+import { queryKeys } from '@/lib/queryKeys';
 import { ShapingComment } from '@/modules/shaping/components/ShapingComment';
 import { getFocusComment } from '@/modules/timeline/api/getFocusComment';
 import { notReachable } from '@/utils/notReachable';
-import { useLoadableData } from '@/utils/useLoadableData';
+import { useQuery } from '@tanstack/react-query';
 
 export const FocusComment = ({ projectId }: { projectId: string }) => {
-  const { state } = useLoadableData(getFocusComment, projectId);
+  const { data, status } = useQuery<string, AxiosError<Error>>({
+    queryKey: queryKeys.timeline.focusComment(projectId),
+    queryFn: ({ signal }) => getFocusComment(projectId, { signal }),
+  });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return <ShapingComment comment={''} loading={true} />;
 
-    case 'loaded':
-      return <ShapingComment comment={state.data} />;
+    case 'success':
+      return <ShapingComment comment={data!} />;
 
     case 'error':
       return null;
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

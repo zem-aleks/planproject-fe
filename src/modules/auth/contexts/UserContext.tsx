@@ -1,10 +1,13 @@
 import { ReactNode, createContext, useContext } from 'react';
 
+import type { AxiosError } from 'axios';
+
+import { queryKeys } from '@/lib/queryKeys';
 import { getUser } from '@/modules/auth/api/getUser';
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
 import { UserEntity } from '@/modules/users/types/user';
 import { noOperation, notReachable } from '@/utils/notReachable';
-import { useLoadableData } from '@/utils/useLoadableData';
+import { useQuery } from '@tanstack/react-query';
 
 type UserContextData = { user: UserEntity | null; reload: () => void };
 
@@ -14,7 +17,11 @@ export const UserContext = createContext<UserContextData>(emptyContextValue);
 
 export const UserContextProvider = ({ children }: { children: ReactNode }) => {
   const { session } = useAuthSession();
-  const { state, reload } = useLoadableData(getUser, undefined);
+  const { data, status, refetch } = useQuery<UserEntity, AxiosError<Error>>({
+    queryKey: queryKeys.user.current(),
+    queryFn: ({ signal }) => getUser(undefined, { signal }),
+    enabled: !!session,
+  });
 
   if (!session)
     return (
@@ -23,24 +30,24 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
       </UserContext.Provider>
     );
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
     case 'error':
       return (
-        <UserContext.Provider value={{ user: null, reload }}>
+        <UserContext.Provider value={{ user: null, reload: refetch }}>
           {children}
         </UserContext.Provider>
       );
 
-    case 'loaded':
+    case 'success':
       return (
-        <UserContext.Provider value={{ user: state.data, reload }}>
+        <UserContext.Provider value={{ user: data!, reload: refetch }}>
           {children}
         </UserContext.Provider>
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 

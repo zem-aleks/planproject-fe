@@ -15,11 +15,13 @@ export const ProjectHeading = ({
             'flex flex-col justify-between gap-2 text-2xl font-semibold text-gray-100 sm:flex-row sm:items-center'
           }
         >
-          {project.title}
+          {project.soul?.name ?? project.title}
           <ProjectStatusBadge status={project.status} />
         </h1>
         <p className={'text-gray-300'}>
-          {project.description || 'No description available'}
+          {project.soul?.summary ||
+            project.description ||
+            'No description available'}
         </p>
       </div>
       <div className={'flex flex-col gap-2'}>

@@ -12,6 +12,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        success:
+          'bg-green-600 text-white hover:bg-green-600/90 focus-visible:ring-green-600/20 dark:focus-visible:ring-green-600/40 dark:bg-green-600/60',
         warning:
           'bg-orange-500 text-white hover:bg-orange-500/90 focus-visible:ring-orange-500/20 dark:focus-visible:ring-orange/40 dark:bg-orange-500/60',
         destructive:

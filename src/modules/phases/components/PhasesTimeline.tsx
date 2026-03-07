@@ -1,4 +1,6 @@
 import * as React from 'react';
+import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router';
 
 import {
   Bar,
@@ -31,12 +33,16 @@ const chartConfig = {
 
 export const PhasesTimeline = React.memo(
   ({ phases }: { phases: PhaseEntity[] }) => {
+    const navigate = useNavigate();
+
     if (phases.length === 0) {
       return null;
     }
 
     const chartData = phases.map((phase) => {
       return {
+        id: phase.id,
+        projectId: phase.projectId,
         title: phase.title,
         startDay: phase.timelineStartDay,
         endDay: phase.timelineEndDay,
@@ -45,6 +51,8 @@ export const PhasesTimeline = React.memo(
     });
 
     const endOfTimeline = Math.max(...phases.map((p) => p.timelineEndDay), 0);
+    const rowHeight = 50;
+    const chartHeight = Math.max(300, phases.length * rowHeight + 40);
 
     return (
       <Card className={'py-4'}>
@@ -57,7 +65,8 @@ export const PhasesTimeline = React.memo(
         <CardContent>
           <ChartContainer
             config={chartConfig}
-            className={'aspect-auto h-[520px] w-full'}
+            className={'aspect-auto w-full'}
+            style={{ height: `${chartHeight}px` }}
           >
             <BarChart accessibilityLayer data={chartData} layout="vertical">
               <CartesianGrid horizontal={false} />
@@ -68,7 +77,7 @@ export const PhasesTimeline = React.memo(
                 axisLine={true}
                 tickLine={true}
                 unit={'days'}
-                domain={[0, endOfTimeline + 10]} // adjust max to fit your data
+                domain={[0, endOfTimeline + 10]}
                 tickCount={endOfTimeline}
               />
               <YAxis
@@ -83,21 +92,34 @@ export const PhasesTimeline = React.memo(
                 dataKey={({ startDay, endDay }) => [startDay, endDay]}
                 fill="#ad46ff99"
                 radius={5}
+                barSize={24}
+                cursor="pointer"
+                onClick={(_data, index) => {
+                  const phase = chartData[index];
+                  if (phase) {
+                    navigate(`/project/${phase.projectId}/phase/${phase.id}`);
+                  }
+                }}
               >
                 <LabelList
                   dataKey="duration"
                   position="inside"
-                  formatter={(v) => `${v} days`}
-                  className="fill-[var(--background)]"
+                  formatter={(v: ReactNode) => `${v} days`}
+                  className="pointer-events-none fill-[var(--background)]"
                   fontSize={12}
                 />
                 <LabelList
                   dataKey="title"
-                  position="right"
-                  offset={8}
-                  className="fill-[#000]"
-                  fontSize={14}
-                  style={{ height: '30px' }}
+                  content={({ x, y, value }) => (
+                    <text
+                      x={Number(x)}
+                      y={Number(y) - 6}
+                      className="fill-foreground"
+                      fontSize={13}
+                    >
+                      {value}
+                    </text>
+                  )}
                 />
               </Bar>
             </BarChart>

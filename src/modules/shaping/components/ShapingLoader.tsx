@@ -1,11 +1,14 @@
 import { ReactNode } from 'react';
 
+import type { AxiosError } from 'axios';
+
+import { queryKeys } from '@/lib/queryKeys';
 import { getShaping } from '@/modules/shaping/api/getShaping';
 import { ShapingEntity } from '@/modules/shaping/types/entity';
 import { Button } from '@/ui/button.tsx';
 import { Spinner } from '@/ui/spinner';
 import { notReachable } from '@/utils/notReachable.ts';
-import { useReloadableData } from '@/utils/useReloadableData';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 type Props = {
   projectId: string;
@@ -17,10 +20,18 @@ type Props = {
 };
 
 export const ShapingLoader = ({ children, projectId }: Props): ReactNode => {
-  const { state, reload, setData } = useReloadableData(getShaping, projectId);
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.shaping.detail(projectId);
+  const { data, error, status, refetch } = useQuery<
+    ShapingEntity,
+    AxiosError<Error>
+  >({
+    queryKey,
+    queryFn: ({ signal }) => getShaping(projectId, { signal }),
+  });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return (
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           <Spinner />
@@ -31,16 +42,23 @@ export const ShapingLoader = ({ children, projectId }: Props): ReactNode => {
       return (
         <div className={'flex flex-col items-center gap-2 py-4'}>
           <p className={'text-xl text-red-700'}>Shaping loading error</p>
-          <p className={'text-muted-foreground pb-2'}>{state.error.message}</p>
-          <Button onClick={reload}>Try again</Button>
+          <p className={'text-muted-foreground pb-2'}>{error.message}</p>
+          <Button onClick={() => refetch()}>Try again</Button>
         </div>
       );
 
-    case 'reloading':
-    case 'loaded':
-      return <>{children(state.data, setData, reload)}</>;
+    case 'success':
+      return (
+        <>
+          {children(
+            data!,
+            (shaping) => queryClient.setQueryData(queryKey, shaping),
+            () => refetch(),
+          )}
+        </>
+      );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

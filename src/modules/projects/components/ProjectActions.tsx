@@ -1,12 +1,16 @@
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { ProjectProgressCard } from '@/modules/projects/components/ProjectProgressCard';
+import { BuildPlanForm } from '@/modules/projects/components/forms/BuildPlanForm';
 import { StartProjectForm } from '@/modules/projects/components/forms/StartProjectForm';
-import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import { SoulActionButtons } from '@/modules/soul/components/SoulActionButtons';
 import { notReachable } from '@/utils/notReachable';
 
 export type Msg =
   | { type: 'onProjectStarted' }
-  | { type: 'onPhasesChanged'; phases: PhaseEntity[] };
+  | { type: 'onPlanBuilt' }
+  | { type: 'onPhasesChanged'; phases: PhaseEntity[] }
+  | { type: 'onSoulChanged' };
 
 export const ProjectActions = ({
   project,
@@ -21,29 +25,54 @@ export const ProjectActions = ({
     case 'completed':
     case 'onHold':
     case 'cancelled':
+    case 'soulBuilding':
+    case 'soulError':
       return null;
 
     case 'active':
-      return <ProjectProgressCard project={project} />;
+      return (
+        <>
+          <SoulActionButtons
+            project={project}
+            onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
+          />
+          <BuildPlanForm
+            project={project}
+            onPlanBuilt={() => onMsg({ type: 'onPlanBuilt' })}
+          />
+          <ProjectProgressCard project={project} />
+        </>
+      );
+
+    case 'soulDone':
+      return (
+        <div className="grid grid-cols-1 gap-4">
+          <SoulActionButtons
+            project={project}
+            onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
+          />
+          <BuildPlanForm
+            project={project}
+            onPlanBuilt={() => onMsg({ type: 'onPlanBuilt' })}
+          />
+        </div>
+      );
 
     case 'analyzing':
       return (
-        <div className={'flex flex-col items-center gap-2'}>
+        <div className="grid grid-cols-1 gap-4">
+          <SoulActionButtons
+            project={project}
+            onSoulChanged={() => onMsg({ type: 'onSoulChanged' })}
+          />
           <StartProjectForm
             project={project}
             onStarted={() => onMsg({ type: 'onProjectStarted' })}
           />
-
-          {/*<div className={'relative flex w-40 items-center justify-center'}>*/}
-          {/*  <div className={'absolute w-full border-b'} />*/}
-          {/*  <div*/}
-          {/*    className={*/}
-          {/*      'text-muted-foreground relative rounded bg-white px-2 text-sm'*/}
-          {/*    }*/}
-          {/*  >*/}
-          {/*    or*/}
-          {/*  </div>*/}
-          {/*</div>*/}
+          <BuildPlanForm
+            project={project}
+            onPlanBuilt={() => onMsg({ type: 'onPlanBuilt' })}
+          />
         </div>
       );
 

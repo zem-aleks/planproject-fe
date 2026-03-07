@@ -1,6 +1,7 @@
 import { Link } from 'react-router';
 
 import { LogoBlock } from '@/modules/home/components/LogoBlock';
+import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
 import { NavMain } from '@/ui/components/nav-main';
 import { NavSecondary } from '@/ui/components/nav-secondary';
 import { NavUser } from '@/ui/components/nav-user';
@@ -101,16 +102,40 @@ const data = {
 };
 
 export function AppSidebar() {
+  const { project } = useProjectByUrlParam();
+
   return (
     <Sidebar collapsible="offcanvas" variant={'inset'}>
-      <SidebarHeader className={''}>
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="h-10 px-4">
-              <Link to={'/projects'}>
-                <LogoBlock />
+            {project ? (
+              <Link
+                to={`/project/${project.id}`}
+                className="bg-accent/60 ring-border/50 flex items-center gap-3 rounded-lg px-3 py-2.5 ring-1"
+              >
+                {project.logoUrl ? (
+                  <img
+                    src={project.logoUrl}
+                    alt={project.title}
+                    className="ring-border/40 size-10 shrink-0 rounded-lg object-cover shadow-sm ring-1"
+                  />
+                ) : (
+                  <div className="bg-primary/10 text-primary ring-primary/20 flex size-10 shrink-0 items-center justify-center rounded-lg text-base font-semibold shadow-sm ring-1">
+                    {project.title.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="line-clamp-3 text-sm font-semibold">
+                  {project.title}
+                </span>
               </Link>
-            </SidebarMenuButton>
+            ) : (
+              <SidebarMenuButton asChild className="h-10 px-4">
+                <Link to={'/projects'}>
+                  <LogoBlock />
+                </Link>
+              </SidebarMenuButton>
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

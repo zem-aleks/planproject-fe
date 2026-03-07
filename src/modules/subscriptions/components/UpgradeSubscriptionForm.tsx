@@ -7,27 +7,36 @@ import {
   SubscriptionType,
 } from '@/modules/users/types/user';
 import { Button } from '@/ui/button';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useMutation } from '@tanstack/react-query';
 
 export const UpgradeSubscriptionForm = (data: {
   type: SubscriptionType;
   period: SubscriptionPeriod;
 }) => {
-  const { state, load } = useLazyLoadableData(createCheckoutSession);
+  const {
+    status,
+    data: responseData,
+    mutate,
+  } = useMutation({
+    mutationFn: (params: {
+      type: SubscriptionType;
+      period: SubscriptionPeriod;
+    }) => createCheckoutSession(params),
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (state.type === 'loaded') {
-      window.location.href = state.data.url;
+    if (status === 'success') {
+      window.location.href = responseData!.url;
     }
-  }, [state, navigate]);
+  }, [status, navigate]);
 
   return (
     <Button
       className={'w-full'}
       variant={'warning'}
-      onClick={() => load(data)}
-      loading={state.type === 'loading'}
+      onClick={() => mutate(data)}
+      loading={status === 'pending'}
     >
       Upgrade
     </Button>

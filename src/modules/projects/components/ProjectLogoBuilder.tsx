@@ -1,15 +1,16 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { RefreshCcw } from 'lucide-react';
 
+import { queryKeys } from '@/lib/queryKeys';
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { generateProjectLogo } from '@/modules/shaping/api/generateProjectLogo';
 import { getProjectLogo } from '@/modules/shaping/api/getProjectLogo';
 import { Button } from '@/ui/button';
 import { Skeleton } from '@/ui/skeleton';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
-import { usePollingData } from '@/utils/usePollableData';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export const ProjectLogoBuilder = ({
   project,
@@ -36,32 +37,34 @@ export const ProjectLogoBuilder = ({
 };
 
 const LogoGenerator = ({ projectId }: { projectId: string }) => {
-  const { state, load } = useLazyLoadableData(generateProjectLogo);
+  const { status, data, mutate } = useMutation({
+    mutationFn: (projectId: string) => generateProjectLogo(projectId),
+  });
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return (
         <Skeleton className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32" />
       );
 
     case 'error':
-    case 'not_requested':
+    case 'idle':
       return (
         <Button
           className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32"
           aria-label={'Generate logo'}
-          onClick={() => load(projectId)}
+          onClick={() => mutate(projectId)}
         >
           <RefreshCcw className={'size-14'} />
         </Button>
       );
 
-    case 'loaded':
+    case 'success':
       return (
         <div className={`size-16 shrink-0 rounded-md bg-white md:size-32`}>
-          {state.data.logoUrl && (
+          {data!.logoUrl && (
             <img
-              src={state.data.logoUrl}
+              src={data!.logoUrl}
               alt="Project Logo"
               className="h-full w-full rounded-md object-contain object-center"
             />
@@ -70,41 +73,42 @@ const LogoGenerator = ({ projectId }: { projectId: string }) => {
       );
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };
 
+type LogoData = Awaited<ReturnType<typeof getProjectLogo>>;
+
 const LogoPoller = ({ projectId }: { projectId: string }) => {
-  const { state, stopPolling } = usePollingData(
-    getProjectLogo,
-    projectId,
-    5000,
-  );
+  const [polling, setPolling] = useState(true);
+  const { data, status } = useQuery<LogoData, AxiosError<Error>>({
+    queryKey: queryKeys.projectLogo.byProject(projectId),
+    queryFn: ({ signal }) => getProjectLogo(projectId, { signal }),
+    refetchInterval: polling ? 5000 : false,
+  });
 
   useEffect(() => {
-    if (state.type === 'loaded' && state.data?.logoUrl !== 'loading') {
-      stopPolling();
+    if (status === 'success' && data?.logoUrl !== 'loading') {
+      setPolling(false);
     }
-  }, [state]);
+  }, [status, data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  switch (state.type) {
-    case 'loading':
+  switch (status) {
+    case 'pending':
       return (
         <Skeleton className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32" />
       );
 
-    case 'stopped':
-    case 'reloading':
-    case 'loaded':
-      if (state.data?.logoUrl === 'loading')
+    case 'success':
+      if (data?.logoUrl === 'loading')
         return (
           <Skeleton className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32" />
         );
       return (
         <div className={`size-16 shrink-0 rounded-md bg-white md:size-32`}>
-          {state.data?.logoUrl && (
+          {data?.logoUrl && (
             <img
-              src={state.data.logoUrl}
+              src={data.logoUrl}
               alt="Project Logo"
               className="h-full w-full rounded-md object-contain object-center"
             />
@@ -116,6 +120,6 @@ const LogoPoller = ({ projectId }: { projectId: string }) => {
       return <LogoGenerator projectId={projectId} />;
 
     default:
-      return notReachable(state);
+      return notReachable(status);
   }
 };

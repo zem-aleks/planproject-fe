@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import type { AxiosError } from 'axios';
 import { toast } from 'sonner';
 
 import { useAuthSession } from '@/modules/auth/contexts/AuthSessionContext';
@@ -10,7 +11,7 @@ import { Card } from '@/ui/card';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
 import { Textarea } from '@/ui/textarea';
 import { notReachable } from '@/utils/notReachable';
-import { useLazyLoadableData } from '@/utils/useLazyLoadableData';
+import { useMutation } from '@tanstack/react-query';
 
 export type Msg =
   | { type: 'onAccepted'; shaping: ShapingEntity }
@@ -100,30 +101,36 @@ export const ModifySummary = ({
   onMsg: (msg: ModifySummaryMsg) => void;
 }) => {
   const { clientId } = useAuthSession();
-  const { state, load } = useLazyLoadableData(addStartShapingUserMessage);
+  const { status, data, error, mutate } = useMutation<
+    ShapingEntity,
+    AxiosError<{ message: string }>,
+    { shapingId: string; clientId: string; message: string }
+  >({
+    mutationFn: (params) => addStartShapingUserMessage(params),
+  });
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
-    switch (state.type) {
-      case 'not_requested':
-      case 'loading':
+    switch (status) {
+      case 'idle':
+      case 'pending':
         break;
 
       case 'error':
         toast.error(
-          `Failed to submit: ${state.error.response?.data.message || state.error.message}`,
+          `Failed to submit: ${error!.response?.data.message || error!.message}`,
         );
         break;
 
-      case 'loaded':
+      case 'success':
         setMessage('');
-        onMsg({ type: 'onUpdate', shaping: state.data });
+        onMsg({ type: 'onUpdate', shaping: data! });
         break;
 
       default:
-        return notReachable(state);
+        return notReachable(status);
     }
-  }, [state]);
+  }, [status]);
 
   return (
     <div
@@ -145,7 +152,7 @@ export const ModifySummary = ({
         onChange={(e) => setMessage(e.target.value)}
         rows={8}
         required={true}
-        disabled={state.type === 'loading'}
+        disabled={status === 'pending'}
         className={'w-full grow'}
         maxLength={4000}
       />
@@ -154,14 +161,14 @@ export const ModifySummary = ({
         <Button
           className={'w-full px-12 md:w-auto'}
           onClick={() => onMsg({ type: 'onBack' })}
-          disabled={state.type === 'loading'}
+          disabled={status === 'pending'}
         >
           Back
         </Button>
         <Button
           className={'w-full bg-green-600 px-12 md:w-auto'}
-          onClick={() => load({ shapingId: shaping.id, message, clientId })}
-          loading={state.type === 'loading'}
+          onClick={() => mutate({ shapingId: shaping.id, message, clientId })}
+          loading={status === 'pending'}
         >
           Submit
         </Button>
