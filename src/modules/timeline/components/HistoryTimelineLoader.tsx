@@ -59,32 +59,36 @@ export const HistoryTimelineLoader = ({ project }: Props): ReactNode => {
         );
       }
       return (
-        <div
-          className={
-            'flex w-full flex-col items-start justify-center gap-4 pb-96'
-          }
-        >
-          {events.map((point) => (
-            <div className={'flex items-end gap-8'}>
+        <div className={'flex w-full flex-col pb-96'}>
+          {events.map((point, index) => (
+            <div key={point.id} className={'flex gap-4'}>
               <div
                 className={
-                  'mt-20 flex h-16 w-16 shrink-0 translate-y-1/3 flex-col items-center justify-center rounded-md bg-gray-50 shadow shadow-pink-900 sm:w-30'
+                  'flex w-16 shrink-0 flex-col items-center justify-start pt-2 sm:w-30'
                 }
               >
-                <div className={'font-semibold'}>Day {point.projectDay}</div>
-                <div className={'text-foreground text-center text-sm'}>
-                  {dayjs(point.createdAt).format('D MMM YYYY')}
+                <div
+                  className={
+                    'flex w-full flex-col items-center justify-center rounded-md bg-gray-50 px-2 py-2 shadow shadow-pink-900'
+                  }
+                >
+                  <div className={'font-semibold'}>Day {point.projectDay}</div>
+                  <div className={'text-muted-foreground text-center text-xs'}>
+                    {dayjs(point.date).format('D MMM')}
+                  </div>
                 </div>
               </div>
-              <div
-                className={
-                  'flex h-full grow flex-col items-center justify-center gap-4'
-                }
-              >
-                <TimelineLine />
+              <div className={'mx-2 flex shrink-0 flex-col items-center pt-4'}>
                 <TimelineDot />
+                {index < events.length - 1 && (
+                  <div className={'min-h-8 flex-1'}>
+                    <TimelineLine />
+                  </div>
+                )}
               </div>
-              <EventsCard events={point.events} project={project} />
+              <div className={'flex-1 pt-2 pb-6'}>
+                <EventsCard events={point.events} project={project} />
+              </div>
             </div>
           ))}
         </div>
@@ -104,11 +108,7 @@ const EventsCard = ({
   project: ProjectPreviewEntity;
 }) => {
   return (
-    <div
-      className={
-        'mt-20 grow translate-y-1/3 rounded-md bg-gray-50 px-2 py-2 shadow shadow-pink-900'
-      }
-    >
+    <div className={'rounded-md bg-gray-50 px-2 py-2 shadow shadow-pink-900'}>
       <ul className={'flex flex-col gap-1'}>
         {events.map((event) => (
           <li>
