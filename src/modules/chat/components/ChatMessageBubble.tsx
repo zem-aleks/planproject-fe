@@ -4,7 +4,6 @@ import { ProposalCard } from '@/modules/chat/components/ProposalCard';
 import type { ChatMessage, ChatProposal } from '@/modules/chat/types/entity';
 import type { ProjectEntity } from '@/modules/projects/types/entity';
 import { MarkdownFormat } from '@/ui/custom/MarkdownFormat';
-import { cn } from '@/ui/lib/utils';
 
 export const ChatMessageBubble = ({
   message,
@@ -27,43 +26,41 @@ export const ChatMessageBubble = ({
 }) => {
   const isUser = message.role === 'user';
 
-  return (
-    <div className={cn('flex gap-3', isUser && 'flex-row-reverse')}>
-      <div
-        className={cn(
-          'flex size-8 shrink-0 items-center justify-center rounded-full',
-          isUser
-            ? 'bg-muted text-muted-foreground'
-            : 'bg-primary/10 text-primary',
-        )}
-      >
-        {isUser ? <User className="size-4" /> : <Bot className="size-4" />}
-      </div>
-      <div
-        className={cn(
-          'max-w-[80%] min-w-0 overflow-hidden rounded-xl px-4 py-2.5 text-sm leading-relaxed',
-          isUser ? 'bg-primary text-primary-foreground' : 'bg-muted',
-        )}
-      >
-        {isUser ? (
+  if (isUser) {
+    return (
+      <div className="flex flex-row-reverse gap-2 md:gap-3">
+        <div className="bg-muted text-muted-foreground flex size-6 shrink-0 items-center justify-center rounded-full md:size-8">
+          <User className="size-3 md:size-4" />
+        </div>
+        <div className="bg-primary text-primary-foreground max-w-[85%] min-w-0 overflow-hidden rounded-xl px-3 py-2 text-sm leading-relaxed md:max-w-[80%] md:px-4 md:py-2.5">
           <p className="break-words whitespace-pre-wrap">{message.content}</p>
-        ) : (
-          <div className="prose-sm max-w-none overflow-hidden break-words">
-            <MarkdownFormat>{message.content}</MarkdownFormat>
-            {proposals?.map((proposal) => (
-              <ProposalCard
-                key={proposal.id}
-                proposal={proposal}
-                projectId={projectId!}
-                chatId={chatId!}
-                onStatusChange={onProposalStatusChange!}
-              />
-            ))}
-            {isStreaming && (
-              <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-current align-text-bottom" />
-            )}
-          </div>
-        )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col">
+      <div className="text-muted-foreground mb-1 flex items-center gap-1.5 text-xs">
+        <Bot className="size-3.5" />
+        <span>AI</span>
+      </div>
+      <div className="bg-muted min-w-0 overflow-hidden rounded-xl px-3 py-2 text-sm leading-relaxed md:px-4 md:py-2.5">
+        <div className="prose-sm max-w-none overflow-hidden break-words">
+          <MarkdownFormat>{message.content}</MarkdownFormat>
+          {proposals?.map((proposal) => (
+            <ProposalCard
+              key={proposal.id}
+              proposal={proposal}
+              projectId={projectId!}
+              chatId={chatId!}
+              onStatusChange={onProposalStatusChange!}
+            />
+          ))}
+          {isStreaming && (
+            <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse rounded-sm bg-current align-text-bottom" />
+          )}
+        </div>
       </div>
     </div>
   );
