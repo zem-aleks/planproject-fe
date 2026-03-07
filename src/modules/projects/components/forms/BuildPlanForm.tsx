@@ -123,8 +123,8 @@ const BuildPlanModal = ({
           </DialogTitle>
           <DialogDescription className="text-muted-foreground w-full">
             {isRegenerate
-              ? 'This will wipe all existing phases and milestones, then regenerate them from the soul. Are you sure?'
-              : 'This will generate project phases and milestones based on the soul. You can review and start the project after.'}
+              ? 'This will wipe all existing phases and milestones, then regenerate them from the project profile. Are you sure?'
+              : 'This will generate project phases and milestones based on the project profile. You can review and start the project after.'}
           </DialogDescription>
         </DialogHeader>
 

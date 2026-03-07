@@ -24,7 +24,7 @@ export const InitSoulForm = ({
   onInitiated: () => void;
 }) => {
   const reason = getReasonFromProject(project);
-  const { status, mutate } = useMutation({
+  const { status, error, mutate } = useMutation({
     mutationFn: (projectId: string) => initSoul(projectId),
   });
 
@@ -47,14 +47,16 @@ export const InitSoulForm = ({
 
           {status === 'error' && (
             <p className="text-destructive text-sm">
-              Failed to initialize. Please try again.
+              {error?.response?.data?.message ||
+                error?.message ||
+                'Failed to initialize. Please try again.'}
             </p>
           )}
 
           <div>
             <Button onClick={handleInit}>
               <Sparkles />
-              Initialize Soul
+              Initialize Project Profile
             </Button>
           </div>
         </Card>
@@ -88,11 +90,12 @@ const ReasonBanner = ({ reason }: { reason: Reason }) => {
           <Sparkles className="text-muted-foreground mt-0.5 size-5 shrink-0" />
           <div>
             <div className="text-base font-semibold">
-              Your project Soul is not initialized yet
+              Your Project Profile is not initialized yet
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              The Soul captures the essence of your project — goals, context,
-              and key decisions. Initialize it to unlock planning features.
+              The Project Profile captures the essence of your project — goals,
+              context, and key decisions. Initialize it to unlock planning
+              features.
             </p>
           </div>
         </div>
@@ -104,7 +107,7 @@ const ReasonBanner = ({ reason }: { reason: Reason }) => {
           <AlertCircle className="mt-0.5 size-5 shrink-0 text-red-500" />
           <div>
             <div className="text-base font-semibold">
-              Soul initialization failed
+              Project Profile initialization failed
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Something went wrong during the previous initialization attempt.
