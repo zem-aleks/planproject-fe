@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 
 import type { AxiosError } from 'axios';
 import {
@@ -24,8 +24,11 @@ import {
 
 import { queryKeys } from '@/lib/queryKeys';
 import type { MilestoneDetailsEntity } from '@/modules/milestones/types/entity';
-import { useProjectByUrlParam } from '@/modules/projects/helpers/useProjectByUrlParam';
-import type { ProjectSoul } from '@/modules/projects/types/entity';
+import { getProject } from '@/modules/projects/api/getProject';
+import type {
+  ProjectEntity,
+  ProjectSoul,
+} from '@/modules/projects/types/entity';
 import { getTodayTimeline } from '@/modules/timeline/api/getTodayTimeline';
 import { cn } from '@/ui/lib/utils';
 import {
@@ -43,11 +46,16 @@ import { useQuery } from '@tanstack/react-query';
 
 export function NavMain() {
   const { pathname } = useLocation();
-  // const { projects } = useContext(ProjectsContext);
-  const { project } = useProjectByUrlParam();
+  const { projectId } = useParams<{ projectId: string }>();
+  const { data: project } = useQuery<ProjectEntity, AxiosError<Error>>({
+    queryKey: queryKeys.projects.detail(projectId!),
+    queryFn: ({ signal }) => getProject(projectId!, { signal }),
+    enabled: !!projectId,
+  });
   const isProjectEditPage = pathname.startsWith('/projects/edit/');
   const hasSoul = !!project?.soul;
   const isPlanned =
+    project?.status === 'planning' ||
     project?.status === 'analyzing' ||
     project?.status === 'active' ||
     project?.status === 'completed' ||

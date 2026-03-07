@@ -44,7 +44,9 @@ export const ProjectActions = ({
         </>
       );
 
+    case 'planning':
     case 'soulDone':
+    case 'planningError':
       return (
         <div className="grid grid-cols-1 gap-4">
           <SoulActionButtons

@@ -80,9 +80,14 @@ const DashboardContent = ({
     case 'soulError':
       return <InitSoulForm project={project} onInitiated={onChanged} />;
 
+    case 'planning':
     case 'soulDone':
+    case 'planningError':
       return (
         <>
+          {project.status === 'planning' && (
+            <PlanningPoller onChanged={onChanged} />
+          )}
           <ProjectActions
             project={project}
             onMsg={(msg) => {
@@ -157,7 +162,6 @@ const DashboardContent = ({
             }}
           />
 
-          <SoulBlock project={project} />
           <PhasesLoader projectId={project.id}>
             {(phases, reload) => (
               <div className={'flex flex-col gap-4'}>
@@ -198,12 +202,22 @@ const DashboardContent = ({
               </div>
             )}
           </PhasesLoader>
+          <SoulBlock project={project} />
         </>
       );
 
     default:
       return notReachable(project.status);
   }
+};
+
+const PlanningPoller = ({ onChanged }: { onChanged: () => void }) => {
+  useEffect(() => {
+    const id = setInterval(onChanged, 10000);
+    return () => clearInterval(id);
+  }, [onChanged]);
+
+  return null;
 };
 
 const SoulBuildingCard = ({ onChanged }: { onChanged: () => void }) => {

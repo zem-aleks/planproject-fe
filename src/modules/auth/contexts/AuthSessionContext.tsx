@@ -41,16 +41,12 @@ export const AuthSessionContextProvider = ({
   const [loaded, setLoaded] = useState<boolean>(false);
   const [session, setSession] = useState<Session | null>(null);
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setApiAuth(session ? session.access_token : undefined);
-      setLoaded(true);
-    });
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setApiAuth(session ? session.access_token : undefined);
+      setLoaded(true);
     });
     return () => subscription.unsubscribe();
   }, []);

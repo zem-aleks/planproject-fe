@@ -12,9 +12,11 @@ import { useQueryClient } from '@tanstack/react-query';
 
 export const MilestoneActions = ({
   milestone,
+  projectStarted,
 }: {
   milestone: MilestoneEntity;
   onUpdated: (milestone: MilestoneEntity) => void;
+  projectStarted: boolean;
 }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -44,7 +46,7 @@ export const MilestoneActions = ({
           View Details
         </Link>
       </Button>
-      {milestone.status !== 'completed' && (
+      {projectStarted && milestone.status !== 'completed' && (
         <Button
           variant={milestone.focused ? 'secondary' : 'default'}
           className={'w-full py-2'}

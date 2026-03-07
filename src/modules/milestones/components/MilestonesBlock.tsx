@@ -6,7 +6,13 @@ import { ModifyMilestonesForm } from '@/modules/milestones/components/ModifyMile
 import { PhaseEntity } from '@/modules/phases/types/entity';
 import { Card } from '@/ui/card';
 
-export const MilestonesBlock = ({ phase }: { phase: PhaseEntity }) => {
+export const MilestonesBlock = ({
+  phase,
+  projectStarted,
+}: {
+  phase: PhaseEntity;
+  projectStarted: boolean;
+}) => {
   if (phase.status === 'building') {
     return (
       <div className={'flex flex-col gap-2'}>
@@ -47,6 +53,7 @@ export const MilestonesBlock = ({ phase }: { phase: PhaseEntity }) => {
                 milestone={milestone}
                 key={phase.id}
                 onUpdated={reload}
+                projectStarted={projectStarted}
               />
             ))}
           </div>

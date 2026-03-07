@@ -5,7 +5,6 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Clock,
   ListChecks,
   Loader2,
   Play,
@@ -22,18 +21,12 @@ import { applySoulQueue } from '@/modules/soul/api/applySoulQueue';
 import { cancelSoulQueue } from '@/modules/soul/api/cancelSoulQueue';
 import { removeFromSoulQueue } from '@/modules/soul/api/removeFromSoulQueue';
 import { Button } from '@/ui/button';
+import { useIsMobile } from '@/ui/hooks/use-mobile';
 import { cn } from '@/ui/lib/utils';
-import { Progress } from '@/ui/progress';
 import { notReachable } from '@/utils/notReachable';
 import { useQueryClient } from '@tanstack/react-query';
 
 const QUEUE_DURATION_S = 300; // 5 minutes
-
-const formatTimeRemaining = (seconds: number): string => {
-  const m = Math.floor(seconds / 60);
-  const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-};
 
 const truncate = (text: string, max: number): string => {
   // Strip markdown syntax and collapse whitespace
@@ -73,10 +66,10 @@ export const SoulQueueSnackbar = ({
   onApplyProposalReverted?: (messageId: string, proposalId: string) => void;
 }) => {
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
   const { soulQueue, soulQueueStartedAt, soulQueueApplying, soulQueueError } =
     project;
   const [expanded, setExpanded] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [remainingSeconds, setRemainingSeconds] = useState(QUEUE_DURATION_S);
   const [applyingManually, setApplyingManually] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
@@ -130,13 +123,11 @@ export const SoulQueueSnackbar = ({
 
     // Timer already expired — fire once, don't start interval
     if (initialElapsed >= QUEUE_DURATION_S) {
-      setProgress(100);
       setRemainingSeconds(0);
       invalidateProject();
       return;
     }
 
-    setProgress(Math.min((initialElapsed / QUEUE_DURATION_S) * 100, 100));
     setRemainingSeconds(
       Math.ceil(Math.max(0, QUEUE_DURATION_S - initialElapsed)),
     );
@@ -145,7 +136,6 @@ export const SoulQueueSnackbar = ({
       const elapsed = (Date.now() - startTime) / 1000;
       const remaining = Math.max(0, QUEUE_DURATION_S - elapsed);
 
-      setProgress(Math.min((elapsed / QUEUE_DURATION_S) * 100, 100));
       setRemainingSeconds(Math.ceil(remaining));
 
       if (remaining <= 0) {
@@ -273,9 +263,26 @@ export const SoulQueueSnackbar = ({
 
   if (applied) {
     return (
-      <div className="fixed top-6 right-6 z-50 w-full max-w-lg">
-        <div className="bg-card rounded-xl border border-green-500/40 shadow-lg">
-          <div className="flex items-center gap-3 px-4 py-3">
+      <div
+        className={cn(
+          'fixed z-50',
+          isMobile
+            ? 'inset-x-0 bottom-0 px-0'
+            : 'top-6 right-6 w-full max-w-lg',
+        )}
+      >
+        <div
+          className={cn(
+            'bg-card border-green-500/40 shadow-lg',
+            isMobile ? 'border-t' : 'rounded-xl border',
+          )}
+        >
+          <div
+            className={cn(
+              'flex items-center gap-3 px-4 py-3',
+              isMobile && 'pb-[max(0.75rem,env(safe-area-inset-bottom))]',
+            )}
+          >
             <Check className="size-4 text-green-500" />
             <span className="text-sm font-medium">
               Changes applied successfully
@@ -287,50 +294,88 @@ export const SoulQueueSnackbar = ({
   }
 
   return (
-    <div className="fixed top-6 right-6 z-50 w-full max-w-lg">
+    <div
+      className={cn(
+        'fixed z-50',
+        isMobile ? 'inset-x-0 bottom-0' : 'top-6 right-6 w-full max-w-lg',
+      )}
+    >
       <div
         className={cn(
-          'bg-card rounded-xl border opacity-80 shadow-lg transition-opacity duration-200 focus-within:opacity-100 hover:opacity-100',
+          'bg-card relative overflow-hidden shadow-lg transition-opacity duration-200',
+          isMobile
+            ? 'border-t opacity-100'
+            : 'rounded-xl border opacity-80 focus-within:opacity-100 hover:opacity-100',
           soulQueueError && 'border-red-500/40 opacity-100',
+          isApplying && 'opacity-100',
         )}
       >
+        {isApplying && (
+          <div className="bg-primary/60 absolute inset-x-0 top-0 h-0.5 animate-[shimmer_1.5s_ease-in-out_infinite]" />
+        )}
         {/* Collapsed bar */}
-        <div className="flex items-center gap-3 px-4 py-3">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <ListChecks className="text-muted-foreground size-4" />
-            <span>
-              {soulQueue.length} change{soulQueue.length !== 1 && 's'} queued
-            </span>
+        <div
+          className={cn(
+            'flex items-center gap-3 px-4 py-3',
+            isMobile && 'pb-[max(0.75rem,env(safe-area-inset-bottom))]',
+          )}
+        >
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <ListChecks className="text-muted-foreground size-4" />
+              <span>
+                {soulQueue.length} change{soulQueue.length !== 1 && 's'} queued
+              </span>
+            </div>
+            {!isApplying && !soulQueueError && soulQueueStartedAt && (
+              <span
+                className={cn(
+                  'ml-6 text-xs',
+                  remainingSeconds <= 60
+                    ? 'text-orange-400'
+                    : 'text-muted-foreground',
+                )}
+              >
+                {remainingSeconds <= 60
+                  ? 'Auto-applying soon…'
+                  : 'Will auto-apply in a few minutes'}
+              </span>
+            )}
           </div>
 
           {isApplying ? (
-            <div className="flex flex-1 items-center justify-between gap-2">
-              <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                <Loader2 className="size-4 animate-spin" />
-                <span>Applying changes…</span>
-              </div>
+            <div className="flex flex-1 items-center justify-end gap-2">
+              <Loader2 className="text-muted-foreground size-4 animate-spin" />
+              <span className="text-muted-foreground text-sm">Applying…</span>
+              <div className="flex-1" />
               <Button
                 variant="ghost"
-                size="sm"
-                className="h-7 text-xs"
-                disabled={cancelling}
-                loading={cancelling}
-                onClick={handleCancel}
+                size="icon"
+                className="size-7"
+                onClick={() => setExpanded((e) => !e)}
               >
-                Cancel
+                {expanded ? (
+                  <ChevronDown className="size-4" />
+                ) : (
+                  <ChevronUp className="size-4" />
+                )}
               </Button>
             </div>
           ) : (
             <>
-              <div className="flex flex-1 items-center gap-2">
-                <Progress value={progress} className="h-1.5" />
-                <div className="text-muted-foreground flex items-center gap-1 text-xs">
-                  <Clock className="size-3" />
-                  <span>{formatTimeRemaining(remainingSeconds)}</span>
-                </div>
-              </div>
+              <div className="flex-1" />
 
               <div className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  disabled={cancelling}
+                  loading={cancelling}
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </Button>
                 <Button size="sm" onClick={handleApplyNow}>
                   <Play className="size-3.5" />
                   {soulQueueError ? 'Retry' : 'Apply Now'}
@@ -384,9 +429,39 @@ export const SoulQueueSnackbar = ({
           </div>
         )}
 
+        {/* Applying list */}
+        {isApplying && expanded && soulQueue.length > 0 && (
+          <div
+            className={cn(
+              'border-t px-4 py-3',
+              isMobile && 'max-h-48 overflow-y-auto',
+            )}
+          >
+            <div className="flex flex-col gap-2">
+              {soulQueue.map((op, i) => (
+                <div
+                  key={op.id}
+                  className="flex animate-pulse items-center gap-2 rounded-lg border p-2"
+                  style={{ animationDelay: `${i * 200}ms` }}
+                >
+                  <Loader2 className="text-primary size-3.5 shrink-0 animate-spin" />
+                  <span className="text-muted-foreground text-sm leading-relaxed">
+                    {getOperationLabel(op)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Expanded list */}
         {expanded && !isApplying && (
-          <div className="border-t px-4 py-3">
+          <div
+            className={cn(
+              'border-t px-4 py-3',
+              isMobile && 'max-h-48 overflow-y-auto',
+            )}
+          >
             <div className="flex flex-col gap-2">
               {soulQueue.map((op) => (
                 <div

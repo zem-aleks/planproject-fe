@@ -13,10 +13,12 @@ export const MilestoneCard = ({
   // phase,
   milestone,
   onUpdated,
+  projectStarted,
 }: {
   phase: PhaseEntity;
   milestone: MilestoneEntity;
   onUpdated: (milestone: MilestoneEntity) => void;
+  projectStarted: boolean;
 }) => {
   const [currentMilestone, setCurrentMilestone] = useState(milestone);
 
@@ -47,6 +49,7 @@ export const MilestoneCard = ({
       <div className={'flex flex-col gap-2'}>
         <MilestoneActions
           milestone={currentMilestone}
+          projectStarted={projectStarted}
           onUpdated={(milestone) => {
             setCurrentMilestone(milestone);
             onUpdated(milestone);

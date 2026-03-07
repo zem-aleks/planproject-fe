@@ -78,7 +78,10 @@ export const RoadmapPage = () => {
                             )}
                           </div>
                         </div>
-                        <MilestonesBlock phase={phase} />
+                        <MilestonesBlock
+                          phase={phase}
+                          projectStarted={project.status === 'active'}
+                        />
                       </AccordionContent>
                     </AccordionItem>
                   ))}

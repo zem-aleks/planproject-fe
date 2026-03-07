@@ -46,6 +46,8 @@ export type ProjectStatus =
   | 'soulBuilding'
   | 'soulError'
   | 'soulDone'
+  | 'planning' // plan generation is in progress (phases/milestones being generated, ~1-2 min)
+  | 'planningError' // plan generation failed
   | 'analyzing' // phases are generated, milestones may be in progress. Opportunity to modify the structure of phases and milestones
   | 'active' // work on the project is started, phases and milestones are being worked on
   | 'completed' // all phases and milestones are completed

@@ -13,6 +13,20 @@ export const ProjectStatusBadge = ({ status }: { status: ProjectStatus }) => {
     case 'soulDone':
       return null;
 
+    case 'planning':
+      return (
+        <Badge className={''} variant={'warning'}>
+          Status: Planning…
+        </Badge>
+      );
+
+    case 'planningError':
+      return (
+        <Badge className={''} variant={'destructive'}>
+          Status: Planning failed
+        </Badge>
+      );
+
     case 'active':
       return (
         <Badge className={''} variant={'warning'}>

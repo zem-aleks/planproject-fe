@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 
+import type { AxiosError } from 'axios';
 import { AlertCircle, Sparkles } from 'lucide-react';
 
 import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
@@ -24,8 +25,12 @@ export const InitSoulForm = ({
   onInitiated: () => void;
 }) => {
   const reason = getReasonFromProject(project);
-  const { status, error, mutate } = useMutation({
-    mutationFn: (projectId: string) => initSoul(projectId),
+  const { status, error, mutate } = useMutation<
+    Awaited<ReturnType<typeof initSoul>>,
+    AxiosError<{ message?: string }>,
+    string
+  >({
+    mutationFn: (projectId) => initSoul(projectId),
   });
 
   useEffect(() => {

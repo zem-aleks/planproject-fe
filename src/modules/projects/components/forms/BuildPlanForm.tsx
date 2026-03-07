@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/ui/dialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/tooltip';
 import { notReachable } from '@/utils/notReachable';
 import { IconLayoutKanban } from '@tabler/icons-react';
 import { useMutation } from '@tanstack/react-query';
@@ -29,59 +30,20 @@ export const BuildPlanForm = ({
 }) => {
   const [open, setOpen] = useState<boolean>(false);
 
+  const isPlanning = project.status === 'planning';
   const isRegenerate =
-    project.status === 'analyzing' || project.status === 'active';
+    project.status === 'planningError' ||
+    project.status === 'analyzing' ||
+    project.status === 'active';
+  const hasQueuedChanges = project.soulQueue.length > 0;
 
-  return (
-    <>
-      <BuildPlanModal
-        open={open}
-        onClose={() => setOpen(false)}
-        project={project}
-        isRegenerate={isRegenerate}
-        onPlanBuilt={() => {
-          onPlanBuilt();
-          setOpen(false);
-        }}
-      />
-      {isRegenerate ? (
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={() => setOpen(true)}
-        >
-          Regenerate Plan
-        </Button>
-      ) : (
-        <Button
-          className="relative w-full animate-[glow_2s_ease_infinite] shadow shadow-white"
-          onClick={() => setOpen(true)}
-        >
-          Do Planning
-        </Button>
-      )}
-    </>
-  );
-};
-
-const BuildPlanModal = ({
-  open,
-  project,
-  isRegenerate,
-  onPlanBuilt,
-  onClose,
-}: {
-  open: boolean;
-  project: ProjectPreviewEntity;
-  isRegenerate: boolean;
-  onPlanBuilt: () => void;
-  onClose: () => void;
-}) => {
   const { status, error, mutate } = useMutation<
     ProjectEntity,
     AxiosError<{ message: string }>,
     string
   >({ mutationFn: (projectId) => buildPlan(projectId) });
+
+  const isPending = status === 'pending' || isPlanning;
 
   useEffect(() => {
     switch (status) {
@@ -97,14 +59,61 @@ const BuildPlanModal = ({
 
       case 'success':
         onPlanBuilt();
+        setOpen(false);
         toast.success('Plan generation started!');
         break;
 
       default:
         return notReachable(status);
     }
-  }, [status]);
+  }, [status]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  return (
+    <>
+      <BuildPlanModal
+        open={open}
+        onClose={() => setOpen(false)}
+        isRegenerate={isRegenerate}
+        isPending={isPending}
+        onConfirm={() => mutate(project.id)}
+      />
+      {(!isRegenerate || isPlanning) && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="w-full">
+              <Button
+                className="relative w-full animate-[glow_2s_ease_infinite] shadow shadow-white"
+                disabled={hasQueuedChanges || isPending}
+                onClick={() => setOpen(true)}
+              >
+                {isPending ? 'Planning in progress…' : 'Do Planning'}
+              </Button>
+            </span>
+          </TooltipTrigger>
+          {hasQueuedChanges && (
+            <TooltipContent>
+              Apply or revert queued changes before planning
+            </TooltipContent>
+          )}
+        </Tooltip>
+      )}
+    </>
+  );
+};
+
+const BuildPlanModal = ({
+  open,
+  isRegenerate,
+  isPending,
+  onConfirm,
+  onClose,
+}: {
+  open: boolean;
+  isRegenerate: boolean;
+  isPending: boolean;
+  onConfirm: () => void;
+  onClose: () => void;
+}) => {
   return (
     <Dialog
       open={open}
@@ -128,17 +137,20 @@ const BuildPlanModal = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Button
-          className="w-full"
-          loading={status === 'pending'}
-          onClick={() => mutate(project.id)}
-        >
-          {isRegenerate ? 'Regenerate' : "Let's plan!"}
-        </Button>
-        {status === 'pending' && (
-          <div className="text-center text-sm text-orange-400">
-            This may take some time. Plan generation is in progress...
-          </div>
+        {isPending ? (
+          <>
+            <div className="text-center text-sm text-orange-400">
+              Plan generation is in progress. You can safely close this dialog —
+              it will continue in the background.
+            </div>
+            <Button variant="outline" className="w-full" onClick={onClose}>
+              Close
+            </Button>
+          </>
+        ) : (
+          <Button className="w-full" onClick={onConfirm}>
+            {isRegenerate ? 'Regenerate' : "Let's plan!"}
+          </Button>
         )}
       </DialogContent>
     </Dialog>

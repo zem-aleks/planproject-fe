@@ -68,6 +68,7 @@ export const ActivePhases = ({
                         milestone={milestone}
                         key={milestone.id}
                         onUpdated={() => refetch()}
+                        projectStarted={project.status === 'active'}
                       />
                     ))}
                   </div>

@@ -41,7 +41,10 @@ export const PhaseViewPage = () => {
               <PhaseDescription phase={phase} />
             </div>
 
-            <MilestonesBlock phase={phase} />
+            <MilestonesBlock
+              phase={phase}
+              projectStarted={project.status === 'active'}
+            />
           </div>
         )}
       </PhaseLoader>

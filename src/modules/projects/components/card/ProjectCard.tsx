@@ -61,6 +61,8 @@ export const ProjectCard = ({ project, onMsg }: Props): ReactNode => {
     case 'soulBuilding':
     case 'soulError':
     case 'shaping':
+    case 'planning':
+    case 'planningError':
     case 'analyzing':
     case 'active':
     case 'completed':

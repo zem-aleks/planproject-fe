@@ -13,7 +13,7 @@ export const App = () => {
         <AppRoutes />
         <Toaster visibleToasts={1} />
       </AuthSessionContextProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="top-right" />
     </QueryClientProvider>
   );
 };
