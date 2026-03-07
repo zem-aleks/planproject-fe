@@ -1,5 +1,6 @@
 import * as React from 'react';
 import type { ReactNode } from 'react';
+import { useNavigate } from 'react-router';
 
 import {
   Bar,
@@ -32,12 +33,16 @@ const chartConfig = {
 
 export const PhasesTimeline = React.memo(
   ({ phases }: { phases: PhaseEntity[] }) => {
+    const navigate = useNavigate();
+
     if (phases.length === 0) {
       return null;
     }
 
     const chartData = phases.map((phase) => {
       return {
+        id: phase.id,
+        projectId: phase.projectId,
         title: phase.title,
         startDay: phase.timelineStartDay,
         endDay: phase.timelineEndDay,
@@ -46,7 +51,7 @@ export const PhasesTimeline = React.memo(
     });
 
     const endOfTimeline = Math.max(...phases.map((p) => p.timelineEndDay), 0);
-    const rowHeight = 70;
+    const rowHeight = 50;
     const chartHeight = Math.max(300, phases.length * rowHeight + 40);
 
     return (
@@ -88,20 +93,33 @@ export const PhasesTimeline = React.memo(
                 fill="#ad46ff99"
                 radius={5}
                 barSize={24}
+                cursor="pointer"
+                onClick={(_data, index) => {
+                  const phase = chartData[index];
+                  if (phase) {
+                    navigate(`/project/${phase.projectId}/phase/${phase.id}`);
+                  }
+                }}
               >
                 <LabelList
                   dataKey="duration"
                   position="inside"
                   formatter={(v: ReactNode) => `${v} days`}
-                  className="fill-[var(--background)]"
+                  className="pointer-events-none fill-[var(--background)]"
                   fontSize={12}
                 />
                 <LabelList
                   dataKey="title"
-                  position="top"
-                  offset={6}
-                  className="fill-foreground"
-                  fontSize={13}
+                  content={({ x, y, value }) => (
+                    <text
+                      x={Number(x)}
+                      y={Number(y) - 6}
+                      className="fill-foreground"
+                      fontSize={13}
+                    >
+                      {value}
+                    </text>
+                  )}
                 />
               </Bar>
             </BarChart>
