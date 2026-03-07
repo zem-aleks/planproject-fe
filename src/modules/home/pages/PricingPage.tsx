@@ -8,28 +8,27 @@ export const PricingPage = () => {
     <PageTemplate>
       {(openOnboarding) => (
         <>
-          <div className="">
+          <div>
             {/* Hero */}
             <section className="relative z-40 mx-auto max-w-5xl px-6 pt-56 pb-20 text-center text-gray-50">
               <h1 className="mb-4 text-4xl font-bold">
-                Turn ideas into actionable plans — faster.
+                Pick the plan that fits your ambition
               </h1>
               <p className="mb-6 text-lg text-gray-200">
-                AI-powered project planning for entrepreneurs, creators, and
-                self-improvers.
+                Every plan includes AI-powered project shaping, a full Project
+                Profile, and a structured roadmap. Upgrade for more projects,
+                deeper insights, and priority support.
               </p>
 
-              <div className={'flex flex-col items-center justify-center'}>
+              <div className="flex flex-col items-center justify-center">
                 <Button
                   onClick={openOnboarding}
                   size={'lg'}
-                  className={
-                    'animate-[glow_3s_ease_infinite] px-20 py-6 text-lg font-semibold'
-                  }
+                  className="animate-[glow_3s_ease_infinite] px-20 py-6 text-lg font-semibold"
                 >
                   Start Free
                 </Button>
-                <Badge variant={'warning'} className={'mt-4'}>
+                <Badge variant={'warning'} className="mt-4">
                   *No Credit Card Required
                 </Badge>
               </div>
@@ -38,40 +37,24 @@ export const PricingPage = () => {
             {/* Pricing Cards */}
             <PricingCards />
 
-            {/* Engagement Section */}
+            {/* What's included */}
             <section className="mx-auto max-w-5xl px-6 py-16 text-center">
-              <h2 className="mb-4 text-2xl font-semibold">
-                If your idea were clear, you’d already be building it
+              <h2 className="text-foreground mb-4 text-2xl font-semibold">
+                Every plan comes with an AI brain behind it
               </h2>
-              <p className="mx-auto max-w-2xl text-gray-600">
-                PlanProject.ai brings clarity by turning vague concepts into
-                step-by-step project plans. With Pro and Business plans you will
-                get an access to more insights and projects.
+              <p className="text-muted-foreground mx-auto max-w-2xl">
+                AI shapes your project through a guided conversation, builds a
+                living Project Profile with decisions, assumptions, and open
+                questions, then generates a phased roadmap with daily tasks. Pro
+                and Business plans unlock more projects and deeper analysis.
               </p>
             </section>
 
-            {/* Final CTA */}
-            <section className="bg-primary px-6 py-16 text-center text-white">
-              <h2 className="mb-4 text-2xl font-semibold">
-                Ready to turn your idea into action?
-              </h2>
-              <div className="flex justify-center gap-4">
-                <Button
-                  variant={'secondary'}
-                  size={'lg'}
-                  className={'px-20 py-6 font-semibold'}
-                  onClick={openOnboarding}
-                >
-                  Start Free
-                </Button>
-              </div>
-            </section>
-
             {/* Comparison Table */}
-            <section className="bg-gray-50 px-6 py-16">
+            <section className="bg-muted px-6 py-16">
               <div className="mx-auto max-w-5xl overflow-x-auto">
-                <table className="w-full overflow-hidden rounded-xl border border-gray-200 text-sm">
-                  <thead className="bg-white">
+                <table className="bg-background w-full overflow-hidden rounded-xl border text-sm">
+                  <thead>
                     <tr>
                       <th className="p-4 text-left font-semibold">Feature</th>
                       <th className="p-4 text-center font-semibold">Basic</th>
@@ -84,7 +67,9 @@ export const PricingPage = () => {
                   <tbody className="divide-y">
                     {[
                       ['Active projects', '1', 'Up to 5', 'Unlimited'],
-                      ['Step-by-step actionable plans', '✅', '✅', '✅'],
+                      ['AI shaping & Project Profile', '✅', '✅', '✅'],
+                      ['Phased roadmap with daily tasks', '✅', '✅', '✅'],
+                      ['Context-aware AI chat', '✅', '✅', '✅'],
                       [
                         'Competitors analysis',
                         '1 competitor',
@@ -94,12 +79,6 @@ export const PricingPage = () => {
                       ['Audience analysis', 'Basic', 'Advanced', 'Full'],
                       ['AI refinement & iteration', '❌', '✅', '✅'],
                       ['Priority support', '❌', '❌', '✅'],
-                      // [
-                      //   'Market & monetization insights',
-                      //   '❌',
-                      //   '❌',
-                      //   '✅ (coming soon)',
-                      // ],
                       ['🦊 AI Hero', '❌', '❌', '✅'],
                       [
                         'Progress tracking & reminders',
@@ -117,6 +96,27 @@ export const PricingPage = () => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </section>
+
+            {/* Final CTA */}
+            <section className="bg-primary px-6 py-16 text-center text-white">
+              <h2 className="mb-2 text-2xl font-semibold">
+                Stop planning in your head. Start building for real.
+              </h2>
+              <p className="mx-auto mb-6 max-w-xl text-white/80">
+                Describe your idea, get a Project Profile and a roadmap in
+                minutes — no credit card needed.
+              </p>
+              <div className="flex justify-center gap-4">
+                <Button
+                  variant={'secondary'}
+                  size={'lg'}
+                  className="px-20 py-6 font-semibold"
+                  onClick={openOnboarding}
+                >
+                  Start Free
+                </Button>
               </div>
             </section>
           </div>
