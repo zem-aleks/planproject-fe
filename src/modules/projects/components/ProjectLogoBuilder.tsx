@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 import type { AxiosError } from 'axios';
 import { RefreshCcw } from 'lucide-react';
 
+import { queryClient } from '@/lib/queryClient';
 import { queryKeys } from '@/lib/queryKeys';
-import { ProjectPreviewEntity } from '@/modules/projects/types/entity';
+import { regenerateProjectLogo } from '@/modules/projects/api/regenerateProjectLogo';
+import type { ProjectPreviewEntity } from '@/modules/projects/types/entity';
 import { generateProjectLogo } from '@/modules/shaping/api/generateProjectLogo';
 import { getProjectLogo } from '@/modules/shaping/api/getProjectLogo';
 import { Button } from '@/ui/button';
@@ -25,13 +27,45 @@ export const ProjectLogoBuilder = ({
     return <LogoPoller projectId={project.id} />;
   }
 
+  return <LogoDisplay projectId={project.id} logoUrl={project.logoUrl} />;
+};
+
+const LogoDisplay = ({
+  projectId,
+  logoUrl,
+}: {
+  projectId: string;
+  logoUrl: string;
+}) => {
+  const { status, mutate } = useMutation({
+    mutationFn: (id: string) => regenerateProjectLogo(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.list() });
+    },
+  });
+
+  if (status === 'pending') {
+    return (
+      <Skeleton className="size-16 shrink-0 rounded-md bg-blue-100 md:size-32" />
+    );
+  }
+
   return (
-    <div className={`size-16 shrink-0 rounded-md bg-white md:size-32`}>
+    <div className="group relative size-16 shrink-0 rounded-md bg-white md:size-32">
       <img
-        src={project.logoUrl}
+        src={logoUrl}
         alt="Project Logo"
         className="h-full w-full rounded-md object-contain object-center"
       />
+      <Button
+        variant="secondary"
+        size="icon"
+        className="absolute right-1 bottom-1 hidden size-6 opacity-80 group-hover:flex hover:opacity-100"
+        aria-label="Regenerate logo"
+        onClick={() => mutate(projectId)}
+      >
+        <RefreshCcw className="size-3.5" />
+      </Button>
     </div>
   );
 };
@@ -39,6 +73,9 @@ export const ProjectLogoBuilder = ({
 const LogoGenerator = ({ projectId }: { projectId: string }) => {
   const { status, data, mutate } = useMutation({
     mutationFn: (projectId: string) => generateProjectLogo(projectId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.list() });
+    },
   });
 
   switch (status) {
@@ -90,6 +127,7 @@ const LogoPoller = ({ projectId }: { projectId: string }) => {
   useEffect(() => {
     if (status === 'success' && data?.logoUrl !== 'loading') {
       setPolling(false);
+      queryClient.invalidateQueries({ queryKey: queryKeys.projects.list() });
     }
   }, [status, data]); // eslint-disable-line react-hooks/exhaustive-deps
 

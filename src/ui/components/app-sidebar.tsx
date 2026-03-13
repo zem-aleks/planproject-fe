@@ -114,7 +114,7 @@ export function AppSidebar() {
                 to={`/project/${project.id}`}
                 className="bg-accent/60 ring-border/50 flex items-center gap-3 rounded-lg px-3 py-2.5 ring-1"
               >
-                {project.logoUrl ? (
+                {project.logoUrl && project.logoUrl !== 'loading' ? (
                   <img
                     src={project.logoUrl}
                     alt={project.title}
