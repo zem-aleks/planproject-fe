@@ -41,6 +41,9 @@ const LogoDisplay = ({
     mutationFn: (id: string) => regenerateProjectLogo(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.projects.list() });
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.projects.detail(projectId),
+      });
     },
   });
 
@@ -129,7 +132,7 @@ const LogoPoller = ({ projectId }: { projectId: string }) => {
       setPolling(false);
       queryClient.invalidateQueries({ queryKey: queryKeys.projects.list() });
     }
-  }, [status, data]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [status, data]);
 
   switch (status) {
     case 'pending':
